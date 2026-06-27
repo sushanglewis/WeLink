@@ -15,7 +15,6 @@ def _metadata_path(workspace_root: Path, session_id: str) -> Path:
 
 
 def build_metadata(
-    workspace_root: Path,
     session_id: str,
     design_id: str | None,
     topic: str | None,
@@ -56,7 +55,6 @@ def update_recording_complete(
     metadata = read_metadata(workspace_root, session_id)
     if metadata is None:
         raise FileNotFoundError(f"metadata not found for {session_id}")
-    metadata["ended_at"] = now_iso()
-    metadata["duration_seconds"] = duration_seconds
-    write_metadata(workspace_root, session_id, metadata)
-    return metadata
+    updated = {**metadata, "ended_at": now_iso(), "duration_seconds": duration_seconds}
+    write_metadata(workspace_root, session_id, updated)
+    return updated
