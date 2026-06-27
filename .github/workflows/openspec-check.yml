@@ -1,15 +1,31 @@
-name: OpenSpec Artifact Check
+name: Lincoln Checks
 
 on:
   push:
-    paths:
-      - "openspec/changes/**"
   pull_request:
-    paths:
-      - "openspec/changes/**"
 
 jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml pytest
+
+      - name: Run static checks
+        run: ./scripts/static-check.sh
+
   check-openspec:
+    needs: static-checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -17,8 +33,15 @@ jobs:
 
       - name: Validate OpenSpec artifact structure
         run: |
+          shopt -s nullglob
+          change_dirs=(openspec/changes/*/)
+          if [ ${#change_dirs[@]} -eq 0 ]; then
+            echo "No OpenSpec changes found; skipping artifact structure check."
+            exit 0
+          fi
+
           EXIT=0
-          for change_dir in openspec/changes/*/; do
+          for change_dir in "${change_dirs[@]}"; do
             change_name=$(basename "$change_dir")
             echo "Checking $change_name..."
             for file in proposal.md design.md tasks.md; do
@@ -36,5 +59,4 @@ jobs:
 
       - name: Check tasks link to issues
         run: |
-          # Placeholder: in a real setup, verify each task maps to an issue.
           echo "Task-to-issue linkage check is performed by the local Lincoln Agent."
