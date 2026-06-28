@@ -10,6 +10,10 @@ describe('spawnRecorder', () => {
     child = new EventEmitter()
     child.pid = 12345
     child.kill = vi.fn()
+    child.stdin = Object.assign(new EventEmitter(), {
+      write: vi.fn(),
+      end: vi.fn(),
+    })
     child.stdout = new EventEmitter()
     child.stderr = new EventEmitter()
     spawnMock = vi.fn(() => child)
@@ -43,7 +47,7 @@ describe('spawnRecorder', () => {
         '--branch',
         'main',
       ],
-      expect.objectContaining({ cwd: '/workspace' }),
+      expect.objectContaining({ cwd: '/workspace', stdio: ['pipe', 'pipe', 'pipe'] }),
     )
   })
 
@@ -62,7 +66,7 @@ describe('spawnRecorder', () => {
     expect(readyHandler).toHaveBeenCalled()
   })
 
-  test('stop resolves on clean exit', async () => {
+  test('stop resolves on clean exit after sending newline', async () => {
     const { spawnRecorder: spawnRecorderMocked } = await import('../../src/recording/spawnRecorder')
     const recorder = spawnRecorderMocked({
       workspaceRoot: '/workspace',
@@ -71,6 +75,8 @@ describe('spawnRecorder', () => {
     })
 
     const stopPromise = recorder.stop()
+    expect(child.stdin.write).toHaveBeenCalledWith('\n')
+    expect(child.stdin.end).toHaveBeenCalled()
     child.emit('exit', 0, null)
 
     await expect(stopPromise).resolves.toBeUndefined()
@@ -88,6 +94,8 @@ describe('spawnRecorder', () => {
     recorder.on('exit', exitHandler)
 
     const stopPromise = recorder.stop()
+    expect(child.stdin.write).toHaveBeenCalledWith('\n')
+    expect(child.stdin.end).toHaveBeenCalled()
     child.emit('exit', 1, null)
 
     await expect(stopPromise).resolves.toBeUndefined()
@@ -106,6 +114,7 @@ describe('spawnRecorder', () => {
     recorder.on('exit', exitHandler)
 
     const cancelPromise = recorder.cancel()
+    expect(child.kill).toHaveBeenCalledWith('SIGKILL')
     child.emit('exit', null, 'SIGTERM')
 
     await expect(cancelPromise).resolves.toBeUndefined()

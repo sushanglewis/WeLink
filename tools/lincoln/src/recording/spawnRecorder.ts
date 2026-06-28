@@ -1,5 +1,5 @@
 import { spawn, type ChildProcessByStdio } from 'node:child_process'
-import { type Readable } from 'node:stream'
+import { type Readable, type Writable } from 'node:stream'
 import { EventEmitter } from 'node:events'
 
 export interface SpawnRecorderOptions {
@@ -18,13 +18,13 @@ export interface RecorderProcess {
 }
 
 class RecorderProcessImpl extends EventEmitter implements RecorderProcess {
-  private child: ChildProcessByStdio<null, Readable, Readable>
+  private child: ChildProcessByStdio<Writable, Readable, Readable>
   private stopped = false
   private exitPromise: Promise<void>
   private resolveExit: () => void = () => {}
   private exitSettled = false
 
-  constructor(child: ChildProcessByStdio<null, Readable, Readable>) {
+  constructor(child: ChildProcessByStdio<Writable, Readable, Readable>) {
     super()
     this.child = child
     this.exitPromise = new Promise((resolve) => {
@@ -79,7 +79,12 @@ class RecorderProcessImpl extends EventEmitter implements RecorderProcess {
       return this.exitPromise
     }
 
-    this.child.kill(force ? 'SIGKILL' : 'SIGINT')
+    if (!force && this.child.stdin) {
+      this.child.stdin.write('\n')
+      this.child.stdin.end()
+    } else {
+      this.child.kill(force ? 'SIGKILL' : 'SIGINT')
+    }
 
     const timeout = setTimeout(() => {
       if (!this.child.killed) {
@@ -110,7 +115,7 @@ export function spawnRecorder(options: SpawnRecorderOptions): RecorderProcess {
 
   const child = spawn(recordInterviewPath, args, {
     cwd: workspaceRoot,
-    stdio: ['ignore', 'pipe', 'pipe'],
+    stdio: ['pipe', 'pipe', 'pipe'],
   })
 
   return new RecorderProcessImpl(child)
