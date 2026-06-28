@@ -2,14 +2,14 @@
 
 # 目标仓库：需求拆分后创建的 GitHub Issues 会进入这个仓库
 repository:
-  owner: your-org
-  name: your-product-repo
+  owner: sushanglewis
+  name: product-manager
   default_branch: main
 
 # 工作流设置
 workflow:
   # 是否允许 Agent 自动创建 GitHub Issues
-  auto_create_issues: false
+  auto_create_issues: true
 
   # 每个 issue 自动添加的标签
   default_labels:
