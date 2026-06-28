@@ -45,6 +45,7 @@ export function useRecorder(options: UseRecorderOptions): RecorderController {
   const recorderRef = useRef<RecorderProcess | null>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const durationRef = useRef(0)
+  const terminatingRef = useRef(false)
 
   const clearRecordingInterval = useCallback(() => {
     if (intervalRef.current) {
@@ -58,6 +59,7 @@ export function useRecorder(options: UseRecorderOptions): RecorderController {
       return
     }
 
+    terminatingRef.current = false
     setState({ status: 'recording', duration: 0, amplitude: 0.3, errorMessage: null })
     durationRef.current = 0
 
@@ -81,9 +83,18 @@ export function useRecorder(options: UseRecorderOptions): RecorderController {
         clearRecordingInterval()
       })
 
-      recorder.on('exit', () => {
+      recorder.on('exit', (code, signal) => {
         recorderRef.current = null
         clearRecordingInterval()
+
+        if (terminatingRef.current) {
+          return
+        }
+
+        const reason = code !== null && code !== undefined
+          ? `record-interview exited unexpectedly with code ${code}`
+          : `record-interview exited unexpectedly with signal ${signal}`
+        setState(s => ({ ...s, status: 'error', errorMessage: reason }))
       })
 
       intervalRef.current = setInterval(() => {
@@ -104,6 +115,7 @@ export function useRecorder(options: UseRecorderOptions): RecorderController {
     const recorder = recorderRef.current
     if (!recorder) return
 
+    terminatingRef.current = true
     clearRecordingInterval()
     setState(s => ({ ...s, status: 'stopped' }))
     await recorder.stop()
@@ -113,6 +125,7 @@ export function useRecorder(options: UseRecorderOptions): RecorderController {
     const recorder = recorderRef.current
     if (!recorder) return
 
+    terminatingRef.current = true
     clearRecordingInterval()
     setState(s => ({ ...s, status: 'cancelled' }))
     await recorder.cancel()

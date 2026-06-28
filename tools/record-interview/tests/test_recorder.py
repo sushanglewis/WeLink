@@ -56,6 +56,25 @@ def test_recorder_raises_on_failure(mock_popen, mock_which):
 
 @patch("record_interview.recorder.shutil.which", return_value="/usr/local/bin/ffmpeg")
 @patch("record_interview.recorder.subprocess.Popen")
+def test_recorder_treats_signal_termination_as_success(mock_popen, mock_which):
+    mock_proc = MagicMock()
+    mock_proc.poll.return_value = None
+    mock_proc.wait.return_value = 0
+    mock_proc.returncode = 255
+    mock_proc.stderr.read.return_value = "Exiting normally, received signal 15."
+    mock_popen.return_value = mock_proc
+
+    recorder = FfmpegRecorder(sample_rate=44100)
+    recorder.start(Path("/tmp/test.m4a"))
+    duration = recorder.stop()
+
+    mock_proc.terminate.assert_called_once()
+    mock_proc.wait.assert_called_once()
+    assert isinstance(duration, int)
+
+
+@patch("record_interview.recorder.shutil.which", return_value="/usr/local/bin/ffmpeg")
+@patch("record_interview.recorder.subprocess.Popen")
 def test_start_raises_when_already_recording(mock_popen, mock_which):
     mock_proc = MagicMock()
     mock_proc.poll.return_value = None

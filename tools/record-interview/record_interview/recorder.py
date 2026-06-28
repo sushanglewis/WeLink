@@ -69,6 +69,10 @@ class FfmpegRecorder:
         self._started_at = None
 
         if returncode != 0:
+            # ffmpeg often exits with 255 after receiving SIGTERM, even though
+            # it has already flushed the output. Treat that as a successful stop.
+            if "Exiting normally" in stderr:
+                return duration
             raise RecordingError(f"ffmpeg exited with code {returncode}: {stderr}")
         return duration
 

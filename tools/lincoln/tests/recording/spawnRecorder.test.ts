@@ -75,4 +75,40 @@ describe('spawnRecorder', () => {
 
     await expect(stopPromise).resolves.toBeUndefined()
   })
+
+  test('stop resolves when child exits with non-zero code', async () => {
+    const { spawnRecorder: spawnRecorderMocked } = await import('../../src/recording/spawnRecorder')
+    const recorder = spawnRecorderMocked({
+      workspaceRoot: '/workspace',
+      sessionId: '2026-06-28-test',
+      recordInterviewPath: '/usr/local/bin/record-interview',
+    })
+
+    const exitHandler = vi.fn()
+    recorder.on('exit', exitHandler)
+
+    const stopPromise = recorder.stop()
+    child.emit('exit', 1, null)
+
+    await expect(stopPromise).resolves.toBeUndefined()
+    expect(exitHandler).toHaveBeenCalledWith(1, null)
+  })
+
+  test('cancel resolves when child exits after signal', async () => {
+    const { spawnRecorder: spawnRecorderMocked } = await import('../../src/recording/spawnRecorder')
+    const recorder = spawnRecorderMocked({
+      workspaceRoot: '/workspace',
+      sessionId: '2026-06-28-test',
+      recordInterviewPath: '/usr/local/bin/record-interview',
+    })
+
+    const exitHandler = vi.fn()
+    recorder.on('exit', exitHandler)
+
+    const cancelPromise = recorder.cancel()
+    child.emit('exit', null, 'SIGTERM')
+
+    await expect(cancelPromise).resolves.toBeUndefined()
+    expect(exitHandler).toHaveBeenCalledWith(null, 'SIGTERM')
+  })
 })

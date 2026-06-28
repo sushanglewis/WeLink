@@ -22,30 +22,23 @@ class RecorderProcessImpl extends EventEmitter implements RecorderProcess {
   private stopped = false
   private exitPromise: Promise<void>
   private resolveExit: () => void = () => {}
-  private rejectExit: (reason: Error) => void = () => {}
+  private exitSettled = false
 
   constructor(child: ChildProcessByStdio<null, Readable, Readable>) {
     super()
     this.child = child
-    this.exitPromise = new Promise((resolve, reject) => {
+    this.exitPromise = new Promise((resolve) => {
       this.resolveExit = resolve
-      this.rejectExit = reject
     })
 
-    this.child.on('error', error => {
-      if (!this.stopped) {
-        this.emit('error', error)
-        this.rejectExit(error)
-      }
+    this.child.on('error', (error) => {
+      this.emit('error', error)
+      this.settleExit()
     })
 
     this.child.on('exit', (code, signal) => {
       this.emit('exit', code, signal)
-      if (code !== 0 && code !== null && !this.stopped) {
-        this.rejectExit(new Error(`record-interview exited with code ${code}`))
-      } else {
-        this.resolveExit()
-      }
+      this.settleExit()
     })
 
     this.child.stdout.on('data', (data: Buffer) => {
@@ -59,6 +52,13 @@ class RecorderProcessImpl extends EventEmitter implements RecorderProcess {
       // Forward stderr for debugging; could be parsed for levels in future
       process.stderr.write(data)
     })
+  }
+
+  private settleExit(): void {
+    if (!this.exitSettled) {
+      this.exitSettled = true
+      this.resolveExit()
+    }
   }
 
   stop(): Promise<void> {
