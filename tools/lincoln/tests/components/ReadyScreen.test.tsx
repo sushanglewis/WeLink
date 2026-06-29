@@ -37,17 +37,32 @@ describe('ReadyScreen', () => {
     expect(lastFrame()).not.toContain('Branch:')
   })
 
-  test('shows start and exit hints', () => {
-    const { lastFrame } = render(
+  test('highlights the selected option', () => {
+    const { lastFrame: selectedLastFrame } = render(
       <ReadyScreen
         sessionId="2026-06-28-test"
         topic=""
         designId=""
         branch=""
+        selectedIndex={0}
       />,
     )
 
-    expect(lastFrame()).toContain('[ Enter ] 开始录音')
-    expect(lastFrame()).toContain('[ Q ] 退出')
+    expect(selectedLastFrame()).toContain('▸')
+    expect(selectedLastFrame()).toContain('开始录音')
+    expect(selectedLastFrame()).toContain('退出')
+
+    const { lastFrame: exitLastFrame } = render(
+      <ReadyScreen
+        sessionId="2026-06-28-test"
+        topic=""
+        designId=""
+        branch=""
+        selectedIndex={1}
+      />,
+    )
+
+    expect(exitLastFrame()).toContain('▸')
+    expect(exitLastFrame()).toContain('退出')
   })
 })
