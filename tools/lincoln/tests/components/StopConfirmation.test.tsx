@@ -8,19 +8,25 @@ async function tick() {
 }
 
 describe('StopConfirmation', () => {
-  test('renders prompt and options', () => {
-    const { lastFrame } = render(<StopConfirmation sessionId="2026-06-28-test" onConfirm={vi.fn()} onCancel={vi.fn()} />,
+  test('renders command and workspace', () => {
+    const { lastFrame } = render(
+      <StopConfirmation
+        sessionId="2026-06-28-test"
+        workspaceRoot="/workspace"
+        onConfirm={vi.fn()}
+      />,
     )
 
-    expect(lastFrame()).toContain('process-interview')
-    expect(lastFrame()).toContain('Yes')
-    expect(lastFrame()).toContain('No')
+    expect(lastFrame()).toContain('Stopped')
+    expect(lastFrame()).toContain('Session 2026-06-28-test saved.')
+    expect(lastFrame()).toContain('Workspace: /workspace')
+    expect(lastFrame()).toContain('claude process-interview 2026-06-28-test')
   })
 
-  test('calls onConfirm when y is pressed', async () => {
+  test('calls onConfirm when any key is pressed', async () => {
     const onConfirm = vi.fn()
-    const onCancel = vi.fn()
-    const { stdin } = render(<StopConfirmation sessionId="2026-06-28-test" onConfirm={onConfirm} onCancel={onCancel} />,
+    const { stdin } = render(
+      <StopConfirmation sessionId="2026-06-28-test" onConfirm={onConfirm} />,
     )
 
     await tick()
@@ -28,20 +34,5 @@ describe('StopConfirmation', () => {
     await tick()
 
     expect(onConfirm).toHaveBeenCalledTimes(1)
-    expect(onCancel).not.toHaveBeenCalled()
-  })
-
-  test('calls onCancel when n is pressed', async () => {
-    const onConfirm = vi.fn()
-    const onCancel = vi.fn()
-    const { stdin } = render(<StopConfirmation sessionId="2026-06-28-test" onConfirm={onConfirm} onCancel={onCancel} />,
-    )
-
-    await tick()
-    stdin.write('n')
-    await tick()
-
-    expect(onCancel).toHaveBeenCalledTimes(1)
-    expect(onConfirm).not.toHaveBeenCalled()
   })
 })

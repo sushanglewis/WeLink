@@ -1,31 +1,32 @@
-import { Box, Text } from 'ink'
-import { useInput } from 'ink'
+import { Box, Text, useInput } from 'ink'
 import React from 'react'
 
 export interface StopConfirmationProps {
   sessionId: string
+  workspaceRoot?: string
   onConfirm: () => void
-  onCancel: () => void
+  onCancel?: () => void
 }
 
-export function StopConfirmation({ sessionId, onConfirm, onCancel }: StopConfirmationProps) {
-  useInput(input => {
-    if (input === 'y') {
-      onConfirm()
-    } else if (input === 'n') {
-      onCancel()
-    }
+export function StopConfirmation({ sessionId, workspaceRoot, onConfirm, onCancel }: StopConfirmationProps) {
+  const command = `claude process-interview ${sessionId}`
+
+  useInput(() => {
+    onConfirm()
   })
 
   return (
     <Box flexDirection="column" padding={1}>
       <Text bold>Stopped</Text>
       <Text>Session {sessionId} saved.</Text>
-      <Text>Run process-interview to generate knowledge artifacts?</Text>
-      <Text>
-        <Text color="green">[y]</Text> Yes{' '}
-        <Text color="red">[n]</Text> No
-      </Text>
+      {workspaceRoot ? <Text color="gray">Workspace: {workspaceRoot}</Text> : null}
+      <Box paddingY={1} flexDirection="column">
+        <Text>Run this command in your terminal to generate knowledge artifacts:</Text>
+        <Text color="cyan">{command}</Text>
+      </Box>
+      {onCancel
+        ? <Text color="gray">[any key] Copy command and exit · [n] Exit without copying</Text>
+        : <Text color="gray">[any key] Exit</Text>}
     </Box>
   )
 }

@@ -6,9 +6,15 @@ export interface ReadyScreenProps {
   topic: string
   designId: string
   branch: string
+  selectedIndex?: number
 }
 
-export function ReadyScreen({ sessionId, topic, designId, branch }: ReadyScreenProps) {
+const OPTIONS = [
+  { label: '开始录音', hint: 'Enter' },
+  { label: '退出', hint: 'q / Esc' },
+]
+
+export function ReadyScreen({ sessionId, topic, designId, branch, selectedIndex = 0 }: ReadyScreenProps) {
   return (
     <Box flexDirection="column" borderStyle="round" borderColor="gray" padding={1}>
       <Box flexDirection="row" justifyContent="space-between" alignItems="center">
@@ -27,9 +33,21 @@ export function ReadyScreen({ sessionId, topic, designId, branch }: ReadyScreenP
         {branch ? <Text color="gray">Branch: {branch}</Text> : null}
       </Box>
 
-      <Box flexDirection="column" alignItems="center" paddingY={1} gap={1}>
-        <Text bold color="green">[ Enter ] 开始录音</Text>
-        <Text color="gray" dimColor>[ Q ] 退出</Text>
+      <Box flexDirection="column" paddingY={1} gap={1}>
+        {OPTIONS.map((option, index) => {
+          const isSelected = index === selectedIndex
+          return (
+            <Box key={option.label} flexDirection="row" gap={1}>
+              <Text color={isSelected ? 'green' : 'gray'}>{isSelected ? '▸' : ' '}</Text>
+              <Text bold={isSelected} color={isSelected ? 'green' : 'gray'} dimColor={!isSelected}>
+                {option.label}
+              </Text>
+              <Text color="gray" dimColor>
+                [{option.hint}]
+              </Text>
+            </Box>
+          )
+        })}
       </Box>
     </Box>
   )

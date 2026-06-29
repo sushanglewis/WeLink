@@ -1,4 +1,4 @@
-import { Box, Text } from 'ink'
+import { Box, Text, useApp } from 'ink'
 import React, { useState } from 'react'
 
 import { CancelledScreen } from './CancelledScreen'
@@ -7,7 +7,6 @@ import { ReadyScreen } from './ReadyScreen'
 import { StopConfirmation } from './StopConfirmation'
 import { useKeyHandler } from '../hooks/useKeyHandler'
 import { useRecorder } from '../recording/useRecorder'
-import { triggerProcessInterview, type TriggerResult } from '../workflow/triggerProcessInterview'
 
 export interface RecordingAppProps {
   workspaceRoot: string
@@ -21,12 +20,7 @@ export interface RecordingAppProps {
 
 type AppPhase = 'ready' | 'recording' | 'cancelled'
 
-type WorkflowStatus = 'idle' | 'processing' | 'success' | 'error' | 'skipped'
-
-interface WorkflowState {
-  status: WorkflowStatus
-  message: string
-}
+const MENU_OPTION_COUNT = 2
 
 export function RecordingApp({
   workspaceRoot,
@@ -37,8 +31,9 @@ export function RecordingApp({
   audioMeterStyle = 'bar',
   recordInterviewPath,
 }: RecordingAppProps) {
+  const { exit } = useApp()
   const [phase, setPhase] = useState<AppPhase>('ready')
-  const [workflow, setWorkflow] = useState<WorkflowState>({ status: 'idle', message: '' })
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const { state, start, stop, cancel } = useRecorder({
     workspaceRoot,
     sessionId,
@@ -49,11 +44,20 @@ export function RecordingApp({
     startOnMount: false,
   })
 
+  const handleExit = () => {
+    exit()
+  }
+
   useKeyHandler({
     onStop: () => {
       if (phase === 'ready') {
-        setPhase('recording')
-        start()
+        if (selectedIndex === 0) {
+          setPhase('recording')
+          start()
+        } else {
+          setPhase('cancelled')
+          handleExit()
+        }
       } else if (state.status === 'recording') {
         stop()
       }
@@ -64,6 +68,17 @@ export function RecordingApp({
       } else if (state.status === 'recording') {
         cancel()
       }
+      handleExit()
+    },
+    onUp: () => {
+      if (phase === 'ready') {
+        setSelectedIndex(index => (index - 1 + MENU_OPTION_COUNT) % MENU_OPTION_COUNT)
+      }
+    },
+    onDown: () => {
+      if (phase === 'ready') {
+        setSelectedIndex(index => (index + 1) % MENU_OPTION_COUNT)
+      }
     },
   })
 
@@ -72,30 +87,12 @@ export function RecordingApp({
   }
 
   if (state.status === 'stopped') {
-    if (workflow.status === 'idle') {
-      return (
-        <StopConfirmation
-          sessionId={sessionId}
-          onConfirm={async () => {
-            setWorkflow({ status: 'processing', message: 'Running process-interview...' })
-            try {
-              const result: TriggerResult = await triggerProcessInterview(workspaceRoot, sessionId)
-              setWorkflow({ status: result.success ? 'success' : 'error', message: result.message })
-            } catch (error) {
-              const message = error instanceof Error ? error.message : String(error)
-              setWorkflow({ status: 'error', message })
-            }
-          }}
-          onCancel={() => setWorkflow({ status: 'skipped', message: 'process-interview skipped' })}
-        />
-      )
-    }
-
     return (
-      <Box flexDirection="column" padding={1}>
-        <Text bold>{workflow.status === 'processing' ? 'Processing' : workflow.status === 'success' ? 'Done' : workflow.status === 'error' ? 'Error' : 'Skipped'}</Text>
-        <Text>{workflow.message}</Text>
-      </Box>
+      <StopConfirmation
+        sessionId={sessionId}
+        workspaceRoot={workspaceRoot}
+        onConfirm={handleExit}
+      />
     )
   }
 
@@ -115,6 +112,7 @@ export function RecordingApp({
         topic={topic}
         designId={designId}
         branch={branch}
+        selectedIndex={selectedIndex}
       />
     )
   }
