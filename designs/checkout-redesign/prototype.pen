@@ -1,0 +1,317 @@
+{
+  "version": "2.14",
+  "children": [
+    {
+      "type": "frame",
+      "id": "zEKxh",
+      "x": 0,
+      "y": 0,
+      "name": "Lincoln Recorder Terminal",
+      "width": 600,
+      "height": 400,
+      "fill": "#0D0D0D",
+      "cornerRadius": 8,
+      "stroke": "#2A2A2A",
+      "strokeWidth": 1,
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "sqAfV",
+          "name": "Title Bar",
+          "width": "fill_container",
+          "height": 44,
+          "fill": "#161616",
+          "padding": [
+            0,
+            16
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "gb7UG",
+              "layoutPosition": "absolute",
+              "x": 16,
+              "y": 16,
+              "name": "Window Controls",
+              "width": 52,
+              "height": 12,
+              "gap": 8,
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "BZ1Qh",
+                  "name": "Close",
+                  "fill": "#FF5F57",
+                  "width": 12,
+                  "height": 12
+                },
+                {
+                  "type": "ellipse",
+                  "id": "l7xsy",
+                  "name": "Minimize",
+                  "fill": "#FEBC2E",
+                  "width": 12,
+                  "height": 12
+                },
+                {
+                  "type": "ellipse",
+                  "id": "CnGhF",
+                  "name": "Maximize",
+                  "fill": "#28C840",
+                  "width": 12,
+                  "height": 12
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "CssSr",
+              "name": "Title",
+              "fill": "#E6E6E6",
+              "content": "Lincoln Recorder",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 13,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "W6pNhn",
+          "name": "Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            32,
+            40
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "I9ruo",
+              "name": "Session Info",
+              "fill": "#6E6E6E",
+              "content": "会话: interview-2026-06-28 · 设备: MacBook Pro 麦克风",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "Q6QxnE",
+              "name": "Recording Row",
+              "width": "fill_container",
+              "gap": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "m3U9Tj",
+                  "name": "Recording Dot",
+                  "fill": "#FF3B30",
+                  "width": 16,
+                  "height": 16
+                },
+                {
+                  "type": "text",
+                  "id": "Od7lz",
+                  "name": "Recording Label",
+                  "fill": "#FF3B30",
+                  "content": "正在录音",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 15,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "oaXCh",
+              "name": "Timer",
+              "fill": "#FFFFFF",
+              "content": "00:01:23",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 56,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "w8LJi",
+              "name": "Level Bar",
+              "width": "fill_container",
+              "height": 28,
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "sdO3C",
+                  "name": "Level 1",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 7
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "Apoco",
+                  "name": "Level 2",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 11.200000000000001
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "XBr9z",
+                  "name": "Level 3",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 16.8
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "G5qh8b",
+                  "name": "Level 4",
+                  "fill": "#FF453A",
+                  "width": 8,
+                  "height": 23.8
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "ZU0w4",
+                  "name": "Level 5",
+                  "fill": "#FF453A",
+                  "width": 8,
+                  "height": 28
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "noWlu",
+                  "name": "Level 6",
+                  "fill": "#FF453A",
+                  "width": 8,
+                  "height": 25.2
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "rjOli",
+                  "name": "Level 7",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 19.599999999999998
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "VlBFM",
+                  "name": "Level 8",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 14
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "p9oJM",
+                  "name": "Level 9",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 9.799999999999999
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "obfHC",
+                  "name": "Level 10",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 5.6000000000000005
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "brkbB",
+                  "name": "Level 11",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 8.4
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "zsLVb",
+                  "name": "Level 12",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 15.400000000000002
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "aar6M",
+                  "name": "Level 13",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 22.400000000000002
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "QSICE",
+                  "name": "Level 14",
+                  "fill": "#FF453A",
+                  "width": 8,
+                  "height": 26.599999999999998
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "nmkRs",
+                  "name": "Level 15",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 21
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "hX6S2",
+                  "name": "Level 16",
+                  "fill": "#34C759",
+                  "width": 8,
+                  "height": 12.6
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "TaFTW",
+              "name": "Hint",
+              "fill": "#8E8E93",
+              "content": "按 Enter 停止 · 按 q 取消",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fileToken": "7db6761c-c410-452c-906c-208bdf3a5768"
+}

@@ -1,0 +1,23 @@
+# Linked GitHub Issues for Lincoln OpenSpec change
+# Session: 2026-06-28-stakeholder-checkout
+# Change: lincoln-tui-recorder
+
+issues:
+  - issue_number: 3
+    title: "lincoln-cli: CLI entry, args parsing, and ~/.lincolnrc config loading"
+    capability: lincoln-cli
+    source: openspec/changes/lincoln-tui-recorder/specs/lincoln-cli.md
+  - issue_number: 4
+    title: "lincoln-tui: Recording screen, audio meter, and key handlers"
+    capability: lincoln-tui
+    source: openspec/changes/lincoln-tui-recorder/design.md
+  - issue_number: 5
+    title: "lincoln-recording-backend: Spawn record-interview and save artifacts"
+    capability: lincoln-recording-backend
+    source: openspec/changes/lincoln-tui-recorder/tasks.md
+  - issue_number: 6
+    title: "lincoln-workflow-integration: Trigger process-interview after recording"
+    capability: lincoln-workflow-integration
+    source: openspec/changes/lincoln-tui-recorder/tasks.md
+
+requirements_file: requirements/2026-06-28-stakeholder-checkout/requirements.md
