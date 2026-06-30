@@ -3,7 +3,7 @@
 # 目标仓库：需求拆分后创建的 GitHub Issues 会进入这个仓库
 repository:
   owner: sushanglewis
-  name: product-manager
+  name: WeLink
   default_branch: main
 
 # 工作流设置
