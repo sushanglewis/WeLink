@@ -10,6 +10,7 @@ interviews/*
 
 # Context state files
 .context/
+.omc/
 
 # Visual companion session artifacts
 .superpowers/

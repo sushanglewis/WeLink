@@ -1,55 +1,59 @@
 schema_version: 1.0.0
 workflow:
-  name: interview-to-knowledge
+  name: oss-first-design
   version: 1.0.0
 current_run:
-  run_id: test-001
-  branch: feat-ready-screen
-  started_at: '2026-06-27T00:00:00Z'
-  last_updated_at: '2026-06-29T07:15:00Z'
-  current_stage: null
-  previous_stage: implement
-  status: completed
+  run_id: supervision-collab-vA
+  branch: init-welink-project-from-template
+  started_at: '2026-06-30T14:58:00Z'
+  last_updated_at: '2026-07-01T02:44:32Z'
+  current_stage: product-prototype
+  previous_stage: product-design-docs
+  status: in_progress
+  context_assessment: 'Requirements provided as a detailed vA technical document (Baserow + Mattermost supervision collaboration).
+    OSS research for Mattermost and Baserow already completed. Route to oss-first-design; skip interview ingestion/clarify
+    and mark explore-opensource completed. Next: product-design-docs with human gate.
+
+    '
+  variables:
+    change_name: collaborative-spreadsheet
+    design_id: supervision-collab-va
+    session_id: supervision-collab-va
+variables:
+  change_name: collaborative-spreadsheet
+  design_id: supervision-collab-va
+  session_id: supervision-collab-va
+recovery:
+  last_known_stage: product-design-docs
+  resume_point: product-design-docs
 stages:
-  ingest:
+  workflow-router:
     status: completed
-    started_at: null
-    completed_at: null
-    entry_checks_passed: null
-    entry_checks_run_at: null
-    exit_checks_passed: null
-    exit_checks_run_at: null
-    human_gate_passed: null
-    human_gate_passed_at: null
-    artifacts_produced: []
-    error_message: null
-    retry_count: 0
+    artifacts_produced:
+    - .claude/workflow-state.yaml
   clarify:
-    status: validation_failed
-    started_at: null
-    completed_at: null
-    entry_checks_passed: null
-    entry_checks_run_at: null
-    exit_checks_passed: null
-    exit_checks_run_at: null
-    human_gate_passed: null
-    human_gate_passed_at: null
-    artifacts_produced: []
-    error_message: null
-    retry_count: 1
+    status: completed
+    artifacts_produced:
+    - requirements/supervision-collab-va/requirements.md
+  explore-opensource:
+    status: completed
+    artifacts_produced:
+    - docs/research/collaborative-spreadsheet-oss-options.md
+    - .context/oss-research/mattermost/
+    - .context/oss-research/baserow/
   product-design-docs:
-    status: not_started
-    started_at: null
-    completed_at: null
+    status: completed
+    started_at: '2026-06-30T14:58:00Z'
     entry_checks_passed: null
     entry_checks_run_at: null
-    exit_checks_passed: null
-    exit_checks_run_at: null
+    exit_checks_passed: true
+    exit_checks_run_at: '2026-07-01T02:44:32Z'
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
     error_message: null
-    retry_count: 0
+    retry_count: 6
+    completed_at: '2026-07-01T02:44:32Z'
   product-prototype:
     status: not_started
     started_at: null
@@ -65,84 +69,11 @@ stages:
     retry_count: 0
   tdd-development-plan:
     status: not_started
-    started_at: null
-    completed_at: null
-    entry_checks_passed: null
-    entry_checks_run_at: null
-    exit_checks_passed: null
-    exit_checks_run_at: null
-    human_gate_passed: null
-    human_gate_passed_at: null
-    artifacts_produced: []
-    error_message: null
-    retry_count: 0
   propose:
     status: not_started
-    started_at: null
-    completed_at: null
-    entry_checks_passed: null
-    entry_checks_run_at: null
-    exit_checks_passed: null
-    exit_checks_run_at: null
-    human_gate_passed: null
-    human_gate_passed_at: null
-    artifacts_produced: []
-    error_message: null
-    retry_count: 0
   split:
     status: not_started
-    started_at: null
-    completed_at: null
-    entry_checks_passed: null
-    entry_checks_run_at: null
-    exit_checks_passed: null
-    exit_checks_run_at: null
-    human_gate_passed: null
-    human_gate_passed_at: null
-    artifacts_produced: []
-    error_message: null
-    retry_count: 0
   implement:
     status: not_started
-    started_at: '2026-06-28T05:08:07Z'
-    completed_at: null
-    entry_checks_passed: null
-    entry_checks_run_at: null
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-28T05:08:07Z'
-    human_gate_passed: null
-    human_gate_passed_at: null
-    artifacts_produced: []
-    error_message: null
-    retry_count: 0
   sync-knowledge:
-    status: completed
-    started_at: '2026-06-29T07:10:00Z'
-    completed_at: '2026-06-29T07:15:00Z'
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-06-29T07:10:00Z'
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-29T07:15:00Z'
-    human_gate_passed: null
-    human_gate_passed_at: null
-    artifacts_produced:
-      - docs/knowledge/03-features/lincoln-recording.md
-      - docs/knowledge/01-interviews/2026-06-28-stakeholder-checkout.md
-      - docs/knowledge/02-requirements/REQ-001.md
-      - docs/knowledge/04-decisions/DEC-001.md
-      - docs/knowledge/00-index.md
-      - .github/lincoln-sync-queue/pr-9.yaml
-    error_message: null
-    retry_count: 0
-variables:
-  session_id: 2026-06-27-test
-  design_id: null
-  change_name: null
-  issue_number: null
-  pr_number: null
-  feature_slug: null
-recovery:
-  last_validated_checkpoint: ingest
-  can_resume_from: clarify
-  abort_reason: null
-  abort_at: null
+    status: not_started
