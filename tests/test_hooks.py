@@ -21,6 +21,15 @@ def _write_state(tmp_path, state):
     return path
 
 
+def _write_process_state(tmp_path, state):
+    """Place the state file inside a process package, e.g. <slug>/workflow-stage.yaml."""
+    slug = state.get("current_run", {}).get("variables", {}).get("process_slug", "lincoln-test")
+    path = tmp_path / slug / "workflow-stage.yaml"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(yaml.dump(state, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    return path
+
+
 @pytest.fixture
 def paused_state(tmp_path):
     state = {
@@ -93,6 +102,38 @@ def entry_not_passed_state(tmp_path):
     return _write_state(tmp_path, state)
 
 
+@pytest.fixture
+def process_package_state(tmp_path):
+    """A node-based state file living inside a process package."""
+    state = {
+        "schema_version": "2.0.0",
+        "workflow": {"name": "interview-to-knowledge", "version": "1.0.0"},
+        "current_run": {
+            "run_id": "test",
+            "branch": "lincoln/test",
+            "started_at": "2026-06-27T00:00:00Z",
+            "last_updated_at": "2026-06-27T00:00:00Z",
+            "current_stage": "clarify",
+            "previous_stage": "ingest",
+            "status": "in_progress",
+            "variables": {"process_slug": "lincoln-test", "session_id": "", "design_id": ""},
+        },
+        "nodes": [
+            {
+                "stage_id": "clarify",
+                "node_id": "clarify-1",
+                "status": "in_progress",
+                "gate_passed": False,
+                "approved_by": None,
+                "artifacts": [],
+                "handoff_file": None,
+            }
+        ],
+        "recovery": {},
+    }
+    return _write_process_state(tmp_path, state)
+
+
 def run_hook(hook_name, state_file, *extra_args):
     hook = HOOKS_DIR / hook_name
     env = os.environ.copy()
@@ -163,6 +204,89 @@ def test_pre_tool_use_blocks_write_when_paused(paused_state):
     )
     assert result.returncode == 1
     assert "BLOCKED" in result.stderr
+
+
+def test_pre_tool_use_blocks_root_process_artifact_write(dialogue_in_progress_state):
+    result = run_hook(
+        "pre-tool-use.sh",
+        dialogue_in_progress_state,
+        "Write",
+        '{"file_path": "requirements/test/requirements.md"}',
+    )
+    assert result.returncode == 1
+    assert "process artifacts must be written under" in result.stderr
+
+
+def test_pre_tool_use_blocks_state_file_write(process_package_state):
+    result = run_hook(
+        "pre-tool-use.sh",
+        process_package_state,
+        "Write",
+        '{"file_path": "lincoln-test/workflow-stage.yaml"}',
+    )
+    assert result.returncode == 1
+    assert "workflow state must be updated through stage_loader" in result.stderr
+
+
+def test_pre_tool_use_allows_process_package_artifact(process_package_state):
+    result = run_hook(
+        "pre-tool-use.sh",
+        process_package_state,
+        "Write",
+        '{"file_path": "lincoln-test/requirements/test/requirements.md"}',
+    )
+    assert result.returncode == 0
+
+
+def test_pre_tool_use_blocks_wrong_process_package_artifact(process_package_state):
+    result = run_hook(
+        "pre-tool-use.sh",
+        process_package_state,
+        "Write",
+        '{"file_path": "other-slug/requirements/test/requirements.md"}',
+    )
+    assert result.returncode == 1
+    assert "process artifacts must be written under" in result.stderr
+
+
+def test_pre_tool_use_derives_status_from_current_stage_node(process_package_state):
+    # Make the current stage not_started even though a previous node is completed.
+    state = yaml.safe_load(process_package_state.read_text(encoding="utf-8"))
+    state["current_run"]["current_stage"] = "clarify"
+    state["current_run"]["status"] = "not_started"
+    state["nodes"] = [
+        {
+            "stage_id": "ingest",
+            "node_id": "ingest-1",
+            "status": "completed",
+            "gate_passed": False,
+            "approved_by": None,
+            "artifacts": [],
+            "handoff_file": None,
+        }
+    ]
+    process_package_state.write_text(
+        yaml.dump(state, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+    result = run_hook(
+        "pre-tool-use.sh",
+        process_package_state,
+        "Write",
+        '{"file_path": "lincoln-test/requirements/test/requirements.md"}',
+    )
+    assert result.returncode == 1
+    assert "Entry checks" in result.stderr
+
+
+def test_pre_tool_use_blocks_plain_pen_access(dialogue_in_progress_state):
+    result = run_hook(
+        "pre-tool-use.sh",
+        dialogue_in_progress_state,
+        "Read",
+        '{"file_path": "lincoln-test/designs/test/prototype.pen"}',
+    )
+    assert result.returncode == 1
+    assert ".pen files must be handled through Pencil tools" in result.stderr
 
 
 def test_on_stop_updates_last_updated_at(entry_not_passed_state):
@@ -338,6 +462,16 @@ def test_guard_allows_task_tools_when_dialogue_override_empty(dialogue_in_progre
         dialogue_stages="",
     )
     assert result.returncode == 0
+
+
+def test_guard_resolves_per_process_state(process_package_state):
+    result = run_guard(
+        process_package_state,
+        "TaskCreate",
+        '{"subject": "x"}',
+        dialogue_stages="",
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_guard_blocks_when_dialogue_override_contains_stage(dialogue_in_progress_state):
