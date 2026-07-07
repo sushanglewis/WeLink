@@ -18,10 +18,19 @@ def test_explore_opensource_skill_exists():
     assert prompt.exists()
 
 
-def test_new_stages_registered_in_skill_yaml():
+def test_new_stages_registered_in_skill_routing():
     root = Path(__file__).resolve().parents[1]
-    data = yaml.safe_load((root / ".claude" / "skills" / "interview-workflow" / "skill.yaml").read_text(encoding="utf-8"))
-    lincoln = data.get("skill_ecosystem", {}).get("lincoln", [])
-    assert "lincoln-build-codebase-knowledge" in lincoln
-    assert "lincoln-explore-opensource" in lincoln
-    assert "lincoln-workflow-router" in lincoln
+    manifest = yaml.safe_load(
+        (root / ".claude" / "stages" / "stage-manifest.yaml").read_text(encoding="utf-8")
+    )
+    required_skills = set()
+    for stage in manifest.get("stages", []):
+        skill = stage.get("required_skills")
+        if skill:
+            if isinstance(skill, str):
+                required_skills.add(skill)
+            else:
+                required_skills.update(skill)
+    assert "workflow-router" in required_skills
+    assert "build-codebase-knowledge" in required_skills
+    assert "explore-opensource" in required_skills

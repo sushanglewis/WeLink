@@ -11,7 +11,7 @@
 ## 快速开始
 
 1. **确认入口条件**：运行入口校验 `openspec_tasks_ready`
-2. **读取完整提示**：参考 `.claude/skills/interview-workflow/prompts/split-to-github.md` 获取详细步骤
+2. **读取完整提示**：参考 `.claude/skills/split-to-github/prompts/main.md` 获取详细步骤
 3. **执行拆分**：为每个 OpenSpec 任务创建一个 GitHub Issue；若任务 ≥3 个且相互独立，可调用 `superpowers:dispatching-parallel-agents` 并行创建
 4. **记录映射**：写入 `.github/linked-issues.yaml`
 5. **更新需求文档**：在 `requirements/<session_id>/requirements.md` 中记录 Issue 编号

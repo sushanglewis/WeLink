@@ -12,7 +12,7 @@ Inspects the current project context and chooses a workflow template from `.clau
 
 ## When to Use
 
-- At session start when `workflow-state.yaml` has no `current_run.workflow_template`.
+- At session start when `.claude/workflow-state.yaml` has no `workflow.template`.
 - When the human PM says "重新评估工作流" or asks to switch templates.
 
 ## Inputs
@@ -23,8 +23,8 @@ Inspects the current project context and chooses a workflow template from `.clau
 
 ## Outputs
 
-- Recommended `workflow_template` name
-- Recommended `current_stage`
+- Recommended `workflow.template` name
+- Recommended `current_run.current_stage`
 - Confidence score and 1-3 confirmation questions if needed
 
 ## Rules

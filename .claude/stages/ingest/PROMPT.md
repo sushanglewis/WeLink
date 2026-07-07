@@ -16,7 +16,7 @@
 
 ## 执行指令
 
-1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/process-interview.md`
+1. **读取完整提示文件**: `.claude/skills/process-interview/prompts/main.md`
    - 该文件包含详细的转写步骤、产物格式和规则
    - 按照提示文件中的步骤 1-9 执行
 

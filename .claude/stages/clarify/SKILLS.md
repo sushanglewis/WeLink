@@ -1,18 +1,25 @@
 # Clarify 阶段技能与工具
 
+## 技能路由
+
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
+- **required**: `superpowers:brainstorming`
+- **optional**: `gsd:import`, `gsd:discuss-phase`, `oh-my-claudecode:deep-interview`, `openspec:explore`
+- **human_gate**: 是
+
 ## 主技能命令
 
 - **命令**: `clarify-requirements`
-- **来源**: `.claude/skills/interview-workflow/skill.yaml`
+- **来源**: `.claude/skills/`
 - **参数**:
   - `session_id` (必填): 访谈会话 ID，如 `2026-06-27-stakeholder`
-- **提示文件**: `.claude/skills/interview-workflow/prompts/clarify-requirements.md`
+- **提示文件**: `.claude/skills/clarify-requirements/prompts/main.md`
 
 ## 辅助子技能
 
 - `superpowers:brainstorming` — 在起草需求前探索 2-3 种需求/方案视角，并列出 trade-offs。  
   **限制**：仅在人类 PM 批准某一方向后才能继续写 `requirements.md`。
-- `gsd-import` — 当存在外部需求文档或计划时，先调用以检测与项目已有决策的冲突。  
+- `gsd:import` — 当存在外部需求文档或计划时，先调用以检测与项目已有决策的冲突。  
   用法：`Skill("gsd-import", args="--from <path>")`。
 
 ## human_gate 子技能规则
@@ -29,18 +36,18 @@ PM 必须输入 `confirm` 或在 `requirements.md` 中写入 `<!-- status: appro
 
 ## 校验器使用
 
-- **校验器路径**: `.claude/skills/interview-workflow/validators/validate.py`
+- **校验器路径**: `scripts/validate_stage.py`
 - **使用方式**:
   ```bash
   # 准入校验
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase entry --check summary_ready --args {session_id}
   
   # 退出校验
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check requirements_has_background_problem_solution_acceptance --args {session_id}
   
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check human_approved --args {session_id}
   ```
 

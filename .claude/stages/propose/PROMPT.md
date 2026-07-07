@@ -16,7 +16,7 @@
 
 ## 执行指令
 
-1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/propose-with-openspec.md`
+1. **读取完整提示文件**: `.claude/skills/propose-with-openspec/prompts/main.md`
    - 该文件包含详细的 OpenSpec CLI 调用步骤和 artifact 验证规则
    - 按照提示文件中的步骤 1-9 执行
 

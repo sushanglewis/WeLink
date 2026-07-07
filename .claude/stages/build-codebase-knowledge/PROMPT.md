@@ -8,7 +8,7 @@
 
 ## 执行步骤
 
-1. 读取 `.claude/skills/lincoln-build-codebase-knowledge/prompts/build-codebase-knowledge.md`。
+1. 读取 `.claude/skills/lincoln-build-codebase-docs/knowledge/prompts/build-codebase-knowledge.md`。
 2. 运行 `scripts/build-codebase-knowledge.py --root .` 获取功能映射。
 3. 按 prompt 深度阅读并生成知识文档。
 4. 向 PM 展示 `docs/knowledge/00-index.md` 并等待确认。

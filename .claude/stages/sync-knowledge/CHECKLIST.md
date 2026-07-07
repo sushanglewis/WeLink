@@ -3,8 +3,8 @@
 ## 入口检查 (Entry Checks)
 
 - [ ] 前置阶段 `implement` 已完成（PR 已合并）
-- [ ] 运行入口校验：`python .claude/skills/interview-workflow/validators/validate.py --phase entry --check pr_merged --args <pr_number>`
-- [ ] 运行入口校验：`python .claude/skills/interview-workflow/validators/validate.py --phase entry --check issue_exists --args <issue_number>`
+- [ ] 运行入口校验：`python scripts/validate_stage.py --phase entry --check pr_merged --args <pr_number>`
+- [ ] 运行入口校验：`python scripts/validate_stage.py --phase entry --check issue_exists --args <issue_number>`
 - [ ] 确认 `.github/lincoln-sync-queue/pr-{pr_number}.yaml` 存在且状态为 `pending`
 - [ ] 确认 sync-queue 文件包含必填字段：`status`, `repository`, `issue_number`, `pr_number`, `merged_at`
 - [ ] 确认 Issue 编号在 `.github/linked-issues.yaml` 中存在
@@ -31,9 +31,9 @@
 
 ## 退出检查 (Exit Checks)
 
-- [ ] 运行退出校验：`python .claude/skills/interview-workflow/validators/validate.py --phase exit --check feature_doc_has_business_and_technical_sections --args <feature_slug>`
-- [ ] 运行退出校验：`python .claude/skills/interview-workflow/validators/validate.py --phase exit --check feature_doc_has_links --args <feature_slug>`
-- [ ] 运行退出校验：`python .claude/skills/interview-workflow/validators/validate.py --phase exit --check no_conflict_with_existing_knowledge --args <feature_slug>`
+- [ ] 运行退出校验：`python scripts/validate_stage.py --phase exit --check feature_doc_has_business_and_technical_sections --args <feature_slug>`
+- [ ] 运行退出校验：`python scripts/validate_stage.py --phase exit --check feature_doc_has_links --args <feature_slug>`
+- [ ] 运行退出校验：`python scripts/validate_stage.py --phase exit --check no_conflict_with_existing_knowledge --args <feature_slug>`
 - [ ] 确认功能文档包含至少 3 个 wikilinks
 - [ ] 确认功能文档包含 `业务知识` 和 `技术知识` 两个章节
 

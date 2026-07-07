@@ -22,7 +22,7 @@
 
 ## 执行指令
 
-1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/clarify-requirements.md`
+1. **读取完整提示文件**: `.claude/skills/clarify-requirements/prompts/main.md`
    - 该文件包含详细的澄清步骤、人类交互规则和产物格式
    - 按照提示文件中的步骤 1-9 执行
 

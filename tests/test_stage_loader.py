@@ -18,12 +18,11 @@ def run_loader(*args):
     )
 
 
-def test_load_ingest_stage_returns_context():
-    result = run_loader("--stage", "ingest", "--action", "load")
+def test_load_workflow_router_stage_returns_context():
+    result = run_loader("--stage", "workflow-router", "--action", "load")
     assert result.returncode == 0
     data = json.loads(result.stdout)
-    assert data["stage_id"] == "ingest"
-    assert data["stage_name"] == "摄入录音"
+    assert data["stage_id"] == "workflow-router"
     assert "context" in data
 
 
@@ -43,8 +42,8 @@ def test_recover_action_outputs_json():
     assert "last_completed" in data
 
 
-def test_validate_entry_fails_when_requirements_missing():
-    # clarify entry check requires summary.md which does not exist in this repo
-    result = run_loader("--stage", "clarify", "--action", "validate-entry")
+def test_validate_exit_fails_when_requirements_missing():
+    # clarify exit check requires requirements.md, which is absent.
+    result = run_loader("--stage", "clarify", "--action", "validate-exit")
     assert result.returncode == 1
     assert "FAIL" in result.stderr or "FAIL" in result.stdout
