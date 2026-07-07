@@ -17,7 +17,9 @@ workflow:
         - "requirements/{session_id}/requirements.md"
       exit_checks:
         - check: requirements_has_background_problem_solution_acceptance
+          args: ["{session_id}"]
         - check: human_approved
+          args: ["{session_id}"]
 
     - id: explore-opensource
       name: 开源方案探索
