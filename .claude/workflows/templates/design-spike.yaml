@@ -14,7 +14,7 @@ workflow:
       human_gate: true
       action: clarify-requirements
       artifacts:
-        - requirements/{session_id}/requirements.md
+        - "requirements/{session_id}/requirements.md"
       exit_checks:
         - check: requirements_has_background_problem_solution_acceptance
         - check: human_approved
@@ -24,7 +24,7 @@ workflow:
       human_gate: true
       action: draft-product-design
       artifacts:
-        - designs/{design_id}/design-review.md
+        - "designs/{design_id}/design-review.md"
       exit_checks:
         - check: design_docs_complete
         - check: design_docs_human_approved
@@ -34,7 +34,7 @@ workflow:
       human_gate: true
       action: build-product-prototype
       artifacts:
-        - designs/{design_id}/prototype.pen
+        - "designs/{design_id}/prototype.pen"
       exit_checks:
         - check: prototype_artifact_complete
 

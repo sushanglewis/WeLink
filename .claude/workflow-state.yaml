@@ -3,13 +3,14 @@ workflow:
   name: oss-first-design
   version: 1.0.0
 current_run:
-  run_id: supervision-collab-vA
-  branch: init-welink-project-from-template
-  started_at: '2026-06-30T14:58:00Z'
-  last_updated_at: '2026-07-07T01:28:45Z'
-  current_stage: product-prototype
-  previous_stage: product-design-docs
+  run_id: test-001
+  branch: lincoln/test-branch
+  started_at: '2026-06-27T00:00:00Z'
+  last_updated_at: '2026-07-07T06:10:32Z'
+  current_stage: workflow-router
+  previous_stage: null
   status: in_progress
+  workflow_template: oss-first-design
   context_assessment: 'Requirements provided as a detailed vA technical document (Baserow + Mattermost supervision collaboration).
     OSS research for Mattermost and Baserow already completed. Route to oss-first-design; skip interview ingestion/clarify
     and mark explore-opensource completed. Next: product-design-docs with human gate.
@@ -20,46 +21,76 @@ current_run:
     design_id: supervision-collab-va
     session_id: supervision-collab-va
 variables:
-  change_name: collaborative-spreadsheet
-  design_id: supervision-collab-va
-  session_id: supervision-collab-va
+  session_id: 2026-06-27-test
+  design_id: test-design
+  change_name: test-change
+  issue_number: null
+  pr_number: null
+  feature_slug: null
 recovery:
-  last_known_stage: product-design-docs
-  resume_point: product-design-docs
+  last_validated_checkpoint: workflow-router
+  can_resume_from: clarify
+  abort_reason: null
+  abort_at: null
 stages:
   workflow-router:
     status: completed
-    artifacts_produced:
-    - .claude/workflow-state.yaml
-  clarify:
-    status: completed
-    artifacts_produced:
-    - requirements/supervision-collab-va/requirements.md
-  explore-opensource:
-    status: completed
-    artifacts_produced:
-    - docs/research/collaborative-spreadsheet-oss-options.md
-    - .context/oss-research/mattermost/
-    - .context/oss-research/baserow/
-  product-design-docs:
-    status: completed
-    started_at: '2026-06-30T14:58:00Z'
+    started_at: null
+    completed_at: null
     entry_checks_passed: null
     entry_checks_run_at: null
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-07-01T02:44:32Z'
+    exit_checks_passed: null
+    exit_checks_run_at: null
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
     error_message: null
-    retry_count: 6
-    completed_at: '2026-07-01T02:44:32Z'
-  product-prototype:
-    status: in_progress
-    started_at: '2026-07-07T01:28:45Z'
+    retry_count: 0
+  clarify:
+    status: validation_failed
+    started_at: null
     completed_at: null
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-07-07T01:28:45Z'
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 1
+  explore-opensource:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  product-design-docs:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  product-prototype:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
     exit_checks_passed: null
     exit_checks_run_at: null
     human_gate_passed: null
@@ -69,11 +100,66 @@ stages:
     retry_count: 0
   tdd-development-plan:
     status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
   propose:
     status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
   split:
     status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
   implement:
     status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
   sync-knowledge:
     status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0

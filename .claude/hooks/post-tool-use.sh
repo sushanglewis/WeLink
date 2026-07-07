@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # PostToolUse hook for Lincoln workflow.
-# Tracks artifacts produced by side-effect tools in the workflow state file.
+# Tracks artifacts produced by side-effect tools and detects PR/branch sync events.
 #
 # Usage (manual):
 #   .claude/hooks/post-tool-use.sh "Write" '{"file_path": "foo.md"}' 0
@@ -26,7 +26,17 @@ fi
 TOOL_NAME="${1:-}"
 TOOL_ARGS="${2:-}"
 EXIT_CODE="${3:-0}"
-STATE_FILE="${LINCOLN_STATE_FILE:-$ROOT/.claude/workflow-state.yaml}"
+STATE_FILE=$("$PYTHON" - "$ROOT" "${LINCOLN_STATE_FILE:-}" <<'PY'
+import sys
+from pathlib import Path
+root = Path(sys.argv[1])
+provided = sys.argv[2]
+sys.path.insert(0, str(root))
+from scripts.lincoln_paths import resolve_state_path
+path = Path(provided) if provided else None
+print(resolve_state_path(path, root))
+PY
+)
 
 # Only track successful side-effect tool uses
 if [[ "$EXIT_CODE" != "0" ]]; then
@@ -44,6 +54,8 @@ SIDE_EFFECT_TOOLS=(
     "mcp__pencil__batch_design"
     "mcp__pencil__export_nodes"
     "mcp__pencil__export_html"
+    "mcp__plugin_ecc_github__create_pull_request"
+    "mcp__plugin_ecc_github__merge_pull_request"
 )
 
 is_side_effect() {
@@ -56,15 +68,98 @@ is_side_effect() {
     return 1
 }
 
-if ! is_side_effect "$TOOL_NAME"; then
-    exit 0
+if is_side_effect "$TOOL_NAME"; then
+    "$PYTHON" "$ROOT/scripts/track-artifacts.py" \
+        --state-file "$STATE_FILE" \
+        --tool "$TOOL_NAME" \
+        --args "$TOOL_ARGS" \
+        --project-root "$ROOT" \
+        2>/dev/null || true
 fi
 
-"$PYTHON" "$ROOT/scripts/track-artifacts.py" \
-    --state-file "$STATE_FILE" \
-    --tool "$TOOL_NAME" \
-    --args "$TOOL_ARGS" \
-    --project-root "$ROOT" \
-    2>/dev/null || true
+# Detect PR/branch sync events and append node record
+PR_EVENT=false
+EVENT_NODE=""
+EVENT_STATUS=""
+if [[ "$TOOL_NAME" == "mcp__plugin_ecc_github__create_pull_request" ]]; then
+    PR_EVENT=true
+    EVENT_NODE="implement"
+    EVENT_STATUS="pr_submitted"
+elif [[ "$TOOL_NAME" == "mcp__plugin_ecc_github__merge_pull_request" ]]; then
+    PR_EVENT=true
+    EVENT_NODE="implement"
+    EVENT_STATUS="merged"
+fi
+
+if [[ "$PR_EVENT" == true ]]; then
+    "$PYTHON" "$ROOT/scripts/stage_loader.py" \
+        --state-file "$STATE_FILE" \
+        --action append-node \
+        --node-id "$EVENT_NODE" \
+        --status "$EVENT_STATUS" \
+        2>/dev/null || true
+fi
+
+# Trace logging: record key tool invocations to .trace/lincoln-trace.jsonl
+# Do not fail the hook if trace write fails; log to stderr and continue.
+PROCESS_SLUG=$("$PYTHON" - "$ROOT" "$STATE_FILE" <<'PY'
+import sys, yaml
+from pathlib import Path
+root = Path(sys.argv[1])
+state_file = Path(sys.argv[2])
+sys.path.insert(0, str(root))
+from scripts.lincoln_paths import get_process_slug
+state = yaml.safe_load(open(state_file, encoding="utf-8"))
+print(get_process_slug(state, state_file))
+PY
+)
+TRACE_DIR="$ROOT/.trace"
+TRACE_FILE="$TRACE_DIR/lincoln-trace.jsonl"
+
+# Determine if this tool should be traced
+TRACE=false
+TARGET=""
+if [[ "$TOOL_NAME" == "Skill" ]]; then
+    TRACE=true
+    # Extract skill name from JSON args
+    SKILL_NAME=$(echo "$TOOL_ARGS" | "$PYTHON" -c "import sys,json; d=json.load(sys.stdin); print(d.get('skill',''))" 2>/dev/null || echo "")
+    SKILL_ARGS=$(echo "$TOOL_ARGS" | "$PYTHON" -c "import sys,json; d=json.load(sys.stdin); print(json.dumps(d.get('args','')))" 2>/dev/null || echo "")
+    TARGET="skill:$SKILL_NAME"
+    TRACE_JSON=$(cat <<EOF
+{"tool": "Skill", "skill": "$SKILL_NAME", "args": $SKILL_ARGS, "stage": "STAGE_PLACEHOLDER", "timestamp": "TIMESTAMP_PLACEHOLDER"}
+EOF
+)
+elif [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Bash" ]]; then
+    TRACE=true
+    if [[ "$TOOL_NAME" == "Bash" ]]; then
+        TARGET=$(echo "$TOOL_ARGS" | "$PYTHON" -c "import sys,json; d=json.load(sys.stdin); print(d.get('command','')[:80])" 2>/dev/null || echo "bash")
+    else
+        TARGET=$(echo "$TOOL_ARGS" | "$PYTHON" -c "import sys,json; d=json.load(sys.stdin); print(d.get('file_path',''))" 2>/dev/null || echo "")
+    fi
+    TRACE_JSON=$(cat <<EOF
+{"tool": "$TOOL_NAME", "target": "$TARGET", "stage": "STAGE_PLACEHOLDER", "timestamp": "TIMESTAMP_PLACEHOLDER"}
+EOF
+)
+fi
+
+if [[ "$TRACE" == true ]]; then
+    # Read current stage from workflow state
+    CURRENT_STAGE=$("$PYTHON" - "$STATE_FILE" <<'PY' 2>/dev/null
+import sys, yaml
+path = sys.argv[1]
+state = yaml.safe_load(open(path, encoding="utf-8"))
+print(state.get("current_run", {}).get("current_stage") or "unknown")
+PY
+) || CURRENT_STAGE="unknown"
+
+    TIMESTAMP=$("$PYTHON" -c "from datetime import datetime, timezone; print(datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))" 2>/dev/null) || TIMESTAMP=""
+
+    # Replace placeholders
+    TRACE_LINE=$(echo "$TRACE_JSON" | sed "s/STAGE_PLACEHOLDER/$CURRENT_STAGE/g; s/TIMESTAMP_PLACEHOLDER/$TIMESTAMP/g")
+
+    # Ensure directory exists and append
+    mkdir -p "$TRACE_DIR" 2>/dev/null || true
+    echo "$TRACE_LINE" >> "$TRACE_FILE" 2>/dev/null || echo "[lincoln-trace] Failed to write trace entry" >&2
+fi
 
 exit 0

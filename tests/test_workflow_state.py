@@ -15,6 +15,7 @@ from scripts.stage_loader import (
     action_recover,
     compute_next_stage,
     load_workflow,
+    get_workflow_template,
 )
 
 STATE_PATH = PROJECT_ROOT / ".claude" / "workflow-state.yaml"
@@ -24,10 +25,10 @@ STATE_PATH = PROJECT_ROOT / ".claude" / "workflow-state.yaml"
 def fresh_state(tmp_path):
     """Return a copy of the project's workflow-state.yaml in a temp path."""
     state = yaml.safe_load(STATE_PATH.read_text(encoding="utf-8"))
-    # Reset to a known starting point
+    # Reset to a known starting point aligned with the active workflow template.
     state["current_run"]["run_id"] = "test-001"
     state["current_run"]["branch"] = "lincoln/test-branch"
-    state["current_run"]["current_stage"] = "ingest"
+    state["current_run"]["current_stage"] = "workflow-router"
     state["current_run"]["previous_stage"] = None
     state["current_run"]["status"] = "in_progress"
     state["current_run"]["started_at"] = "2026-06-27T00:00:00Z"
@@ -49,8 +50,8 @@ def fresh_state(tmp_path):
         }
     state["variables"] = {
         "session_id": "2026-06-27-test",
-        "design_id": None,
-        "change_name": None,
+        "design_id": "test-design",
+        "change_name": "test-change",
         "issue_number": None,
         "pr_number": None,
         "feature_slug": None,
@@ -75,39 +76,39 @@ def test_load_state_requires_schema_version(fresh_state):
 
 
 def test_compute_next_stage_follows_workflow_order():
-    workflow = load_workflow()
-    assert compute_next_stage(workflow, "ingest") == "clarify"
-    assert compute_next_stage(workflow, "clarify") == "product-design-docs"
+    workflow = load_workflow(get_workflow_template(load_state(STATE_PATH)))
+    assert compute_next_stage(workflow, "workflow-router") == "clarify"
+    assert compute_next_stage(workflow, "clarify") == "explore-opensource"
     assert compute_next_stage(workflow, "sync-knowledge") is None
 
 
 def test_action_transition_next_updates_current_run(fresh_state):
     state = load_state(fresh_state)
-    state["stages"]["ingest"]["status"] = "completed"
-    next_stage = action_transition_next("ingest", state, fresh_state)
+    state["stages"]["workflow-router"]["status"] = "completed"
+    next_stage = action_transition_next("workflow-router", state, fresh_state)
     assert next_stage == "clarify"
     updated = load_state(fresh_state)
     assert updated["current_run"]["current_stage"] == "clarify"
-    assert updated["current_run"]["previous_stage"] == "ingest"
+    assert updated["current_run"]["previous_stage"] == "workflow-router"
     assert updated["stages"]["clarify"]["status"] == "not_started"
 
 
 def test_action_recover_finds_last_completed(fresh_state):
     state = load_state(fresh_state)
-    state["stages"]["ingest"]["status"] = "completed"
+    state["stages"]["workflow-router"]["status"] = "completed"
     state["stages"]["clarify"]["status"] = "validation_failed"
     state["stages"]["clarify"]["retry_count"] = 1
     save_state(state, fresh_state)
 
     state = load_state(fresh_state)
     result = action_recover(state)
-    assert result["last_completed"] == "ingest"
+    assert result["last_completed"] == "workflow-router"
     assert result["can_resume_from"] == "clarify"
 
 
 def test_state_file_in_project_has_all_stages():
     state = load_state(STATE_PATH)
-    workflow = load_workflow()
+    workflow = load_workflow(get_workflow_template(state))
     expected = {s["id"] for s in workflow["steps"]}
     actual = set(state["stages"].keys())
     assert actual == expected

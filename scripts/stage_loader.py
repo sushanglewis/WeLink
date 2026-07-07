@@ -35,14 +35,12 @@ WORKFLOW_TEMPLATE_DIR = PROJECT_ROOT / ".claude" / "workflows" / "templates"
 DEFAULT_WORKFLOW_PATH = WORKFLOW_PATH
 STATE_PATH = PROJECT_ROOT / ".claude" / "workflow-state.yaml"
 STAGES_DIR = PROJECT_ROOT / ".claude" / "stages"
-VALIDATOR_PATH = (
-    PROJECT_ROOT
-    / ".claude"
-    / "skills"
-    / "interview-workflow"
-    / "validators"
-    / "validate.py"
-)
+VALIDATOR_PATH = PROJECT_ROOT / "scripts" / "validate_stage.py"
+
+# Compatibility aliases for upstream tools that consume stage_loader helpers
+LEGACY_STATE_PATH = STATE_PATH
+SKILL_ROUTING_PATH = PROJECT_ROOT / ".claude" / "skills" / "routing.yaml"
+LEGACY_SKILL_ROUTING_PATH = SKILL_ROUTING_PATH
 
 REQUIRED_STATE_KEYS = {
     "schema_version",
@@ -61,6 +59,13 @@ REQUIRED_STATE_KEYS = {
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def get_workflow_template(state: dict[str, Any]) -> str | None:
+    """Return the active workflow template name from state."""
+    # Newer states store the template in current_run; legacy/branch-scoped states
+    # store it under the top-level workflow.name.
+    return state.get("current_run", {}).get("workflow_template") or state.get("workflow", {}).get("name")
 
 
 def load_yaml(path: Path) -> Any:
@@ -86,10 +91,14 @@ def save_yaml(path: Path, data: Any) -> None:
 def resolve_workflow_path(template_name: str | None = None) -> Path:
     if not template_name:
         return DEFAULT_WORKFLOW_PATH
+    # First check templates directory, then fall back to main workflows directory
     template_path = WORKFLOW_TEMPLATE_DIR / f"{template_name}.yaml"
-    if not template_path.exists():
-        raise FileNotFoundError(f"Workflow template not found: {template_path}")
-    return template_path
+    if template_path.exists():
+        return template_path
+    main_path = PROJECT_ROOT / ".claude" / "workflows" / f"{template_name}.yaml"
+    if main_path.exists():
+        return main_path
+    raise FileNotFoundError(f"Workflow template not found: {template_path} or {main_path}")
 
 
 def load_workflow(template_name: str | None = None) -> dict[str, Any]:
@@ -191,7 +200,7 @@ def run_validator(
 
 
 def action_load(stage_id: str, state: dict[str, Any]) -> dict[str, Any]:
-    template_name = state.get("current_run", {}).get("workflow_template")
+    template_name = get_workflow_template(state)
     workflow = load_workflow(template_name)
     stage_def = find_stage(workflow, stage_id)
     stage_dir = STAGES_DIR / stage_id
@@ -225,7 +234,7 @@ def action_validate(
     phase: str,
     state_file: Path | None = None,
 ) -> int:
-    template_name = state.get("current_run", {}).get("workflow_template")
+    template_name = get_workflow_template(state)
     workflow = load_workflow(template_name)
     stage_def = find_stage(workflow, stage_id)
     checks = stage_def.get(f"{phase}_checks", [])
@@ -269,7 +278,7 @@ def action_validate(
 
 
 def action_transition_next(stage_id: str, state: dict[str, Any], state_file: Path | None = None) -> str | None:
-    template_name = state.get("current_run", {}).get("workflow_template")
+    template_name = get_workflow_template(state)
     workflow = load_workflow(template_name)
     next_stage_id = compute_next_stage(workflow, stage_id)
 
@@ -309,7 +318,7 @@ def action_transition_next(stage_id: str, state: dict[str, Any], state_file: Pat
 
 def action_recover(state: dict[str, Any], state_file: Path | None = None) -> dict[str, Any]:
     stages = state.get("stages", {})
-    template_name = state.get("current_run", {}).get("workflow_template")
+    template_name = get_workflow_template(state)
     workflow = load_workflow(template_name)
     step_ids = [s["id"] for s in workflow.get("steps", [])]
 
@@ -331,6 +340,59 @@ def action_recover(state: dict[str, Any], state_file: Path | None = None) -> dic
         "can_resume_from": resume_point,
         "current_stage": state["current_run"].get("current_stage"),
         "current_status": state["current_run"].get("status"),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Upstream compatibility helpers
+# ---------------------------------------------------------------------------
+
+
+def _is_legacy_state(state: dict[str, Any]) -> bool:
+    """WeLink uses the legacy/branch-scoped 'stages' schema."""
+    return "stages" in state
+
+
+def get_latest_node_for_stage(state: dict[str, Any], stage_id: str | None) -> dict[str, Any] | None:
+    """No-op for the stages schema; kept for API compatibility."""
+    return None
+
+
+def get_nodes(state: dict[str, Any]) -> list[dict[str, Any]]:
+    """No-op for the stages schema; kept for API compatibility."""
+    return []
+
+
+def get_variables(state: dict[str, Any]) -> dict[str, Any]:
+    """Return workflow variables from either location used by WeLink states."""
+    return state.get("current_run", {}).get("variables", state.get("variables", {}))
+
+
+def resolve_state_path(path: Path | None = None) -> Path:
+    """Return the canonical state file path."""
+    return path if path is not None else STATE_PATH
+
+
+def interpolate_artifact(value: str, state: dict[str, Any], state_file: Path | None = None) -> str:
+    """Resolve artifact path placeholders using workflow variables."""
+    return interpolate(value, get_variables(state))
+
+
+def load_skill_routing() -> dict[str, Any]:
+    """Load the skill routing table from .claude/skills/routing.yaml."""
+    path = SKILL_ROUTING_PATH
+    if not path.exists():
+        raise FileNotFoundError(f"Skill routing file not found: {path}")
+    return load_yaml(path)
+
+
+def get_stage_skills(routing_data: dict[str, Any], stage_id: str) -> dict[str, list[str]]:
+    """Return required/optional skills for a stage from the routing table."""
+    routing = routing_data.get("routing", {})
+    entry = routing.get(stage_id, {})
+    return {
+        "required": list(entry.get("required", [])),
+        "optional": list(entry.get("optional", [])),
     }
 
 

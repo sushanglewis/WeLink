@@ -27,7 +27,7 @@
 
 ## 执行指令
 
-1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/plan-tdd-development.md`
+1. **读取完整提示文件**: `.claude/skills/plan-tdd-development/prompts/main.md`
    - 该文件包含详细的 TDD 计划生成步骤和格式要求
    - 按照提示文件中的步骤 1-5 执行
 
