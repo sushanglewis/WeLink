@@ -1,4 +1,4 @@
-# Design Review: Baserow + Mattermost 督办协作系统
+# Design Review: Teable + Mattermost 督办协作系统
 
 > **⚠️ 选型更新(2026-07-15)**:本文档基于 Baserow 的具体实例编写(含 `database 84`、`table_id: 378/835` 等),**选型已更新为 [Teable](https://github.com/teableio/teable)**。文档中的督办流程、Agent 编排、数据访问层设计模式仍可参考,但具体表编号、字段 ID、API 调用、MCP/CLI 工具选型需按 Teable 重新设计与搭建。Baserow 仅保留作为功能完备性参照基线(见 SRS §1.3)。
 
@@ -13,13 +13,13 @@
 
 ## 1. 概述与目标
 
-基于现有 Baserow 督办主表（`table_id: 378`）与跟进记录表（`table_id: 835`），为 Agent（Claude）提供一组可编排的脚本/CLI 工具，使其能够批量完成督办事项录入、跟进记录创建、通知发送与延时监控，而无需在运行时逐行处理业务数据。
+基于现有 Teable 督办主表（`table_id: 378`）与跟进记录表（`table_id: 835`），为 Agent（Claude）提供一组可编排的脚本/CLI 工具，使其能够批量完成督办事项录入、跟进记录创建、通知发送与延时监控，而无需在运行时逐行处理业务数据。
 
 **核心目标：**
 - 提供 `upload-excel`、`follow-up-tasks`、`send-notifications`、`check-followups` 等脚本，Agent 通过调用脚本完成批量操作。
-- 脚本接收明确的入参：Baserow 表编号、文件路径、操作类型（如 `append`），脚本内部自动化完成数据录入，并返回成功记录数与失败明细。
+- 脚本接收明确的入参：Teable 表编号、文件路径、操作类型（如 `append`），脚本内部自动化完成数据录入，并返回成功记录数与失败明细。
 - Agent 不解析 Excel 行数据，仅接收脚本返回的汇总信息，并向督办专员汇报结果与发送主表筛选 URL。
-- Baserow 内部通过公式/自动化将 Excel 中的经办人字段匹配为协作者（Collaborators），并触发通知。
+- Teable 内部通过公式/自动化将 Excel 中的经办人字段匹配为协作者（Collaborators），并触发通知。
 - 跟进记录创建后自动触发延时监控，24h/36h 未填报则分级提醒；提醒按经办人聚合批量发送，避免消息轰炸。
 
 ## 2. 系统架构
@@ -32,7 +32,7 @@
                                 │ 调用脚本 / CLI
                                 ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        tools/baserow-mattermost/                             │
+│                        tools/teable-mattermost/                             │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐ │
 │  │ upload-excel │ │follow-up-tasks│ │send-notifications│ │  webhook-server    │ │
 │  └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └──────────┬───────────┘ │
@@ -43,13 +43,13 @@
 │         ▼                                                                    │
 │  ┌────────────────────────────────────────────────────────────────────────┐ │
 │  │                     shared: clients, parsers, scheduler                │ │
-│  │  BaserowClient / MattermostClient / ExcelParser / TaskParser / Celery  │ │
+│  │  TeableClient / MattermostClient / ExcelParser / TaskParser / Celery  │ │
 │  └────────────────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│     Baserow     │    │   Mattermost    │    │  Celery + Redis │
+│     Teable     │    │   Mattermost    │    │  Celery + Redis │
 │  table 378/835  │    │      API        │    │  check_24h/36h  │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
@@ -64,20 +64,20 @@
   - Agent：调用 `upload-excel --file path/to.xlsx --notify`，等待脚本返回结果摘要。
 - **价值**：减少 Agent 上下文负担，避免在 runtime 中处理上百条业务数据。
 
-### 3.2 脚本工具集（tools/baserow-mattermost/）
+### 3.2 脚本工具集（tools/teable-mattermost/）
 
 | 脚本 | 职责 | 典型调用 |
 |------|------|----------|
 | `upload-excel` | 解析 Excel，按表编号批量新增主表记录；返回成功数与失败明细 | `upload-excel --table-id 378 --file data.xlsx --operation append` |
 | `follow-up-tasks` | 按任务编号批量创建跟进记录 | `follow-up-tasks --table-id 835 --tasks SJ20260750,SJ20260751` |
 | `send-notifications` | 按经办人/协作者聚合后批量发送 Mattermost 通知 | `send-notifications --by-handler --url-filter collaborator` |
-| `webhook-server` | 接收 Baserow `rows.created` Webhook，注册延时任务 | `webhook-server --host 0.0.0.0 --port 8000` |
+| `webhook-server` | 接收 Teable `rows.created` Webhook，注册延时任务 | `webhook-server --host 0.0.0.0 --port 8000` |
 | `check-followups` | 手动触发 24h/36h 检查（也供 Celery 调用） | `check-followups --row-id 195 --deadline 36h` |
 
-### 3.3 Baserow 数据访问层
+### 3.3 Teable 数据访问层
 
-- **首选方案**：Baserow MCP Server（官方内置）或 `baserow-cli`。
-- **备选方案**：直接调用 Baserow REST API（`requests`）。
+- **首选方案**：Teable RESTful OpenAPI（官方 Swagger，覆盖 base/table/record CRUD）。
+- **备选方案**：社区 Teable MCP Server / Python SDK（需在 PoC 阶段验证可用性与版本）。
 - **关键操作**：
   - 批量创建主表记录
   - 创建跟进记录并写入 Collaborators
@@ -88,8 +88,8 @@
 
 - **职责**：脚本接收 `--table-id`、`--file`、`--operation` 等参数，自动化完成 Excel 解析与主表批量写入，返回成功记录数和失败明细。
 - **库**：`pandas` + `openpyxl`。
-- **字段映射**：`config/field_mapping.py` 中维护 Excel 列名 → Baserow field_id 的映射。
-- **经办人处理**：Excel 中的 `经办人及联系方式` 字段作为普通文本录入主表；**协作者匹配由 Baserow 内部公式/自动化完成**，不需要脚本预先解析并写入 `Collaborators`。
+- **字段映射**：`config/field_mapping.py` 中维护 Excel 列名 → Teable field_id 的映射。
+- **经办人处理**：Excel 中的 `经办人及联系方式` 字段作为普通文本录入主表；**协作者匹配由 Teable 内部公式/自动化完成**，不需要脚本预先解析并写入 `Collaborators`。
 - **失败处理**：记录导入失败不允许整体失败；失败行作为明细返回给 Agent。
 
 ### 3.5 任务编号解析器
@@ -99,7 +99,7 @@
 
 ### 3.6 Webhook 服务
 
-- **职责**：接收 Baserow `rows.created` 事件，为每个新跟进记录注册 24h/36h 检查任务。
+- **职责**：接收 Teable `rows.created` 事件，为每个新跟进记录注册 24h/36h 检查任务。
 - **实现**：FastAPI + `POST /webhook/follow-up-created`。
 - **幂等**：以 row_id 为任务 key，重复注册时覆盖或忽略。
 
@@ -116,14 +116,14 @@
 
 - **职责**：按经办人/协作者聚合待办事项，批量构造并发送 Mattermost 私聊/频道消息，包含汇总后的筛选 URL、截止时间、操作步骤。
 - **实现**：Mattermost MCP Server 或 `mattermostdriver` / Mattermost REST API。
-- **URL 构造**：使用 Baserow 主表筛选视图 URL，按当前登录用户的协作者字段筛选（如 `filter__field_XXXX__has=[current_user]`）。
+- **URL 构造**：使用 Teable 主表筛选视图 URL，按当前登录用户的协作者字段筛选（如 `filter__field_XXXX__has=[current_user]`）。
 - **批量策略**：为避免消息轰炸，同一批次内按经办人聚合所有待跟进任务，发送一条汇总消息而非逐条发送。
 
 ## 4. 数据模型与字段映射
 
 ### 4.1 主表（table_id: 378）写入字段
 
-| Baserow field_id | 含义 | Excel 列示例 |
+| Teable field_id | 含义 | Excel 列示例 |
 |------------------|------|--------------|
 | field_3524 | 任务编号 | SJ20260750 |
 | field_3526 | 交办时间 | 2026-06-20 |
@@ -133,16 +133,16 @@
 
 ### 4.2 跟进表（table_id: 835）写入字段
 
-| Baserow field_id | 字段名 | 类型 | 值示例 |
+| Teable field_id | 字段名 | 类型 | 值示例 |
 |------------------|--------|------|--------|
 | 7926 | 任务编号 | text | SJ20260750 |
 | 7961 | 关联主表 | link_row | `[{ "id": 1 }]` |
-| 7966 | Collaborators | multiple_collaborators | 由 Baserow 公式/自动化根据主表经办人字段匹配生成 |
+| 7966 | Collaborators | multiple_collaborators | 由 Teable 公式/自动化根据主表经办人字段匹配生成 |
 
-### 4.3 Baserow 内部自动化
+### 4.3 Teable 内部自动化
 
-- **协作者自动匹配**：在 Baserow 中配置公式或自动化规则，将主表 `经办人账号`（或 `经办人及联系方式`）字段匹配为 Baserow 用户，并自动写入跟进表的 `Collaborators` 字段。
-- **通知触发**：当跟进记录创建且 `Collaborators` 被填充后，可通过 Webhook 或 Baserow 内置通知触发 Mattermost 消息。
+- **协作者自动匹配**：在 Teable 中配置公式或自动化规则，将主表 `经办人账号`（或 `经办人及联系方式`）字段匹配为 Teable 用户，并自动写入跟进表的 `Collaborators` 字段。
+- **通知触发**：当跟进记录创建且 `Collaborators` 被填充后，可通过 Webhook 或 Teable 内置通知触发 Mattermost 消息。
 
 ## 5. 关键流程时序
 
@@ -152,8 +152,8 @@
 2. Agent 调用脚本：`upload-excel --table-id 378 --file data.xlsx --operation append`。
 3. 脚本自动化解析 Excel 并批量写入主表；返回成功记录数与失败明细。
 4. Agent 向督办专员汇报汇总信息，并发送新增事项的主表筛选 URL。
-5. Baserow 内部公式/自动化根据主表经办人字段匹配协作者，写入跟进表 `Collaborators`。
-6. Baserow 触发 `rows.created` Webhook，延时服务注册 24h/36h 任务。
+5. Teable 内部公式/自动化根据主表经办人字段匹配协作者，写入跟进表 `Collaborators`。
+6. Teable 触发 `rows.created` Webhook，延时服务注册 24h/36h 任务。
 
 ### 5.2 流程 2：任务编号批量跟进
 
@@ -161,7 +161,7 @@
 2. Agent 调用脚本：`follow-up-tasks --table-id 835 --tasks SJ20260750,SJ20260751`。
 3. 脚本校验主表存在性并批量创建跟进记录。
 4. 脚本返回成功/失败清单；Agent 向督办专员汇报。
-5. Baserow 自动匹配协作者并触发 Webhook。
+5. Teable 自动匹配协作者并触发 Webhook。
 
 ### 5.3 流程 3：24h/36h 监控
 
@@ -174,8 +174,8 @@
 ## 6. 技术栈
 
 - **Python 3.12+**
-- **Baserow MCP Server**（官方内置）：首选数据 CRUD 接口
-- **`baserow-cli`**：脚本式 Baserow 操作备选
+- **Teable RESTful OpenAPI**（官方）：首选数据 CRUD 接口
+- **Teable 社区 MCP Server / SDK**：脚本式 Teable 操作备选
 - **Mattermost MCP Server**（官方 v11.2+）：发送通知的首选接口
 - **`mattermostdriver`**：Mattermost REST API 备选
 - **FastAPI** / **Uvicorn**：Webhook HTTP 服务
@@ -188,13 +188,13 @@
 ## 7. 项目结构
 
 ```
-tools/baserow-mattermost/
+tools/teable-mattermost/
 ├── pyproject.toml
 ├── requirements.txt
 ├── .env.example
 ├── README.md
 ├── src/
-│   ├── baserow_mattermost/
+│   ├── teable_mattermost/
 │   │   ├── __init__.py
 │   │   ├── cli/
 │   │   │   ├── upload_excel.py
@@ -204,7 +204,7 @@ tools/baserow-mattermost/
 │   │   ├── web/
 │   │   │   └── webhook_server.py
 │   │   ├── clients/
-│   │   │   ├── baserow_client.py      # 封装 MCP / CLI / REST
+│   │   │   ├── teable_client.py      # 封装 MCP / CLI / REST
 │   │   │   └── mattermost_client.py
 │   │   ├── parsers/
 │   │   │   ├── excel_parser.py
@@ -216,7 +216,7 @@ tools/baserow-mattermost/
 │   │   │   ├── settings.py
 │   │   │   └── field_mapping.py
 │   │   ├── models/
-│   │   │   ├── baserow_schemas.py
+│   │   │   ├── teable_schemas.py
 │   │   │   └── webhook_schemas.py
 │   │   └── utils/
 │   │       ├── url_builder.py
@@ -230,7 +230,7 @@ tools/baserow-mattermost/
 └── tests/
     ├── test_excel_parser.py
     ├── test_task_parser.py
-    ├── test_baserow_client.py
+    ├── test_teable_client.py
     ├── test_celery_tasks.py
     └── test_webhook_handler.py
 ```
@@ -242,10 +242,10 @@ tools/baserow-mattermost/
 | `MATTERMOST_URL` | Mattermost 服务器地址 |
 | `MATTERMOST_BOT_TOKEN` | Bot Access Token |
 | `MATTERMOST_BOT_USERNAME` | Bot 用户名 |
-| `BASEROW_URL` | Baserow 服务器地址 |
-| `BASEROW_DB_TOKEN` | Database Token |
-| `BASEROW_MAIN_TABLE_ID` | 主表 ID，默认 378 |
-| `BASEROW_FOLLOW_TABLE_ID` | 跟进表 ID，默认 835 |
+| `TEABLE_URL` | Teable 服务器地址 |
+| `TEABLE_DB_TOKEN` | Database Token |
+| `TEABLE_MAIN_TABLE_ID` | 主表 ID，默认 378 |
+| `TEABLE_FOLLOW_TABLE_ID` | 跟进表 ID，默认 835 |
 | `REDIS_URL` | Redis 连接地址 |
 | `WEBHOOK_HOST` / `WEBHOOK_PORT` | Webhook 服务监听地址 |
 
@@ -270,8 +270,8 @@ tools/baserow-mattermost/
 
 ## 11. 推荐实现顺序
 
-1. **环境验证**：确认 Baserow MCP / `baserow-cli` 与 Mattermost MCP 可用性。
-2. **基础框架**：项目结构、配置加载、Baserow/Mattermost Client 封装。
+1. **环境验证**：确认 Teable OpenAPI 与 Mattermost MCP 可用性。
+2. **基础框架**：项目结构、配置加载、Teable/Mattermost Client 封装。
 3. **Webhook 服务**：接收 `rows.created` 并注册 Celery 任务。
 4. **延时任务**：实现 `check_24h` / `check_36h`。
 5. **任务编号跟进脚本**：`follow-up-tasks`。
@@ -282,8 +282,8 @@ tools/baserow-mattermost/
 ## 12. 决策记录
 
 - **脚本/CLI 优先，Agent 仅编排**：Agent 不直接解析 Excel 行数据，只调用脚本并汇报汇总信息；脚本负责自动化录入。
-- **Baserow 内部自动化匹配协作者**：协作者字段由 Baserow 公式/自动化根据主表经办人字段生成，脚本不预处理经办人映射。
-- **Baserow MCP / `baserow-cli` 优先**：优先使用官方 MCP Server 或 `baserow-cli` 进行 CRUD，直接 REST API 作为备选。
+- **Teable 内部自动化匹配协作者**：协作者字段由 Teable 公式/自动化根据主表经办人字段生成，脚本不预处理经办人映射。
+- **Teable OpenAPI 优先**：优先使用官方 RESTful OpenAPI 进行 CRUD,社区 MCP Server / SDK 作为备选。
 - **Mattermost MCP 优先**：优先使用 Mattermost 官方 MCP Server 发送通知，`mattermostdriver` 作为备选。
 - **通知按经办人批量聚合**：同一批次内按经办人聚合所有待跟进任务，发送一条汇总消息，避免消息轰炸。
 - **Created on 字段粒度到小时**：便于按小时批次触发和聚合提醒任务。

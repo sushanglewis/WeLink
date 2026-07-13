@@ -1,4 +1,6 @@
-# Data Model: Baserow + Mattermost 督办协作系统
+# Data Model: Teable + Mattermost 督办协作系统
+
+> **⚠️ 选型更新(2026-07-15)**:本文档基于 Baserow 的具体实例编写,**选型已更新为 [Teable](https://github.com/teableio/teable)**。文档中的字段语义、关联关系(Link to table、Collaborators)仍可参考,但 Baserow 特有的 `field_<数字>` 标识、`table_id: 378/835`、`database 84` 等实例数据为历史参考,需按 Teable 实际的字段 ID(`fld...`)、表 ID(`tbl...`)、base ID(`app...`)重新映射。Baserow 仅保留作为功能完备性参照基线(见 SRS §1.3)。
 
 ## 主表（table_id: 378）字段映射
 
@@ -21,8 +23,8 @@
 | 3536 | 部门主要领导 | text | 部门主要领导 | 可选 |
 | 3537 | 部门责任人 | text | 部门责任人 | 可选 |
 | 3538 | 科室责任人 | text | 科室责任人 | 可选 |
-| 3539 | 经办人及联系方式 | text | 姓名+联系方式（文本），作为 Baserow 自动化匹配协作者的来源 | 是 |
-| *建议新增* | 经办人账号 | multiple_collaborators | 绑定 Baserow 用户（可由公式自动填充） | 否（Baserow 自动化） |
+| 3539 | 经办人及联系方式 | text | 姓名+联系方式（文本），作为 Teable 自动化匹配协作者的来源 | 是 |
+| *建议新增* | 经办人账号 | multiple_collaborators | 绑定 Teable 用户（可由公式自动填充） | 否（Teable 自动化） |
 | 3540 | 部门反馈工作落实情况 | long_text | 当前主表上的反馈字段 | 否（经办人填报） |
 | 3541 | 部门反馈存在困难问题 | text | | 否 |
 | 3542 | 部门反馈下一步工作计划 | long_text | | 否 |
@@ -47,17 +49,17 @@
 | 7943 | 部门反馈存在困难问题 | text | 经办人填报 | 监控字段之一 |
 | 7944 | 部门反馈下一步工作计划 | text | 经办人填报 | 监控字段之一 |
 | 7965 | Created by | created_by | 创建者 | 应为 Agent 账号 |
-| 7966 | Collaborators | multiple_collaborators | @ 经办人 | 由 Baserow 公式/自动化根据主表经办人字段生成 |
+| 7966 | Collaborators | multiple_collaborators | @ 经办人 | 由 Teable 公式/自动化根据主表经办人字段生成 |
 
-## Baserow 内部自动化规则
+## Teable 内部自动化规则
 
-- **协作者自动匹配**：配置 Baserow 自动化或公式，当主表 `经办人及联系方式` 字段包含标准化姓名时，自动在跟进表 `Collaborators` 字段写入匹配的 Baserow user_id。
-- **通知触发**：当跟进记录创建且 `Collaborators` 被填充后，可通过 Webhook 或 Baserow 内置通知触发 Mattermost 消息。
+- **协作者自动匹配**：配置 Teable 自动化或公式，当主表 `经办人及联系方式` 字段包含标准化姓名时，自动在跟进表 `Collaborators` 字段写入匹配的 Teable user_id。
+- **通知触发**：当跟进记录创建且 `Collaborators` 被填充后，可通过 Webhook 或 Teable 内置通知触发 Mattermost 消息。
 - **小时精度**：`Created on` 字段显示精度到小时，便于按小时批次聚合提醒。
 
 ## 关键约束
 
 1. **任务编号唯一性**：主表中 `field_3524` 应全局唯一，用于 Excel 导入和任务编号跟进。
-2. **记录导入不可失败**：即使经办人无法匹配为 Baserow 用户，主表记录也必须成功导入；协作者字段留空即可。
+2. **记录导入不可失败**：即使经办人无法匹配为 Teable 用户，主表记录也必须成功导入；协作者字段留空即可。
 3. **跟进记录与主表关联**：脚本创建跟进记录时应同时写入 `field_7926`（文本）和 `field_7961`（Link to table）。
 4. **监控字段默认非空**：默认以 `field_7942`、`field_7943`、`field_7944` 全部非空作为"已填报"判断标准。

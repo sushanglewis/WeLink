@@ -1,8 +1,20 @@
 process_slug: issue-6
 issue_number: '6'
 current_stage: product-prototype
-last_updated: '2026-07-15T02:04:53Z'
+last_updated: '2026-07-15T03:40:36Z'
 documents:
+- path: designs/online-collaborative-spreadsheet/fields.md
+  stage: product-prototype
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: designs/online-collaborative-spreadsheet/ui-spec.md
+  stage: product-prototype
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
 - path: designs/supervision-collab-va/data-model.md
   stage: product-design-docs
   status: completed
