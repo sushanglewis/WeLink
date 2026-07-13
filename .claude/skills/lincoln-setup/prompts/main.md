@@ -24,8 +24,8 @@ python scripts/lincoln-setup.py install-skills
 
 - 默认会逐个询问用户确认。如果用户明确说“全部安装”，可追加 `--yes`。
 - 该命令会：
-  - 将 `superpowers`（v1.2.0）clone 到 `~/.claude/skills/superpowers`
-  - 将 `gsd`（v2.0.1）clone 到 `~/.claude/skills/gsd`
+  - 将 `superpowers`（上游 obra/superpowers，main 分支）clone 到 `~/.claude/skills/superpowers`
+  - 将 `gsd`（上游 gsd-build/get-shit-done，main 分支）clone 到 `~/.claude/skills/gsd`
   - 安装 `oh-my-claudecode` 插件（如声明为 default_install）
 - 如果目标目录已存在且 ref 匹配，自动跳过；如果 ref 不匹配或工作区 dirty，先向用户说明再决定。
 
@@ -38,11 +38,13 @@ python scripts/lincoln-setup.py install-clis
 ```
 
 - 默认逐个询问用户确认。
+- **先问用户是否需要录音转写能力**；只有需要时才安装 ffmpeg 与 Whisper 实现。
 - 需要处理的 CLI 包括：
   - `openspec`：基于 Node.js，运行 `npm install -g @fission-ai/openspec`
   - `gh`：macOS 用 `brew install gh`，Linux 用包管理器
-  - `ffmpeg`：macOS 用 `brew install ffmpeg`
-  - Whisper 实现：优先 `faster-whisper`；如果失败，提供 `openai-whisper` 或 OpenAI API key 选项
+  - `ffmpeg`（可选，仅录音转写需要）：macOS 用 `brew install ffmpeg`
+  - Whisper 实现（可选，仅录音转写需要）：优先 `faster-whisper`；如果失败，提供 `openai-whisper` 或 OpenAI API key 选项
+- 顺带询问用户是否需要 benchmark；需要时介绍 `scripts/lincoln_benchmark.py` 的用法。
 - 安装失败后，给出对应平台的手动安装命令。
 
 ## 4. 配置仓库信息

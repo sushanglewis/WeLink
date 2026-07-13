@@ -9,13 +9,17 @@
 Lincoln 的 hooks 通常会在你第一次打开仓库时自动触发安装。如果 Claude 没有自动开始，请复制下面的提示词发送给 Claude：
 
 > 请帮我完成 Lincoln 的初始化安装：
-> 1. 检查当前仓库的 Lincoln 环境，列出所有缺失的依赖。
-> 2. 安装外部 skills：superpowers（v1.2.0）、gsd（v2.0.1）到 `~/.claude/skills/`，并确保 ref 正确。
-> 3. 安装 CLI 工具：openspec、gh、ffmpeg、以及一个 Whisper 实现（优先 faster-whisper）。
-> 4. 安装 oh-my-claudecode 插件。
-> 5. 交互式配置 `.github/openspec-config.yml`（询问我 GitHub owner 和 repo name）。
-> 6. 运行 `scripts/init-project.sh` 完成项目初始化。
-> 7. 完成后汇报状态。
+> 1. 先问我两个问题，并根据回答决定安装范围：
+>    - 是否需要**录音转写**能力（访谈录音 → 文字稿）？需要才安装 ffmpeg 和 Whisper。
+>    - 是否需要运行 **benchmark**（Lincoln 基准评测）？
+> 2. 检查当前仓库的 Lincoln 环境，列出所有缺失的依赖。
+> 3. 安装外部 skills：superpowers、gsd（均跟踪上游仓库 main 分支）到 `~/.claude/skills/`，并确保 ref 正确。
+> 4. 安装 CLI 工具：openspec、gh；仅当我需要录音转写时，再安装 ffmpeg 和一个 Whisper 实现（优先 faster-whisper）。
+> 5. 安装 oh-my-claudecode 插件。
+> 6. 交互式配置 `.github/openspec-config.yml`（询问我 GitHub owner 和 repo name）。
+> 7. 运行 `scripts/init-project.sh` 完成项目初始化。
+> 8. 如果我需要 benchmark，介绍 `scripts/lincoln_benchmark.py` 的用法。
+> 9. 完成后汇报状态。
 >
 > 安装任何全局工具或写入配置前，请先向我确认。
 
@@ -93,6 +97,8 @@ issue-21/
 ```
 
 `issue-21/workflow-stage.yaml` 是人类、Agent 之间共享的阶段交接协议；`.claude/templates/issue-package/workflow-stage.yaml` 只是生成它的模板。
+
+**跨成员、跨 Agent 协作**：分支名必须严格使用 `issue-<number>` 约定。任何成员或 Agent 收到上游节点的 handoff 时，按分支名即可定位对应 issue 与工作包（`{process_slug}/workflow-stage.yaml`），从而保障从需求到最终验收，issue、branch、PR 端到端一一对应。可用 `scripts/list-active-lincoln-branches.sh` 查看所有活跃 issue 分支的阶段状态与等待对象。
 
 > 全部模板的详细说明见 [`.claude/workflows/README.md`](.claude/workflows/README.md)。工作流模板是场景参考，人类可以基于当前场景要求 Agent 按某个固定 workflow 执行，不强制自动路由。
 
@@ -248,13 +254,15 @@ Lincoln 提供两个配套工具：
 
 - `python3`（≥3.10 推荐）
 - `node` ≥ 20（用于 `tools/lincoln/`）
-- `ffmpeg`
-- `faster-whisper` 或 OpenAI Whisper API key
 - `gh` CLI（已登录）
 - `openspec` CLI：`npm install -g @fission-ai/openspec`
+- `ffmpeg`（可选，仅录音转写需要）
+- `faster-whisper` 或 OpenAI Whisper API key（可选，仅录音转写需要）
 - Pencil 应用或 Pencil MCP（用于 `.pen` 原型）
 - `ecc` CLI（来自 everything-claude-code）
 - Obsidian（可选，用于可视化浏览 vault）
+
+Benchmark（可选）：`scripts/lincoln_benchmark.py` 提供 Lincoln 工作流的基准评测入口，需要时运行 `python3 scripts/lincoln_benchmark.py --help` 查看用法。
 
 此外，Lincoln 依赖若干外部 skill/CLI，清单见 `.claude/skills/dependencies.yaml`。初始化或升级后请让 Claude 运行：
 
@@ -302,6 +310,26 @@ Lincoln 的 `.claude/` 是开放的系统提示层，欢迎基于同一套元模
 - [`.claude/skills/dependencies.yaml`](.claude/skills/dependencies.yaml) — 外部 skill 与 CLI 依赖清单。
 
 > 提示：新增 workflow 模板时，请同步更新 `.claude/workflows/README.md` 的快速路由表与模板详解；新增 skills 或 hooks 时，请确保与 `.claude/settings.json` 和 `dependencies.yaml` 兼容，并补充必要的验证与测试。
+
+---
+
+## License 与第三方致谢
+
+Lincoln 本体以 [MIT License](LICENSE) 发布,Copyright (c) 2026 苏尚lewis (sushanglewis)。
+
+Lincoln 引用以下开源项目作为外部 skills、插件与 CLI 依赖(声明见 [`.claude/skills/dependencies.yaml`](.claude/skills/dependencies.yaml),均按其各自许可证使用):
+
+| 项目 | 来源 | 用途 | 许可证 |
+|---|---|---|---|
+| superpowers | [obra/superpowers](https://github.com/obra/superpowers) | 通用技能(brainstorming、TDD 等) | MIT |
+| gsd | [gsd-build/get-shit-done](https://github.com/gsd-build/get-shit-done) | 流程技能(import、docs-update 等) | MIT |
+| oh-my-claudecode | [Yeachan-Heo/oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) | 可选多智能体编排插件 | MIT |
+| openspec | [Fission-AI/openspec](https://github.com/Fission-AI/openspec) | 变更提案 CLI | MIT |
+| gh | [cli/cli](https://github.com/cli/cli) | GitHub CLI | MIT |
+| ffmpeg | [FFmpeg](https://ffmpeg.org/) | 可选,录音转写 | LGPL/GPL(见官网) |
+| faster-whisper | [SYSTRAN/faster-whisper](https://github.com/SYSTRAN/faster-whisper) | 可选,本地语音转写 | MIT |
+
+外部 agent 定义由 `scripts/sync-external-agents.sh` 按 manifest 同步,来源与许可证见 [`.claude/agents/external/NOTICES.md`](.claude/agents/external/NOTICES.md)(everything-claude-code、oh-my-claudecode、wshobson/agents,均为 MIT)。
 
 ---
 
