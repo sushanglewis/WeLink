@@ -2,9 +2,10 @@
 set -euo pipefail
 
 # On-stop hook for Lincoln workflow.
-# Updates last_updated_at in the workflow state file when a session ends.
+# Updates last_updated_at in the workflow stage file when a session ends.
 #
-# The state file is branch-scoped: .claude/workflow-state.yaml.
+# The operational state file is branch-scoped: <process_slug>/workflow-stage.yaml
+# (falls back to legacy .claude/workflow-state.yaml if present).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -33,17 +34,11 @@ if [[ ! -f "$STATE_FILE" ]]; then
     exit 0
 fi
 
-"$PYTHON" - "$STATE_FILE" <<'PY'
-import sys
-from datetime import datetime, timezone
-import yaml
-
-path = sys.argv[1]
-state = yaml.safe_load(open(path, encoding="utf-8"))
-state["current_run"]["last_updated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-with open(path, "w", encoding="utf-8") as f:
-    yaml.dump(state, f, allow_unicode=True, sort_keys=False)
-PY
+# Update last_updated_at through the canonical state mutation layer.
+"$PYTHON" "$ROOT/scripts/stage_loader.py" \
+    --state-file "$STATE_FILE" \
+    --action update-last-updated \
+    2>/dev/null || true
 
 CURRENT_STAGE=$("$PYTHON" - "$STATE_FILE" <<'PY' 2>/dev/null
 import sys, yaml
@@ -65,9 +60,18 @@ PY
 ) || STAGE_STATUS=""
 
 if [[ -n "$CURRENT_STAGE" && ( "$STAGE_STATUS" == "waiting_for_human" || "$STAGE_STATUS" == "validation_failed" ) ]]; then
-    # handoff-report is not supported by the flat-path stage_loader variant.
-    # A handoff note can be generated manually with the lincoln-handoff skill.
-    :
+    "$PYTHON" "$ROOT/scripts/stage_loader.py" \
+        --state-file "$STATE_FILE" \
+        --stage "$CURRENT_STAGE" \
+        --action handoff-report \
+        >/dev/null 2>&1 || true
 fi
+
+# Generate a session-stop benchmark report directly from the hook.
+# lincoln_benchmark.py handles its own 5-second deduplication.
+LINCOLN_SKIP_TRACE=1 "$PYTHON" "$ROOT/scripts/lincoln_benchmark.py" \
+    --state-file "$STATE_FILE" \
+    --trigger session_stop \
+    >/dev/null 2>&1 || true
 
 exit 0

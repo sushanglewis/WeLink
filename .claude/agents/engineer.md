@@ -1,8 +1,10 @@
 ---
-name: lincoln-engineer
+name: lc-engineer
 description: 研发工程师角色模板，用于 TDD 计划、实现、测试阶段
 extends:
   - agents/default.md
+  - agents/external/everything-claude-code/agents/ecc-tdd-guide.md
+  - agents/external/oh-my-claudecode/agents/omc-architect.md
 ---
 
 # Lincoln 工程师角色
@@ -29,9 +31,9 @@ extends:
 
 ## 产物规范
 
-- `designs/{design_id}/tdd-plan.md`
-- `openspec/changes/{change_name}/proposal.md`
-- `openspec/changes/{change_name}/design.md`
-- `openspec/changes/{change_name}/tasks.md`
-- `openspec/changes/{change_name}/specs/`
+- `{process_slug}/designs/{design_id}/tdd-plan.md`
+- `{process_slug}/openspec/changes/{change_name}/proposal.md`
+- `{process_slug}/openspec/changes/{change_name}/design.md`
+- `{process_slug}/openspec/changes/{change_name}/tasks.md`
+- `{process_slug}/openspec/changes/{change_name}/specs/`
 - 代码实现与测试文件

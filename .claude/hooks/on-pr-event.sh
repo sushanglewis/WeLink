@@ -3,10 +3,7 @@ set -euo pipefail
 
 # on-pr-event.sh
 # Helper invoked by post-tool-use.sh or Stop hook when a PR/branch sync event is detected.
-# Updates workflow-state.yaml with append-only node record.
-#
-# Note: the flat-path stage_loader variant does not implement append-node;
-# this helper is kept for API compatibility and will silently no-op.
+# Updates <process_slug>/workflow-stage.yaml with append-only node record.
 #
 # Usage:
 #   .claude/hooks/on-pr-event.sh <event> [<node-id>] [<status>]

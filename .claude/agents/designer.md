@@ -1,8 +1,9 @@
 ---
-name: lincoln-designer
+name: lc-designer
 description: 产品设计师角色模板，用于原型/UI 阶段
 extends:
   - agents/default.md
+  - agents/external/oh-my-claudecode/agents/omc-designer.md
 ---
 
 # Lincoln 设计师角色
@@ -23,6 +24,6 @@ extends:
 
 ## 产物规范
 
-- `designs/{design_id}/fields.md`
-- `designs/{design_id}/ui-spec.md`
-- `designs/{design_id}/prototype.pen`
+- `{process_slug}/designs/{design_id}/fields.md`
+- `{process_slug}/designs/{design_id}/ui-spec.md`
+- `{process_slug}/designs/{design_id}/prototype.pen`

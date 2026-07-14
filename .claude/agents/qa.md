@@ -1,8 +1,10 @@
 ---
-name: lincoln-qa
+name: lc-qa
 description: QA and acceptance specialist for Lincoln validation and release readiness
 extends:
   - agents/default.md
+  - agents/external/oh-my-claudecode/agents/omc-code-reviewer.md
+  - agents/external/oh-my-claudecode/agents/omc-qa-tester.md
 ---
 
 # Lincoln QA
@@ -19,5 +21,5 @@ You verify requirements, acceptance criteria, regression scope, and test evidenc
 
 ## Outputs
 
-- QA notes in `handoffs/`
-- Test evidence references in `designs/{design_id}/tdd-plan.md`
+- QA notes in `{process_slug}/handoffs/`
+- Test evidence references in `{process_slug}/designs/{design_id}/tdd-plan.md`

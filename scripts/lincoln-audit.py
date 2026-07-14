@@ -25,6 +25,7 @@ from scripts.stage_loader import (  # noqa: E402
     get_nodes,
     get_variables,
     interpolate_artifact,
+    load_stage_yaml,
     load_state,
     load_workflow,
     resolve_state_path,
@@ -44,15 +45,10 @@ def _parse_iso(ts: str | None) -> Any:
 
 
 def _get_stage_status(state: dict[str, Any], stage_id: str) -> str | None:
-    """Return stage status, supporting both nodes and stages schemas."""
     node = get_latest_node_for_stage(state, stage_id)
     if node is not None:
         return node.get("status")
-    # Legacy/branch-scoped flat-path states store status in the stages map.
-    stage_state = state.get("stages", {}).get(stage_id)
-    if isinstance(stage_state, dict):
-        return stage_state.get("status")
-    return stage_state if isinstance(stage_state, str) else None
+    return None
 
 
 def audit_state_consistency(state: dict[str, Any], workflow: dict[str, Any]) -> dict[str, Any]:
@@ -94,14 +90,13 @@ def audit_artifact_completeness(state: dict[str, Any], workflow: dict[str, Any],
 
     missing = []
     for sid in check_stages:
-        stage_def = find_stage(workflow, sid)
-        artifacts = stage_def.get("artifacts", [])
+        try:
+            stage = load_stage_yaml(sid)
+        except Exception:
+            continue
+        artifacts = stage.get("artifacts", {}).get("required", [])
         node = get_latest_node_for_stage(state, sid)
         produced = node.get("artifacts", []) if node else []
-        # Also support stages schema artifacts_produced list.
-        stage_state = state.get("stages", {}).get(sid, {})
-        if isinstance(stage_state, dict):
-            produced = produced + list(stage_state.get("artifacts_produced", []))
         for art in artifacts:
             resolved = interpolate_artifact(str(art), state, state_file)
             art_path = PROJECT_ROOT / resolved
@@ -121,19 +116,12 @@ def audit_human_gate_compliance(state: dict[str, Any], workflow: dict[str, Any])
         if status != "completed":
             continue
         try:
-            stage_def = find_stage(workflow, sid)
-        except ValueError:
+            stage = load_stage_yaml(sid)
+        except Exception:
             continue
-        if not stage_def.get("human_gate", False):
-            continue
-        # Support both nodes schema (gate_passed) and stages schema (human_gate_passed).
         node = get_latest_node_for_stage(state, sid)
-        if node and node.get("gate_passed"):
-            continue
-        stage_state = state.get("stages", {}).get(sid, {})
-        if isinstance(stage_state, dict) and stage_state.get("human_gate_passed"):
-            continue
-        violations.append(sid)
+        if stage.get("human_gate", False) and (node is None or not node.get("gate_passed")):
+            violations.append(sid)
 
     if violations:
         return {"check": "human_gate_compliance", "status": "FAIL", "message": f"Stages missing human gate approval: {', '.join(violations)}"}
@@ -224,7 +212,7 @@ def audit_handoff_file(state: dict[str, Any], state_file: Path | None = None) ->
 
 def run_all_audits(state: dict[str, Any], state_file: Path | None = None) -> list[dict[str, Any]]:
     """Run all audit rules and return results."""
-    template_name = state.get("workflow", {}).get("template") or state.get("workflow", {}).get("name")
+    template_name = state.get("workflow", {}).get("template")
     workflow = load_workflow(template_name)
 
     results = [

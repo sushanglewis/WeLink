@@ -140,19 +140,35 @@ if [[ -n "$TARGET_PATH" ]]; then
         exit 1
     fi
 
-    if [[ "$NORMALIZED_TARGET" == ".claude/workflow-state.yaml" ]] && is_side_effect "$TOOL_NAME"; then
+    if [[ "$NORMALIZED_TARGET" == "$PROCESS_SLUG/workflow-stage.yaml" ]] && is_side_effect "$TOOL_NAME"; then
         echo "BLOCKED: workflow state must be updated through stage_loader, not $TOOL_NAME." >&2
         exit 1
     fi
 
-    if [[ "$NORMALIZED_TARGET" == recordings/* ]] && is_side_effect "$TOOL_NAME"; then
+    if [[ "$NORMALIZED_TARGET" == "$PROCESS_SLUG/recordings/"* ]] && is_side_effect "$TOOL_NAME"; then
         echo "BLOCKED: recordings are read-only process inputs." >&2
         exit 1
     fi
 
-    # In the flat-path WeLink layout, process artifacts live directly under the
-    # project root and are allowed once the current stage has passed entry checks.
-    # The entry-check block above handles the gate.
+    if is_side_effect "$TOOL_NAME"; then
+        if [[ -n "$PROCESS_SLUG" ]]; then
+            case "$NORMALIZED_TARGET" in
+                recordings/*|*/recordings/*|interviews/*|*/interviews/*|requirements/*|*/requirements/*|designs/*|*/designs/*|openspec/changes/*|*/openspec/changes/*|docs/research/*|*/docs/research/*)
+                    if [[ "$NORMALIZED_TARGET" != "$PROCESS_SLUG/"* ]]; then
+                        echo "BLOCKED: process artifacts must be written under '$PROCESS_SLUG/'." >&2
+                        exit 1
+                    fi
+                    ;;
+            esac
+        else
+            case "$NORMALIZED_TARGET" in
+                recordings/*|*/recordings/*|interviews/*|*/interviews/*|requirements/*|*/requirements/*|designs/*|*/designs/*|openspec/changes/*|*/openspec/changes/*|docs/research/*|*/docs/research/*)
+                    echo "BLOCKED: process artifacts must be written under an initialized <process_slug>/." >&2
+                    exit 1
+                    ;;
+            esac
+        fi
+    fi
 fi
 
 # Block side-effect tools when entry checks have not passed

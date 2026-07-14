@@ -24,7 +24,6 @@ interviews/*
 
 # Context state files
 .context/
-.omc/
 
 # Visual companion session artifacts
 .superpowers/
@@ -36,6 +35,9 @@ docs/knowledge/.obsidian/graph.json
 # macOS
 .DS_Store
 
+# Session trace files (instance-level, not committed)
+*/.trace/
+
 # Python virtual environments
 .venv/
 venv/
@@ -45,3 +47,9 @@ node_modules/
 __pycache__/
 *.pyc
 *.log
+.omc/
+
+# Generated harness adapter artifacts (regenerate via:
+#   python3 scripts/lincoln-setup.py generate-harness --harness codex --harness opencode)
+.opencode/
+AGENTS.md

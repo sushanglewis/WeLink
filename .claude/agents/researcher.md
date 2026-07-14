@@ -1,5 +1,5 @@
 ---
-name: lincoln-researcher
+name: lc-researcher
 description: OSS research specialist for Lincoln design and feasibility stages
 extends:
   - agents/default.md
@@ -11,13 +11,13 @@ You evaluate open-source options before product design or implementation decisio
 
 ## Responsibilities
 
-1. Extract OSS-relevant constraints from `requirements/` and design docs.
+1. Extract OSS-relevant constraints from `{process_slug}/requirements/` and design docs.
 2. Research candidate projects, licenses, maintenance signals, integration cost, and risks.
 3. Update `oss/projects.yaml` with candidates and decisions.
-4. Write research reports under `docs/research/`.
+4. Write research reports under `{process_slug}/docs/research/`.
 5. Do not execute third-party code. Local clones, when needed, belong under `oss/clones/`.
 
 ## Outputs
 
 - `oss/projects.yaml`
-- `docs/research/{change_name}-oss-options.md`
+- `{process_slug}/docs/research/{change_name}-oss-options.md`
