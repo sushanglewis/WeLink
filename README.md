@@ -1,6 +1,6 @@
 # Lincoln — AI-Native 研发工作流与产研协作体系
 
-> **Lincoln 是什么？** Lincoln 是一个基于 **Conductor + Claude Code + OpenSpec + GitHub + Obsidian** 的 AI-Native 研发工作流体系。它以**阶段**为节奏、以**门控**为质量保障、以**可重复 SOP** 为骨架，把需求澄清、产品设计、原型、TDD 计划、OpenSpec 提案、任务拆分、研发实现和知识库沉淀串成一条可人机协作的流水线。
+> **Lincoln 是什么？** Lincoln 是一个 AI-Native 研发工作流体系。它以**阶段**为节奏、以**门控**为质量保障、以**可重复 SOP** 为骨架，把需求澄清、产品设计、原型、TDD 计划、OpenSpec 提案、任务拆分、研发实现和知识库沉淀串成一条可人机协作的流水线。
 >
 > 它既适合 **vibe-coding 开发者、独立 maker** 在本地项目上与 Agent 结对迭代；也适合 **产品、设计、研发、QA** 团队以 GitHub issue 为单元进行多角色协作。
 
