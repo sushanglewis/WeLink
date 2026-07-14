@@ -1,5 +1,7 @@
 # Open Source Research: 协同表格 (Collaborative Spreadsheet)
 
+> ⚠️ **已被国产化要求取代（2026-07-14）**：本研究候选（Baserow / NocoDB / Grist / Teable）多为**境外项目或 AGPL 许可**，不符合政企"国产化"硬约束（须为中国境内项目、许可支持嵌入自研产品或可商务买断）。**请勿据此选型**。explore-opensource 阶段需按国产化约束转向国产多维表格方案重新评估。详见 `issue-6/requirements/2026-07-10-collaborative-spreadsheet/` 选型原则。
+
 ## Recommendation
 
 **Top choice:** Baserow  

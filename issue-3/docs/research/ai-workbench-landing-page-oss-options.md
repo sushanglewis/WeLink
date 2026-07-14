@@ -1,5 +1,7 @@
 # Open Source Research: 企业 AI 工作台一级落地页
 
+> ⚠️ **已被国产化要求取代（2026-07-14）**：本研究候选（LibreChat / Open WebUI / LobeChat）均为**境外项目**，不符合政企"国产化"硬约束（须为中国境内项目、许可支持嵌入自研产品或可商务买断）。**请勿据此选型**。explore-opensource 阶段需按国产化约束转向国产 AI 工作台/对话框架重新评估。详见 `issue-3/requirements/github-issue-3/requirements.md` 技术集成一节。
+
 ## Recommendation
 
 **Top choice:** LibreChat  
