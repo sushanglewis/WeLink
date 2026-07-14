@@ -1,85 +1,22 @@
 # Linked GitHub Issues for Lincoln OpenSpec change
-# Session: 2026-06-28-stakeholder-checkout
-# Change: lincoln-tui-recorder
+# Session: 2026-07-13-issue-47
+# Change: multi-harness-adapter
+# Note: PM decided single-issue delivery on branch issue-47; slices below are
+# task slices within issue #47, not separate GitHub issues.
 
 issues:
-  - issue_number: 3
-    title: "lincoln-cli: CLI entry, args parsing, and ~/.lincolnrc config loading"
-    capability: lincoln-cli
-    source: openspec/changes/lincoln-tui-recorder/specs/lincoln-cli.md
-  - issue_number: 4
-    title: "lincoln-tui: Recording screen, audio meter, and key handlers"
-    capability: lincoln-tui
-    source: openspec/changes/lincoln-tui-recorder/design.md
-  - issue_number: 5
-    title: "lincoln-recording-backend: Spawn record-interview and save artifacts"
-    capability: lincoln-recording-backend
-    source: openspec/changes/lincoln-tui-recorder/tasks.md
-  - issue_number: 6
-    title: "lincoln-workflow-integration: Trigger process-interview after recording"
-    capability: lincoln-workflow-integration
-    source: openspec/changes/lincoln-tui-recorder/tasks.md
+  - issue_number: 47
+    title: "Lincoln 多 harness 适配(codex/opencode)+ lc-* 命令统一"
+    capability: multi-harness-adapter
+    source: issue-47/openspec/changes/multi-harness-adapter/proposal.md
+    slices:
+      - id: slice-1
+        title: "适配生成器核心 + harness manifest + 轻量门控模板"
+      - id: slice-2
+        title: "opencode 适配(.opencode/agent + command/lc-*)"
+      - id: slice-3
+        title: "codex 适配(AGENTS.md + ~/.codex/prompts,含 spike 验证)"
+      - id: slice-4
+        title: "lc-* 重命名 + 安装集成 + CI 漂移校验 + 文档"
 
-requirements_file: requirements/2026-06-28-stakeholder-checkout/requirements.md
-
----
-# Linked GitHub Issues for recording-replacement (LEW-17 / #25)
-# Generated during split stage. Issue numbers below are local placeholders
-# because this environment cannot reach github.com; replace with real issue
-# IDs once network access is available.
-
-parent:
-  issue_number: 25
-  title: "Replace Lincoln in-house recording tools with OSS-first local CLI recorder"
-
-sub_issues:
-  - issue_number: 25-phase-1
-    title: "Phase 1: lincoln-record CLI skeleton and configuration"
-    status: completed
-    accepts:
-      - tools/lincoln-record/src/cli.rs
-      - tools/lincoln-record/src/config.rs
-      - tools/lincoln-record/src/audio/devices.rs
-      - tools/lincoln-record/tests/cli_args.rs
-      - tools/lincoln-record/tests/config_test.rs
-      - tools/lincoln-record/tests/devices_test.rs
-  - issue_number: 25-phase-2
-    title: "Phase 2: Audio capture and checkpoint saving"
-    status: completed
-    accepts:
-      - tools/lincoln-record/src/audio/source.rs
-      - tools/lincoln-record/src/audio/resampler.rs
-      - tools/lincoln-record/src/audio/saver.rs
-      - tools/lincoln-record/src/audio/capture/microphone.rs
-      - tools/lincoln-record/src/main.rs
-      - tools/lincoln-record/tests/integration_tests.rs
-  - issue_number: 25-phase-3
-    title: "Phase 3: Local transcription providers"
-    status: completed
-    accepts:
-      - tools/lincoln-record/src/transcription/provider.rs
-      - tools/lincoln-record/src/transcription/diarization.rs
-      - tools/lincoln-record/src/output/transcript.rs
-      - tools/lincoln-record/src/output/metadata.rs
-      - tools/lincoln-record/tests/transcription_tests.rs
-  - issue_number: 25-phase-4
-    title: "Phase 4: Speaker diarization sidecar"
-    status: completed
-    accepts:
-      - tools/lincoln-record/diarize/diarize.py
-      - tools/lincoln-record/diarize/merge.py
-      - tools/lincoln-record/tests/diarization_tests.rs
-  - issue_number: 25-phase-5
-    title: "Phase 5: Lincoln-standard output and adapter"
-    status: completed
-    accepts:
-      - tools/lincoln/src/recording/spawnRecorder.ts
-      - tools/lincoln/src/recording/useRecorder.ts
-      - tools/lincoln/src/components/RecordingApp.tsx
-      - tools/lincoln/tests/recording/spawnRecorder.test.ts
-  - issue_number: 25-phase-6
-    title: "Phase 6: Deprecate record-interview and update docs"
-    status: completed
-    accepts:
-      - tools/record-interview/README.md
-      - .claude/skills/process-interview/SKILL.md
+requirements_file: issue-47/requirements/2026-07-13-issue-47/requirements.md
