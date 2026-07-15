@@ -1,0 +1,92 @@
+schema_version: 2.0.0
+workflow:
+  name: oss-first-design
+  version: 1.0.0
+  template: oss-first-design
+current_run:
+  run_id: 20260714072902-iss6
+  branch: issue-6
+  current_stage: product-prototype
+  status: in_progress
+  started_at: '2026-07-14T07:29:02Z'
+  last_updated_at: '2026-07-15T02:04:53Z'
+  issue_number: 6
+  execution_mode: team
+  variables:
+    process_slug: issue-6
+    session_id: 2026-07-10-collaborative-spreadsheet
+    design_id: online-collaborative-spreadsheet
+    issue_number: 6
+    change_name: online-collaborative-spreadsheet
+    pr_number: null
+    feature_slug: null
+artifact_guidance: "This issue work package holds all artifacts produced while resolving the issue.\n\nHow to use templates:\n\
+  - Copy a `.tpl` file from the relevant directory, remove the `.tpl` extension,\n  and replace placeholders ({issue_number},\
+  \ {session_id}, {design_id}, {change_name}).\n- Use `designs/` for product design docs, `requirements/` for clarified needs,\n\
+  \  `interviews/` for recorded session outputs, `openspec/` for implementation proposals,\n  `docs/` for research and decision\
+  \ records, and `recordings/` for raw input files only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage>\
+  \ --action record-artifacts`\n  to persist produced artifact paths back into this workflow-stage.yaml.\n\nApproval convention:\n\
+  - Add `<!-- status: approved -->` or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before handoff.\n"
+nodes:
+- stage_id: workflow-router
+  node_id: workflow-router-migrated
+  status: completed
+  started_at: '2026-07-15T02:04:35Z'
+  completed_at: '2026-07-15T02:04:36Z'
+  gate_passed: true
+  approved_by: sushanglewis
+  artifacts:
+  - issue-6/workflow-stage.yaml
+  handoff_file: null
+- stage_id: clarify
+  node_id: clarify-migrated
+  status: completed
+  started_at: '2026-07-15T02:04:36Z'
+  completed_at: '2026-07-15T02:04:36Z'
+  gate_passed: true
+  approved_by: sushanglewis
+  artifacts:
+  - issue-6/requirements/2026-07-10-collaborative-spreadsheet/srs.md
+  - issue-6/requirements/2026-07-10-collaborative-spreadsheet/feature-requirements.md
+  - issue-6/requirements/2026-07-10-collaborative-spreadsheet/supervision-collab-requirements.md
+  handoff_file: null
+- stage_id: explore-opensource
+  node_id: explore-opensource-migrated
+  status: completed
+  started_at: '2026-07-15T02:04:52Z'
+  completed_at: '2026-07-15T02:04:52Z'
+  gate_passed: true
+  approved_by: sushanglewis
+  artifacts:
+  - issue-6/docs/research/collaborative-spreadsheet-oss-options.md
+  handoff_file: null
+- stage_id: product-design-docs
+  node_id: product-design-docs-migrated
+  status: completed
+  started_at: '2026-07-15T02:04:52Z'
+  completed_at: '2026-07-15T02:04:53Z'
+  gate_passed: true
+  approved_by: sushanglewis
+  artifacts:
+  - issue-6/designs/supervision-collab-va/design-review.md
+  - issue-6/designs/supervision-collab-va/scenarios.md
+  - issue-6/designs/supervision-collab-va/feature-catalog.md
+  - issue-6/designs/supervision-collab-va/data-model.md
+  - issue-6/designs/supervision-collab-va/flows.md
+  - issue-6/designs/supervision-collab-va/feasibility.md
+  - issue-6/designs/supervision-collab-va/integration-plan.md
+  handoff_file: null
+- stage_id: product-prototype
+  node_id: product-prototype-migrated
+  status: in_progress
+  started_at: '2026-07-15T02:04:53Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts: []
+  handoff_file: null
+recovery:
+  last_validated_checkpoint: ''
+  can_resume_from: workflow-router
+  abort_reason: null
+  abort_at: null
