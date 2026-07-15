@@ -1,9 +1,28 @@
 projects:
+  - name: teableio/teable
+    url: https://github.com/teableio/teable
+    license: AGPL-3.0 (commercial license available via business agreement)
+    fit_score: 4.5
+    status: recommended
+    domain: collaborative-spreadsheet
+    decided_at: "2026-07-15"
+    notes: |
+      China-domestic multi-dimensional spreadsheet (维格表) platform, satisfying
+      the government/enterprise 国产化 hard constraint. Provides workspace /
+      app / table / view / field / record data model, real-time collaboration,
+      permission system, REST API, and Webhooks. Selected as the underlying
+      implementation for WeLink's collaborative-spreadsheet L1 feature
+      (issue-6). AGPL-3.0 requires a commercial license for embedding into
+      WeLink's proprietary product; business agreement path confirmed.
+      Supersedes Baserow (NL, MIT/paid-enterprise), which is retained as the
+      functional-completeness reference baseline in the SRS only.
+
   - name: OpenWhispr/OpenWhispr
     url: https://github.com/OpenWhispr/OpenWhispr
     license: MIT
     fit_score: 4.5
     status: recommended
+    domain: voice-transcription
     notes: |
       Cross-platform (macOS/Windows/Linux) Electron voice dictation + meeting
       transcription app. Local Whisper/Parakeet transcription, local speaker
