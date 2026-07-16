@@ -122,7 +122,7 @@
 |------|------|--------|------|----------|
 | F-036 | CLI / MCP 原生支持 | P0 | 除内置自动化/AI 应用外，表格必须支持 **CLI 命令** 或 **MCP Server**；若只有 REST API，也必须能在 1 人天内封装为 MCP，供 Agent 调用 | Agent 可通过 MCP/CLI 执行：查表、按条件查询、插入/更新/删除行、列出 workspace/database/table |
 | F-037 | 事件捕获与通知 | P0 | 支持捕获表格行级事件（create/update/delete），并通知协作者或外部系统 | 主表新增记录后，关联的协作者收到通知；Webhook 同时触发外部延时任务 |
-| F-038 | 协作者列 | P0 | 支持“协作人 / multiple_collaborators”字段类型，可自动匹配系统用户；当协作者被写入时，该用户收到通知 | 主表“经办人”字段值可自动匹配为 Baserow 用户并写入跟进表协作者列；被匹配用户收到 IM/邮件通知 |
+| F-038 | 协作者列 | P0 | 支持“协作人 / multiple_collaborators”字段类型，可自动匹配系统用户；当协作者被写入时，该用户收到通知 | 主表“经办人”字段值可自动匹配为系统用户并写入跟进表协作者列；被匹配用户收到 IM/邮件通知 |
 | F-039 | 主表行内子表标签展示 | P0 | 主表与子表为一对多关联时，主表行内以**标签**形式展示所有子表记录的某个字段枚举值；点击标签可打开该子表记录的**表单视图**进行查看/编辑 | 主表“跟进记录”列显示多个标签（如“2026-07-10 / 未填报”）；点击标签弹出子表填报表单 |
 | F-040 | 行列级 CURD 权限控制 | P0 | 支持基于用户角色的行级、列级增删改查控制；不同角色对同一表的不同行/列拥有不同权限 | 督办专员可删除任意行，经办人只能更新自己被协作者的行且无法查看/编辑敏感列；配置后用户无权限的按钮/字段不显示 |
 
@@ -256,5 +256,5 @@
 - `designs/supervision-collab-va/feature-catalog.md` — 督办协作功能清单
 - `designs/supervision-collab-va/flows.md` — 督办协作数据流
 - `designs/supervision-collab-va/data-model.md` — 主表/跟进表字段映射
-- `designs/supervision-collab-va/integration-plan.md` — Baserow 嵌入 IM 系统方案
+- `designs/supervision-collab-va/integration-plan.md` — Teable 嵌入 IM 系统方案
 - `docs/research/collaborative-spreadsheet-oss-options.md` — 协同表格开源方案研究

@@ -1,27 +1,29 @@
-# Feasibility: Baserow + Mattermost 督办协作系统
+# Feasibility: Teable + Mattermost 督办协作系统
+
+> **⚠️ 选型更新(2026-07-15)**:本文档基于 Baserow 的具体实例编写,**选型已更新为 [Teable](https://github.com/teableio/teable)**。文档中的可行性论证框架(业务、技术、运维)仍可参考,但具体工具链与版本号需按 Teable 实际能力重新核对。Baserow 仅保留作为功能完备性参照基线(见 SRS §1.3)。
 
 ## 业务可行性
 
 - **需求来源明确**：督办协作是政府/企业常见的任务闭环场景，存在"派发—跟进—提醒—反馈"的固定模式。
-- **用户路径清晰**：督办专员通过 Mattermost 批量操作，经办人通过 Mattermost 接收通知并登录 Baserow 填报，符合现有工作习惯。
-- **Baserow 已承载数据**：主表与跟进表已存在且已建立 Link to table 关联，无需从零设计数据库。
+- **用户路径清晰**：督办专员通过 Mattermost 批量操作，经办人通过 Mattermost 接收通知并登录 Teable 填报，符合现有工作习惯。
+- **Teable 已承载数据**：主表与跟进表已存在且已建立 Link to table 关联，无需从零设计数据库。
 - **风险点**：Excel 模板格式、经办人账号映射、汇报周期定义需要在开发前与业务方确认。
 
 ## 技术可行性
 
 - **Mattermost Bot**：`mattermostdriver` 官方库支持 Bot 账号、DM 发送、文件下载，技术成熟。
-- **Baserow API**：提供标准的 REST API 和 Webhook，支持批量创建、字段过滤、协作者写入。
+- **Teable API**：提供标准的 REST API 和 Webhook，支持批量创建、字段过滤、协作者写入。
 - **延时任务**：Celery + Redis 方案成熟，支持任务持久化、取消、延迟执行，满足 24h/36h 监控需求。
 - **Excel 解析**：Python `pandas` + `openpyxl` 可稳定解析 `.xlsx`，支持错误行定位。
 - **部署**：可通过 Docker Compose 统一部署 Bot、Webhook、Celery Worker、Redis。
 
 ## 开源项目与 MCP 调研
 
-### Baserow
+### Teable
 
-- **官方 MCP Server**：Baserow 提供内置 MCP Server，支持 CRUD、列出数据库/表、获取表结构等操作。文档：https://baserow.io/user-docs/mcp-server
-- **`baserow-cli`**：社区 CLI 工具，支持 `rows create`、`rows batch-create`、`tables list` 等操作，适合脚本化调用。仓库：https://github.com/jzakirov/baserow-cli
-- **官方 REST API**：若 MCP/CLI 不满足需求，可直接调用 Baserow REST API。
+- **官方 RESTful OpenAPI**:Teable 基于 OpenAPI(Swagger)提供完整 REST API,覆盖 CRUD、列出 base/表、获取表结构等操作。文档:https://help.teable.io/en/api-doc/token
+- **社区 MCP Server / SDK**:社区提供 Teable MCP Server 与 Python SDK,适合脚本化调用与 Agent 编排。具体可用性与版本需在 PoC 阶段验证。
+- **官方 OpenAPI 客户端**:若社区 SDK 不满足需求,可直接调用 Teable RESTful OpenAPI。
 
 ### Mattermost
 

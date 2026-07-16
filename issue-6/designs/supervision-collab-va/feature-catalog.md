@@ -1,4 +1,6 @@
-# Feature Catalog: Baserow + Mattermost 督办协作系统
+# Feature Catalog: Teable + Mattermost 督办协作系统
+
+> **⚠️ 选型更新(2026-07-15)**:本文档基于 Baserow 的具体实例编写,**选型已更新为 [Teable](https://github.com/teableio/teable)**。文档中的功能编号、优先级、验收标准仍可参考,但 Baserow 特有的 `field_<数字>`、`table_id` 实例数据为历史参考,需按 Teable 实际字段/表 ID 重新映射。Baserow 仅保留作为功能完备性参照基线(见 SRS §1.3)。
 
 ## P0 功能清单与验收标准
 
@@ -7,19 +9,19 @@
 | 编号 | 功能 | 验收标准 |
 |------|------|----------|
 | FR-001 | Agent 调用脚本导入 Excel | Agent 通过 `upload-excel --table-id 378 --file path.xlsx --operation append` 触发导入，脚本在 60 秒内完成百级数据写入。 |
-| FR-002 | 字段可配置映射 | `config/field_mapping.py` 中修改 Excel 列名到 Baserow field_id 的映射后，无需改代码即可适配新模板。 |
+| FR-002 | 字段可配置映射 | `config/field_mapping.py` 中修改 Excel 列名到 Teable field_id 的映射后，无需改代码即可适配新模板。 |
 | FR-003 | 错误行与原因返回 | 脚本返回失败明细（行号、列名、失败原因）；Agent 仅向督办专员汇报汇总信息。 |
 | FR-004 | 批量创建主表记录 | 一次导入 100 行以内数据时，脚本能在 60 秒内完成全部主表记录创建；记录导入不允许因经办人映射失败而整体失败。 |
-| FR-006 | Baserow 自动匹配协作者 | 主表经办人字段通过 Baserow 公式/自动化匹配为 Baserow 用户，并自动写入跟进表 `Collaborators`；匹配失败时留空。 |
+| FR-006 | Teable 自动匹配协作者 | 主表经办人字段通过 Teable 公式/自动化匹配为 Teable 用户，并自动写入跟进表 `Collaborators`；匹配失败时留空。 |
 
 ### FR-007 ~ FR-010：任务编号批量跟进
 
 | 编号 | 功能 | 验收标准 |
 |------|------|----------|
 | FR-007 | 任务编号识别 | Agent 或脚本能从文本中提取逗号、空格、换行分隔的任意数量任务编号。 |
-| FR-008 | 主表存在性校验 | 脚本对每个编号调用 Baserow API 查询，确认对应主表记录存在。 |
+| FR-008 | 主表存在性校验 | 脚本对每个编号调用 Teable API 查询，确认对应主表记录存在。 |
 | FR-009 | 失败清单返回 | 不存在的编号以列表形式返回给 Agent，Agent 向督办专员说明"未找到对应任务编号"。 |
-| FR-010 | 成功清单与通知 | 存在的编号创建跟进记录后，脚本返回成功编号列表；Baserow 自动匹配协作者并触发后续通知。 |
+| FR-010 | 成功清单与通知 | 存在的编号创建跟进记录后，脚本返回成功编号列表；Teable 自动匹配协作者并触发后续通知。 |
 
 ### FR-012 ~ FR-014：经办人通知
 
