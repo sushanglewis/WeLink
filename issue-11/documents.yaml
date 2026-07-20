@@ -1,5 +1,29 @@
 process_slug: issue-11
 issue_number: '11'
 current_stage: ingest
-last_updated: '2026-07-20T02:55:31Z'
-documents: []
+last_updated: '2026-07-20T02:57:42Z'
+documents:
+- path: interviews/2026-07-20-issue-11/metadata.json
+  stage: ingest
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: interviews/2026-07-20-issue-11/raw-insights.md
+  stage: ingest
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: interviews/2026-07-20-issue-11/summary.md
+  stage: ingest
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: interviews/2026-07-20-issue-11/transcript.md
+  stage: ingest
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
