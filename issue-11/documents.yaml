@@ -1,8 +1,44 @@
 process_slug: issue-11
 issue_number: '11'
 current_stage: product-design-docs
-last_updated: '2026-07-20T03:33:00Z'
+last_updated: '2026-07-20T03:36:23Z'
 documents:
+- path: designs/issue-11/data-model.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: designs/issue-11/design-review.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: designs/issue-11/feasibility.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: designs/issue-11/feature-catalog.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: designs/issue-11/flows.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: designs/issue-11/scenarios.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
 - path: interviews/2026-07-20-issue-11/metadata.json
   stage: ingest
   status: completed
