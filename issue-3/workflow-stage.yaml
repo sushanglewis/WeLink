@@ -9,7 +9,7 @@ current_run:
   current_stage: product-prototype
   status: in_progress
   started_at: '2026-06-27T00:00:00Z'
-  last_updated_at: '2026-07-07T10:26:52Z'
+  last_updated_at: '2026-07-16T03:46:21Z'
   issue_number: 3
   execution_mode: team
   variables:
@@ -20,17 +20,13 @@ current_run:
     change_name: ai-workbench-landing-page
     pr_number: null
     feature_slug: null
-artifact_guidance: "This issue work package holds all artifacts produced while resolving\
-  \ the issue.\n\nHow to use templates:\n- Copy a `.tpl` file from the relevant directory,\
-  \ remove the `.tpl` extension,\n  and replace placeholders ({issue_number}, {session_id},\
-  \ {design_id}, {change_name}).\n- Use `designs/` for product design docs, `requirements/`\
-  \ for clarified needs,\n  `interviews/` for recorded session outputs, `openspec/`\
-  \ for implementation proposals,\n  `docs/` for research and decision records, and\
-  \ `recordings/` for raw input files only.\n- When a stage completes, run `scripts/stage_loader.py\
-  \ --stage <stage> --action record-artifacts`\n  to persist produced artifact paths\
-  \ back into this workflow-stage.yaml.\n\nApproval convention:\n- Add `<!-- status:\
-  \ approved -->` or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human\
-  \ PM before handoff.\n"
+artifact_guidance: "This issue work package holds all artifacts produced while resolving the issue.\n\nHow to use templates:\n\
+  - Copy a `.tpl` file from the relevant directory, remove the `.tpl` extension,\n  and replace placeholders ({issue_number},\
+  \ {session_id}, {design_id}, {change_name}).\n- Use `designs/` for product design docs, `requirements/` for clarified needs,\n\
+  \  `interviews/` for recorded session outputs, `openspec/` for implementation proposals,\n  `docs/` for research and decision\
+  \ records, and `recordings/` for raw input files only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage>\
+  \ --action record-artifacts`\n  to persist produced artifact paths back into this workflow-stage.yaml.\n\nApproval convention:\n\
+  - Add `<!-- status: approved -->` or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before handoff.\n"
 nodes:
 - stage_id: workflow-router
   node_id: workflow-router-migrated
@@ -57,7 +53,8 @@ nodes:
   completed_at: '2026-07-07T08:35:59Z'
   gate_passed: false
   approved_by: null
-  artifacts: []
+  artifacts:
+  - issue-3/docs/research/ai-workbench-landing-page-oss-options.md
   handoff_file: null
 - stage_id: product-design-docs
   node_id: product-design-docs-migrated
