@@ -1,7 +1,7 @@
 process_slug: issue-11
 issue_number: '11'
-current_stage: clarify
-last_updated: '2026-07-20T03:26:07Z'
+current_stage: product-design-docs
+last_updated: '2026-07-20T03:33:00Z'
 documents:
 - path: interviews/2026-07-20-issue-11/metadata.json
   stage: ingest
@@ -29,19 +29,19 @@ documents:
   approved_by: system
 - path: requirements/2026-07-20-issue-11/prd.md
   stage: clarify
-  status: in_progress
-  gate_passed: false
-  human_confirmed: false
-  approved_by: null
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
 - path: requirements/2026-07-20-issue-11/requirements.md
   stage: clarify
-  status: in_progress
-  gate_passed: false
-  human_confirmed: false
-  approved_by: null
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
 - path: requirements/2026-07-20-issue-11/user-stories.md
   stage: clarify
-  status: in_progress
-  gate_passed: false
-  human_confirmed: false
-  approved_by: null
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
