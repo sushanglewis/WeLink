@@ -314,6 +314,10 @@ echo "==> Validate Python syntax for scripts"
 "$PYTHON" -m py_compile scripts/lincoln_paths.py
 "$PYTHON" -m py_compile scripts/check-main-merge-hygiene.py
 "$PYTHON" -m py_compile scripts/lincoln_harness_adapter.py
+"$PYTHON" -m py_compile scripts/bump_version.py
+"$PYTHON" -m py_compile scripts/check-dependency-drift.py
+"$PYTHON" -m py_compile scripts/lc-benchmark-cli.py
+"$PYTHON" -m py_compile scripts/package-lincoln-plugin.py
 
 echo "==> Check main merge hygiene"
 "$PYTHON" scripts/check-main-merge-hygiene.py || true
@@ -331,6 +335,13 @@ done
 
 echo "==> Check harness drift"
 bash scripts/check-harness-drift.sh
+
+echo "==> Check version lockstep"
+"$PYTHON" scripts/bump_version.py --check
+
+echo "==> Check plugin package manifest"
+find .claude scripts tools -type d -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null || true
+"$PYTHON" scripts/package-lincoln-plugin.py check
 
 echo "==> Run pytest"
 "$PYTHON" -m pytest tests/ -v

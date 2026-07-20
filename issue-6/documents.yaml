@@ -1,7 +1,7 @@
 process_slug: issue-6
 issue_number: '6'
 current_stage: product-prototype
-last_updated: '2026-07-15T03:40:36Z'
+last_updated: '2026-07-16T03:44:26Z'
 documents:
 - path: designs/online-collaborative-spreadsheet/fields.md
   stage: product-prototype
