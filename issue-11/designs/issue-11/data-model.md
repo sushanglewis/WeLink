@@ -30,6 +30,7 @@
 |------|------|------|------|
 | `id` | string | 导航项标识 | `contacts` / `chat` / `ai-sheets` |
 | `label` | string | 显示名称 | 中文化，如「通讯录」「聊天」「AI 表格」 |
+| `position` | enum | 导航位置 | 默认 `sidebar`（左侧边栏） |
 | `icon` | string | 图标名称/SVG | 必填 |
 | `type` | enum | 内容类型 | `webview` / `native` |
 | `url_path` | string | WebView 加载路径 | `type=webview` 时必填 |
@@ -54,6 +55,7 @@
 | `title` | string | 通知标题 | 必填 |
 | `body` | string | 通知内容 | 必填 |
 | `channel_id` | string | 频道/会话 ID | 用于点击跳转 |
+| `source` | enum | 通知来源 | `webview` / `native` |
 | `sender_name` | string | 发送者名称 | 可选 |
 | `created_at` | datetime | 通知时间 | 必填 |
 

@@ -51,7 +51,7 @@ sequenceDiagram
     end
 ```
 
-## 时序：新消息通知
+## 时序：新消息通知与红点统一
 
 ```mermaid
 sequenceDiagram
@@ -60,16 +60,20 @@ sequenceDiagram
     participant WV as 聊天 WebView
     participant Bridge as Tauri JS Bridge
     participant App as 桌面应用 Shell
+    participant Sidebar as 左侧边栏导航
     participant OS as 操作系统
 
     MM->>WV: WebSocket 推送新消息
-    WV->>Bridge: postMessage('new-message', payload)
-    Bridge->>App: 调用 native notify
+    WV->>Bridge: postMessage('unread-update', {channelId, count})
+    Bridge->>App: 调用 native updateUnreadCount
+    App->>Sidebar: 更新对应导航项红点/未读数
     App->>App: 更新托盘红点
-    App->>OS: 发送系统通知
-    OS-->>App: 用户点击通知
-    App->>App: 唤出窗口并切换至聊天标签
-    App->>WV: 通知已处理
+    alt 需要弹窗
+        App->>OS: 发送系统通知
+        OS-->>App: 用户点击通知
+        App->>App: 唤出窗口并切换至聊天标签
+        App->>WV: 通知已处理
+    end
 ```
 
 ## 架构图
