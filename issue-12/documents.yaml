@@ -1,7 +1,7 @@
 process_slug: issue-12
 issue_number: '12'
-current_stage: clarify
-last_updated: '2026-07-20T03:50:31Z'
+current_stage: product-design-docs
+last_updated: '2026-07-20T03:59:38Z'
 documents:
 - path: interviews/2026-07-20-issue-12/metadata.json
   stage: ingest
@@ -27,3 +27,21 @@ documents:
   gate_passed: true
   human_confirmed: false
   approved_by: system
+- path: requirements/2026-07-20-issue-12/prd.md
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: sushanglewis
+- path: requirements/2026-07-20-issue-12/requirements.md
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: sushanglewis
+- path: requirements/2026-07-20-issue-12/user-stories.md
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: sushanglewis
