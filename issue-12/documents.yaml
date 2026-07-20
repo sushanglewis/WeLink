@@ -1,7 +1,7 @@
 process_slug: issue-12
 issue_number: '12'
 current_stage: product-design-docs
-last_updated: '2026-07-20T03:59:38Z'
+last_updated: '2026-07-20T04:10:33Z'
 documents:
 - path: interviews/2026-07-20-issue-12/metadata.json
   stage: ingest
