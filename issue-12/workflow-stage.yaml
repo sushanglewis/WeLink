@@ -6,10 +6,10 @@ workflow:
 current_run:
   run_id: 20260720034854-bfcff550
   branch: issue-12
-  current_stage: ingest
-  status: in_progress
+  current_stage: clarify
+  status: not_started
   started_at: '2026-07-20T03:48:54Z'
-  last_updated_at: '2026-07-20T03:48:54Z'
+  last_updated_at: '2026-07-20T03:50:31Z'
   issue_number: '12'
   variables:
     process_slug: issue-12
@@ -23,23 +23,53 @@ current_run:
   pr_number: ''
   feature_slug: ''
   execution_mode: team
-artifact_guidance: "This issue work package holds all artifacts produced while resolving\
-  \ the issue.\n\nHow to use templates:\n- Document templates live read-only under\
-  \ `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
-  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format\
-  \ reference and author the\n  document directly in the appropriate package directory,\
-  \ replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
-  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n\
-  \  `interviews/` for recorded session outputs, `openspec/` for implementation proposals,\n\
-  \  `docs/` for research and decision records, and `recordings/` for raw input files\
-  \ only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage>\
-  \ --action record-artifacts`\n  to persist produced artifact paths back into this\
-  \ workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
-  \ in the package root. Read that\n  index first to learn which documents exist and\
-  \ their approval status.\n\nApproval convention:\n- Add `<!-- status: approved -->`\
-  \ or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before\
-  \ handoff.\n"
-nodes: []
+  previous_stage: ingest
+artifact_guidance: "This issue work package holds all artifacts produced while resolving the issue.\n\nHow to use templates:\n\
+  - Document templates live read-only under `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
+  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format reference and author the\n  document\
+  \ directly in the appropriate package directory, replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
+  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n  `interviews/` for recorded session outputs,\
+  \ `openspec/` for implementation proposals,\n  `docs/` for research and decision records, and `recordings/` for raw input\
+  \ files only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage> --action record-artifacts`\n  to persist\
+  \ produced artifact paths back into this workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
+  \ in the package root. Read that\n  index first to learn which documents exist and their approval status.\n\nApproval convention:\n\
+  - Add `<!-- status: approved -->` or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before handoff.\n"
+nodes:
+- stage_id: workflow-router
+  node_id: workflow-router-2026-07-20T03:50:23Z
+  status: completed
+  gate_passed: true
+  approved_by: sushanglewis
+  started_at: '2026-07-20T03:50:23Z'
+  completed_at: '2026-07-20T03:50:23Z'
+  artifacts: []
+  handoff_file: null
+- stage_id: ingest
+  node_id: ingest-2026-07-20T03:50:30Z
+  status: in_progress
+  started_at: '2026-07-20T03:50:30Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - issue-12/interviews/2026-07-20-issue-12/metadata.json
+  - issue-12/interviews/2026-07-20-issue-12/raw-insights.md
+  - issue-12/interviews/2026-07-20-issue-12/summary.md
+  - issue-12/interviews/2026-07-20-issue-12/transcript.md
+  handoff_file: null
+- stage_id: ingest
+  node_id: ingest-completed
+  status: completed
+  started_at: '2026-07-20T03:50:31Z'
+  completed_at: '2026-07-20T03:50:31Z'
+  gate_passed: true
+  approved_by: system
+  artifacts:
+  - issue-12/interviews/2026-07-20-issue-12/metadata.json
+  - issue-12/interviews/2026-07-20-issue-12/transcript.md
+  - issue-12/interviews/2026-07-20-issue-12/summary.md
+  - issue-12/interviews/2026-07-20-issue-12/raw-insights.md
+  handoff_file: null
 recovery:
   last_validated_checkpoint: ''
   can_resume_from: ingest

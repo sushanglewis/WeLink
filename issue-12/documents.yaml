@@ -1,5 +1,29 @@
 process_slug: issue-12
 issue_number: '12'
-current_stage: ingest
-last_updated: '2026-07-20T03:48:54Z'
-documents: []
+current_stage: clarify
+last_updated: '2026-07-20T03:50:31Z'
+documents:
+- path: interviews/2026-07-20-issue-12/metadata.json
+  stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: interviews/2026-07-20-issue-12/raw-insights.md
+  stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: interviews/2026-07-20-issue-12/summary.md
+  stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: interviews/2026-07-20-issue-12/transcript.md
+  stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
