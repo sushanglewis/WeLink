@@ -9,7 +9,7 @@ current_run:
   current_stage: ingest
   status: in_progress
   started_at: '2026-07-20T02:48:59Z'
-  last_updated_at: '2026-07-20T02:48:59Z'
+  last_updated_at: '2026-07-20T02:55:31Z'
   issue_number: '11'
   variables:
     process_slug: issue-11
@@ -23,23 +23,26 @@ current_run:
   pr_number: ''
   feature_slug: ''
   execution_mode: team
-artifact_guidance: "This issue work package holds all artifacts produced while resolving\
-  \ the issue.\n\nHow to use templates:\n- Document templates live read-only under\
-  \ `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
-  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format\
-  \ reference and author the\n  document directly in the appropriate package directory,\
-  \ replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
-  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n\
-  \  `interviews/` for recorded session outputs, `openspec/` for implementation proposals,\n\
-  \  `docs/` for research and decision records, and `recordings/` for raw input files\
-  \ only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage>\
-  \ --action record-artifacts`\n  to persist produced artifact paths back into this\
-  \ workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
-  \ in the package root. Read that\n  index first to learn which documents exist and\
-  \ their approval status.\n\nApproval convention:\n- Add `<!-- status: approved -->`\
-  \ or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before\
-  \ handoff.\n"
-nodes: []
+artifact_guidance: "This issue work package holds all artifacts produced while resolving the issue.\n\nHow to use templates:\n\
+  - Document templates live read-only under `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
+  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format reference and author the\n  document\
+  \ directly in the appropriate package directory, replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
+  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n  `interviews/` for recorded session outputs,\
+  \ `openspec/` for implementation proposals,\n  `docs/` for research and decision records, and `recordings/` for raw input\
+  \ files only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage> --action record-artifacts`\n  to persist\
+  \ produced artifact paths back into this workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
+  \ in the package root. Read that\n  index first to learn which documents exist and their approval status.\n\nApproval convention:\n\
+  - Add `<!-- status: approved -->` or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before handoff.\n"
+nodes:
+- stage_id: ingest
+  node_id: ingest-2026-07-20T02:55:22Z
+  status: in_progress
+  started_at: '2026-07-20T02:55:22Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts: []
+  handoff_file: null
 recovery:
   last_validated_checkpoint: ''
   can_resume_from: ingest
