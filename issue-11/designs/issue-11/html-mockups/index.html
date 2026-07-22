@@ -8,16 +8,35 @@
         :root {
             --brand: #2563eb;
             --brand-dark: #1d4ed8;
+            --brand-light: #eff6ff;
             --bg: #f3f4f6;
             --surface: #ffffff;
             --surface-2: #f9fafb;
+            --surface-3: #f3f4f6;
             --text: #111827;
             --text-2: #6b7280;
             --border: #e5e7eb;
             --success: #10b981;
+            --warning: #f59e0b;
             --error: #ef4444;
             --sidebar-width: 240px;
             --sidebar-collapsed: 72px;
+        }
+
+        [data-theme="dark"] {
+            --brand: #3b82f6;
+            --brand-dark: #2563eb;
+            --brand-light: rgba(59, 130, 246, 0.15);
+            --bg: #0f172a;
+            --surface: #1f2937;
+            --surface-2: #111827;
+            --surface-3: #374151;
+            --text: #f9fafb;
+            --text-2: #9ca3af;
+            --border: #374151;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --error: #f87171;
         }
 
         * { box-sizing: border-box; }
@@ -34,15 +53,17 @@
 
         .prototype-nav {
             width: 200px;
-            background: #1f2937;
+            background: #111827;
             color: #fff;
             padding: 16px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .prototype-nav h3 {
             margin: 0 0 16px;
-            font-size: 14px;
+            font-size: 12px;
             color: #9ca3af;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -55,8 +76,8 @@
             background: transparent;
             border: none;
             color: #d1d5db;
-            padding: 10px 12px;
-            margin-bottom: 4px;
+            padding: 9px 12px;
+            margin-bottom: 3px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
@@ -66,6 +87,16 @@
         .prototype-nav button.active {
             background: #374151;
             color: #fff;
+        }
+
+        .nav-group {
+            margin-bottom: 18px;
+        }
+
+        .theme-toggle {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid #374151;
         }
 
         .prototype-stage {
@@ -140,7 +171,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
         }
 
         .splash-logo {
@@ -168,6 +199,29 @@
             color: var(--text-2);
         }
 
+        .splash-loader {
+            margin-top: 24px;
+            width: 120px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .splash-loader::after {
+            content: '';
+            display: block;
+            height: 100%;
+            width: 40%;
+            background: var(--brand);
+            animation: load 1.5s infinite ease-in-out;
+        }
+
+        @keyframes load {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+
         /* Onboarding */
         .onboarding {
             flex-direction: column;
@@ -178,7 +232,7 @@
         }
 
         .onboarding-card {
-            width: 420px;
+            width: 440px;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -241,6 +295,8 @@
             border-radius: 6px;
             font-size: 14px;
             outline: none;
+            background: var(--surface);
+            color: var(--text);
         }
 
         .form-group input:focus {
@@ -280,6 +336,17 @@
             color: var(--error);
             font-size: 12px;
             margin-top: 6px;
+        }
+
+        .info-msg {
+            color: var(--text-2);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .link {
+            color: var(--brand);
+            text-decoration: none;
         }
 
         /* Main App */
@@ -380,6 +447,7 @@
             display: flex;
             align-items: center;
             cursor: pointer;
+            position: relative;
         }
 
         .user-avatar {
@@ -391,6 +459,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            flex-shrink: 0;
         }
 
         .status-dot {
@@ -399,10 +468,14 @@
             right: 0;
             width: 10px;
             height: 10px;
-            background: var(--success);
-            border: 2px solid #1f2937;
             border-radius: 50%;
+            border: 2px solid #1f2937;
         }
+
+        .status-dot.online { background: var(--success); }
+        .status-dot.away { background: var(--warning); }
+        .status-dot.dnd { background: var(--error); }
+        .status-dot.offline { background: #9ca3af; }
 
         .user-info {
             margin-left: 10px;
@@ -454,6 +527,7 @@
             border-radius: 4px;
             font-size: 12px;
             cursor: pointer;
+            color: var(--text);
         }
 
         .webview-placeholder {
@@ -467,7 +541,7 @@
         }
 
         .webview-placeholder.chat {
-            background: #fff;
+            background: var(--surface);
             align-items: stretch;
             justify-content: stretch;
             padding: 0;
@@ -481,7 +555,7 @@
         .chat-list {
             width: 240px;
             border-right: 1px solid var(--border);
-            background: #fff;
+            background: var(--surface);
         }
 
         .chat-list-header {
@@ -495,9 +569,11 @@
             border-bottom: 1px solid var(--border);
             display: flex;
             gap: 10px;
+            cursor: pointer;
         }
 
-        .chat-item.active { background: #eff6ff; }
+        .chat-item:hover { background: var(--surface-2); }
+        .chat-item.active { background: var(--brand-light); }
 
         .chat-avatar {
             width: 36px;
@@ -520,6 +596,7 @@
             font-size: 13px;
             font-weight: 500;
             margin-bottom: 2px;
+            color: var(--text);
         }
 
         .chat-preview .msg {
@@ -537,12 +614,13 @@
             padding: 16px;
             border-bottom: 1px solid var(--border);
             font-weight: 600;
+            color: var(--text);
         }
 
         .chat-messages {
             flex: 1;
             padding: 16px;
-            background: #f8fafc;
+            background: var(--surface-2);
         }
 
         .message {
@@ -552,12 +630,13 @@
         }
 
         .message-bubble {
-            background: #fff;
+            background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 10px 14px;
             max-width: 70%;
             font-size: 13px;
+            color: var(--text);
         }
 
         .chat-input {
@@ -565,6 +644,7 @@
             border-top: 1px solid var(--border);
             display: flex;
             gap: 8px;
+            background: var(--surface);
         }
 
         .chat-input input {
@@ -573,7 +653,78 @@
             border: 1px solid var(--border);
             border-radius: 6px;
             outline: none;
+            background: var(--surface-2);
+            color: var(--text);
         }
+
+        /* WebView states */
+        .webview-loading {
+            flex: 1;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            color: var(--text-2);
+        }
+
+        .webview-loading.active { display: flex; }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .webview-error {
+            flex: 1;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .webview-error.active { display: flex; }
+
+        .error-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .offline-banner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            border-bottom: 1px solid #fde68a;
+        }
+
+        [data-theme="dark"] .offline-banner {
+            background: #451a03;
+            color: #fbbf24;
+            border-bottom-color: #78350f;
+        }
+
+        .offline-banner.active { display: flex; }
 
         /* Settings Modal */
         .settings-overlay {
@@ -589,8 +740,8 @@
         .settings-overlay.active { display: flex; }
 
         .settings-modal {
-            width: 680px;
-            height: 480px;
+            width: 720px;
+            height: 520px;
             background: var(--surface);
             border-radius: 8px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.2);
@@ -603,11 +754,12 @@
             background: var(--surface-2);
             border-right: 1px solid var(--border);
             padding: 16px 0;
+            overflow-y: auto;
         }
 
         .settings-category {
             padding: 10px 16px;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-2);
             font-weight: 600;
             text-transform: uppercase;
@@ -615,13 +767,16 @@
         }
 
         .settings-item {
-            padding: 10px 16px;
+            padding: 9px 16px;
             font-size: 14px;
             cursor: pointer;
+            color: var(--text);
         }
 
+        .settings-item:hover { background: var(--surface-3); }
+
         .settings-item.active {
-            background: #eff6ff;
+            background: var(--brand-light);
             color: var(--brand);
             font-weight: 500;
         }
@@ -635,13 +790,14 @@
         .settings-content h3 {
             margin: 0 0 20px;
             font-size: 18px;
+            color: var(--text);
         }
 
         .setting-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 0;
+            padding: 14px 0;
             border-bottom: 1px solid var(--border);
         }
 
@@ -652,6 +808,7 @@
         .setting-row .label {
             font-weight: 500;
             margin-bottom: 4px;
+            color: var(--text);
         }
 
         .setting-row .desc {
@@ -670,6 +827,7 @@
             border-radius: 12px;
             position: relative;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         .toggle.on { background: var(--brand); }
@@ -699,6 +857,9 @@
             color: var(--text-2);
         }
 
+        .settings-panel { display: none; }
+        .settings-panel.active { display: block; }
+
         /* About */
         .about-content {
             padding: 40px;
@@ -721,6 +882,7 @@
 
         .about-content h2 {
             margin: 0 0 8px;
+            color: var(--text);
         }
 
         .about-content .version {
@@ -781,6 +943,7 @@
         .notification-meta .name {
             font-weight: 600;
             font-size: 13px;
+            color: var(--text);
         }
 
         .notification-meta .app {
@@ -791,6 +954,123 @@
         .notification-body {
             font-size: 13px;
             color: var(--text);
+        }
+
+        /* User menu */
+        .user-menu {
+            position: absolute;
+            bottom: 56px;
+            left: 12px;
+            width: 180px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 90;
+            overflow: hidden;
+        }
+
+        .user-menu.active { display: block; }
+
+        .user-menu-header {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-menu-header .name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .user-menu-header .email {
+            font-size: 12px;
+            color: var(--text-2);
+        }
+
+        .user-menu-item {
+            padding: 10px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .user-menu-item:hover { background: var(--surface-2); }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
+        .status-submenu {
+            padding: 4px 0;
+        }
+
+        .status-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .status-option:hover { background: var(--surface-2); }
+
+        .status-option-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Tray menu */
+        .tray-menu {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 180px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .tray-menu.active { display: block; }
+
+        .tray-menu-header {
+            padding: 10px 14px;
+            font-size: 12px;
+            color: var(--text-2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tray-menu-item {
+            padding: 10px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .tray-menu-item:hover { background: var(--surface-2); }
+
+        .tray-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            background: var(--error);
+            color: white;
+            font-size: 11px;
+            margin-left: 6px;
+            padding: 0 5px;
         }
 
         .hint {
@@ -805,18 +1085,45 @@
             font-size: 12px;
             color: #92400e;
         }
+
+        [data-theme="dark"] .hint {
+            background: #451a03;
+            color: #fbbf24;
+            border-color: #78350f;
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <nav class="prototype-nav">
-        <h3>屏幕导航</h3>
-        <button class="active" onclick="showScreen('splash')">启动页 Splash</button>
-        <button onclick="showScreen('onboarding-org')">引导 - 组织 URL</button>
-        <button onclick="showScreen('onboarding-login')">引导 - 登录</button>
-        <button onclick="showScreen('main-chat')">主界面 - 聊天</button>
-        <button onclick="showScreen('main-contacts')">主界面 - 通讯录</button>
-        <button onclick="showScreen('main-ai')">主界面 - AI 表格</button>
-        <button onclick="showScreen('about')">关于页</button>
+        <div class="nav-group">
+            <h3>启动与登录</h3>
+            <button class="active" onclick="showScreen('splash')">启动页 Splash</button>
+            <button onclick="showScreen('onboarding-org')">引导 - 组织 URL</button>
+            <button onclick="showScreen('onboarding-login')">引导 - 登录</button>
+            <button onclick="showScreen('onboarding-login-error')">登录 - 错误态</button>
+            <button onclick="showScreen('sso-callback')">SSO 回调加载</button>
+        </div>
+        <div class="nav-group">
+            <h3>主界面</h3>
+            <button onclick="showScreen('main-chat')">主界面 - 聊天</button>
+            <button onclick="showScreen('main-contacts')">主界面 - 通讯录</button>
+            <button onclick="showScreen('main-ai')">主界面 - AI 表格</button>
+            <button onclick="showScreen('main-loading')">WebView 加载态</button>
+            <button onclick="showScreen('main-error')">WebView 错误态</button>
+            <button onclick="showScreen('main-offline')">网络离线态</button>
+            <button onclick="showScreen('about')">关于页</button>
+        </div>
+        <div class="nav-group">
+            <h3>交互演示</h3>
+            <button onclick="toggleSettings()">打开设置面板</button>
+            <button onclick="toggleNotification()">模拟系统通知</button>
+            <button onclick="toggleTrayMenu()">模拟托盘菜单</button>
+        </div>
+        <div class="theme-toggle">
+            <button onclick="toggleTheme()">切换浅色 / 深色模式</button>
+        </div>
     </nav>
 
     <main class="prototype-stage">
@@ -839,6 +1146,7 @@
                 <div class="splash-logo">E</div>
                 <h1>EAIC</h1>
                 <p>企业智能协作平台</p>
+                <div class="splash-loader"></div>
             </section>
 
             <!-- Onboarding: Org URL -->
@@ -849,13 +1157,14 @@
                     <div class="org-preview">
                         <div class="org-avatar">企</div>
                         <div>
-                            <div style="font-weight: 600;">示例企业</div>
+                            <div style="font-weight: 600; color: var(--text);">示例科技有限公司</div>
                             <div style="font-size: 12px; color: var(--text-2);">example.eaic.com</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>组织地址</label>
                         <input type="text" value="https://mattermost.example.com" />
+                        <div class="info-msg">安装包已预配置地址，你仍可修改</div>
                     </div>
                     <button class="btn">下一步</button>
                 </div>
@@ -873,14 +1182,47 @@
                     <div class="form-group">
                         <label>密码</label>
                         <input type="password" value="********" />
-                        <div class="error-msg" style="display:none;">邮箱或密码错误</div>
                     </div>
                     <div class="form-row">
-                        <label><input type="checkbox" checked /> 记住我</label>
-                        <a href="#" style="color: var(--brand); text-decoration: none;">忘记密码？</a>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text);">
+                            <input type="checkbox" checked /> 记住我
+                        </label>
+                        <a href="#" class="link">忘记密码？</a>
                     </div>
                     <button class="btn">登录</button>
                 </div>
+            </section>
+
+            <!-- Onboarding: Login Error -->
+            <section class="screen onboarding" id="onboarding-login-error">
+                <div class="onboarding-card">
+                    <h2>登录到 EAIC</h2>
+                    <p class="subtitle">使用已同步的企业邮箱和密码</p>
+                    <div class="form-group">
+                        <label>企业邮箱</label>
+                        <input type="email" value="zhangsan@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" value="********" />
+                        <div class="error-msg">邮箱或密码错误，请检查后重试</div>
+                    </div>
+                    <div class="form-row">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text);">
+                            <input type="checkbox" checked /> 记住我
+                        </label>
+                        <a href="#" class="link">忘记密码？</a>
+                    </div>
+                    <button class="btn">登录</button>
+                </div>
+            </section>
+
+            <!-- SSO Callback -->
+            <section class="screen splash" id="sso-callback">
+                <div class="splash-logo">E</div>
+                <h1>正在完成登录</h1>
+                <p>请稍候，正在与组织身份认证服务交换令牌</p>
+                <div class="splash-loader"></div>
             </section>
 
             <!-- Main: Chat -->
@@ -905,15 +1247,41 @@
                             <span class="label">AI 表格</span>
                         </div>
                     </div>
-                    <div class="user-area" onclick="toggleSettings()">
+                    <div class="user-area" onclick="toggleUserMenu(event)">
                         <div class="user-avatar">
                             张
-                            <span class="status-dot"></span>
+                            <span class="status-dot online"></span>
                         </div>
                         <div class="user-info">
                             <div class="name">张三</div>
                             <div class="status">在线</div>
                         </div>
+                    </div>
+                    <div class="user-menu" id="user-menu">
+                        <div class="user-menu-header">
+                            <div class="name">张三</div>
+                            <div class="email">zhangsan@example.com</div>
+                        </div>
+                        <div class="status-submenu">
+                            <div class="status-option" onclick="setStatus('online')">
+                                <span class="status-option-dot" style="background: var(--success);"></span> 在线
+                            </div>
+                            <div class="status-option" onclick="setStatus('away')">
+                                <span class="status-option-dot" style="background: var(--warning);"></span> 离开
+                            </div>
+                            <div class="status-option" onclick="setStatus('dnd')">
+                                <span class="status-option-dot" style="background: var(--error);"></span> 勿扰
+                            </div>
+                            <div class="status-option" onclick="setStatus('offline')">
+                                <span class="status-option-dot" style="background: #9ca3af;"></span> 离线
+                            </div>
+                        </div>
+                        <div class="user-menu-divider"></div>
+                        <div class="user-menu-item" onclick="toggleSettings(); hideUserMenu();">个人设置</div>
+                        <div class="user-menu-item" onclick="toggleSettings(); hideUserMenu();">系统设置</div>
+                        <div class="user-menu-item" onclick="showScreen('about'); hideUserMenu();">关于 EAIC</div>
+                        <div class="user-menu-divider"></div>
+                        <div class="user-menu-item" style="color: var(--error);" onclick="hideUserMenu()">退出登录</div>
                     </div>
                 </aside>
                 <div class="content-area">
@@ -951,7 +1319,7 @@
                                         <div class="message-bubble">下午的需求评审你参加吗？</div>
                                     </div>
                                     <div class="message">
-                                        <div class="chat-avatar">张</div>
+                                        <div class="chat-avatar" style="background: var(--brand); color: white;">张</div>
                                         <div class="message-bubble">参加，我提前准备一下。</div>
                                     </div>
                                 </div>
@@ -987,14 +1355,17 @@
                             <span class="label">AI 表格</span>
                         </div>
                     </div>
-                    <div class="user-area" onclick="toggleSettings()">
-                        <div class="user-avatar">张<span class="status-dot"></span></div>
+                    <div class="user-area" onclick="toggleUserMenu(event)">
+                        <div class="user-avatar">张<span class="status-dot online"></span></div>
                         <div class="user-info"><div class="name">张三</div><div class="status">在线</div></div>
                     </div>
                 </aside>
                 <div class="content-area">
                     <div class="webview-toolbar">
                         <span class="webview-title">通讯录</span>
+                        <div class="webview-actions">
+                            <button onclick="toggleSidebar()">切换边栏</button>
+                        </div>
                     </div>
                     <div class="webview-placeholder">
                         <p>WebView 嵌入：通讯录 B/S 页面</p>
@@ -1024,17 +1395,89 @@
                             <span class="label">AI 表格</span>
                         </div>
                     </div>
-                    <div class="user-area" onclick="toggleSettings()">
-                        <div class="user-avatar">张<span class="status-dot"></span></div>
+                    <div class="user-area" onclick="toggleUserMenu(event)">
+                        <div class="user-avatar">张<span class="status-dot online"></span></div>
                         <div class="user-info"><div class="name">张三</div><div class="status">在线</div></div>
                     </div>
                 </aside>
                 <div class="content-area">
                     <div class="webview-toolbar">
                         <span class="webview-title">AI 表格</span>
+                        <div class="webview-actions">
+                            <button onclick="toggleSidebar()">切换边栏</button>
+                        </div>
                     </div>
                     <div class="webview-placeholder">
                         <p>WebView 嵌入：AI 表格 B/S 页面</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main: WebView Loading -->
+            <section class="screen main-app" id="main-loading">
+                <aside class="sidebar">
+                    <div class="sidebar-header"><div class="logo">E</div><span class="app-name">EAIC</span></div>
+                    <div class="nav-items">
+                        <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
+                        <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
+                        <div class="nav-item"><span class="icon">🤖</span><span class="label">AI 表格</span></div>
+                    </div>
+                    <div class="user-area"><div class="user-avatar">张<span class="status-dot online"></span></div><div class="user-info"><div class="name">张三</div><div class="status">在线</div></div></div>
+                </aside>
+                <div class="content-area">
+                    <div class="webview-toolbar"><span class="webview-title">聊天</span></div>
+                    <div class="webview-loading active">
+                        <div class="spinner"></div>
+                        <div>正在加载...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main: WebView Error -->
+            <section class="screen main-app" id="main-error">
+                <aside class="sidebar">
+                    <div class="sidebar-header"><div class="logo">E</div><span class="app-name">EAIC</span></div>
+                    <div class="nav-items">
+                        <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
+                        <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
+                        <div class="nav-item"><span class="icon">🤖</span><span class="label">AI 表格</span></div>
+                    </div>
+                    <div class="user-area"><div class="user-avatar">张<span class="status-dot online"></span></div><div class="user-info"><div class="name">张三</div><div class="status">在线</div></div></div>
+                </aside>
+                <div class="content-area">
+                    <div class="webview-toolbar"><span class="webview-title">聊天</span></div>
+                    <div class="webview-error active">
+                        <div class="error-icon">!</div>
+                        <div style="font-weight: 600;">页面加载失败</div>
+                        <div style="font-size: 13px; color: var(--text-2);">错误代码：ERR_CONNECTION_REFUSED</div>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <button class="btn" style="width: auto; padding: 8px 20px;">重试</button>
+                            <button class="btn btn-secondary" style="width: auto; padding: 8px 20px;">返回</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main: Offline -->
+            <section class="screen main-app" id="main-offline">
+                <aside class="sidebar">
+                    <div class="sidebar-header"><div class="logo">E</div><span class="app-name">EAIC</span></div>
+                    <div class="nav-items">
+                        <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
+                        <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
+                        <div class="nav-item"><span class="icon">🤖</span><span class="label">AI 表格</span></div>
+                    </div>
+                    <div class="user-area"><div class="user-avatar">张<span class="status-dot offline"></span></div><div class="user-info"><div class="name">张三</div><div class="status">离线</div></div></div>
+                </aside>
+                <div class="content-area">
+                    <div class="offline-banner active">
+                        <span>⚠️</span>
+                        <span>网络连接已断开，部分功能不可用。恢复后将自动重连。</span>
+                    </div>
+                    <div class="webview-toolbar"><span class="webview-title">聊天</span></div>
+                    <div class="webview-placeholder">
+                        <p>当前处于离线状态</p>
+                        <p style="font-size: 13px;">请检查网络连接后重试</p>
                     </div>
                 </div>
             </section>
@@ -1065,45 +1508,200 @@
                     <button class="close-btn" onclick="toggleSettings()">×</button>
                     <div class="settings-sidebar">
                         <div class="settings-category">个人设置</div>
-                        <div class="settings-item active">通用</div>
-                        <div class="settings-item">通知</div>
-                        <div class="settings-item">显示</div>
-                        <div class="settings-item">安全</div>
+                        <div class="settings-item active" onclick="switchSettings('personal-general')">通用</div>
+                        <div class="settings-item" onclick="switchSettings('personal-notifications')">通知</div>
+                        <div class="settings-item" onclick="switchSettings('personal-display')">显示</div>
+                        <div class="settings-item" onclick="switchSettings('personal-security')">安全</div>
                         <div class="settings-category">系统设置</div>
-                        <div class="settings-item">通用</div>
-                        <div class="settings-item">高级</div>
-                        <div class="settings-item">账号</div>
+                        <div class="settings-item" onclick="switchSettings('system-general')">通用</div>
+                        <div class="settings-item" onclick="switchSettings('system-advanced')">高级</div>
+                        <div class="settings-item" onclick="switchSettings('system-account')">账号</div>
                     </div>
                     <div class="settings-content">
-                        <h3>通用</h3>
-                        <div class="setting-row">
-                            <div class="left">
-                                <div class="label">头像</div>
-                                <div class="desc">点击更换个人头像</div>
+                        <!-- Personal: General -->
+                        <div class="settings-panel active" id="settings-personal-general">
+                            <h3>通用</h3>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">头像</div>
+                                    <div class="desc">点击更换个人头像</div>
+                                </div>
+                                <div class="control"><div class="user-avatar" style="background: var(--brand); color: white;">张</div></div>
                             </div>
-                            <div class="control"><div class="user-avatar" style="background: var(--brand); color: white;">张</div></div>
-                        </div>
-                        <div class="setting-row">
-                            <div class="left">
-                                <div class="label">全名</div>
-                                <div class="desc">在团队中显示的名称</div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">全名</div>
+                                    <div class="desc">在团队中显示的名称</div>
+                                </div>
+                                <div class="control"><input type="text" value="张三" style="width: 140px; padding: 6px;" /></div>
                             </div>
-                            <div class="control"><input type="text" value="张三" style="width: 140px; padding: 6px;" /></div>
-                        </div>
-                        <div class="setting-row">
-                            <div class="left">
-                                <div class="label">用户名</div>
-                                <div class="desc">zhangsan（只读）</div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">用户名</div>
+                                    <div class="desc">zhangsan（只读）</div>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">邮箱</div>
+                                    <div class="desc">zhangsan@example.com（只读）</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 24px; text-align: right;">
+                                <button class="btn" style="width: auto; padding: 8px 24px;">保存</button>
                             </div>
                         </div>
-                        <div class="setting-row">
-                            <div class="left">
-                                <div class="label">邮箱</div>
-                                <div class="desc">zhangsan@example.com（只读）</div>
+
+                        <!-- Personal: Notifications -->
+                        <div class="settings-panel" id="settings-personal-notifications">
+                            <h3>通知</h3>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">桌面通知</div>
+                                    <div class="desc">收到新消息时显示系统通知</div>
+                                </div>
+                                <div class="control"><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">消息提示音</div>
+                                    <div class="desc">新消息到达时播放声音</div>
+                                </div>
+                                <div class="control"><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">邮件通知</div>
+                                    <div class="desc">离线时接收邮件摘要</div>
+                                </div>
+                                <div class="control"><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">提及关键词</div>
+                                    <div class="desc">包含以下关键词时触发通知</div>
+                                </div>
+                                <div class="control"><input type="text" value="@张三 @all" style="width: 160px; padding: 6px;" /></div>
                             </div>
                         </div>
-                        <div style="margin-top: 24px; text-align: right;">
-                            <button class="btn" style="width: auto; padding: 8px 24px;">保存</button>
+
+                        <!-- Personal: Display -->
+                        <div class="settings-panel" id="settings-personal-display">
+                            <h3>显示</h3>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">主题</div>
+                                    <div class="desc">选择界面主题模式</div>
+                                </div>
+                                <div class="control">
+                                    <select style="padding: 6px;">
+                                        <option>跟随系统</option>
+                                        <option>浅色</option>
+                                        <option>深色</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">语言</div>
+                                    <div class="desc">应用界面语言</div>
+                                </div>
+                                <div class="control">
+                                    <select style="padding: 6px;">
+                                        <option>简体中文</option>
+                                        <option>English</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal: Security -->
+                        <div class="settings-panel" id="settings-personal-security">
+                            <h3>安全</h3>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">修改密码</div>
+                                    <div class="desc">修改你的企业账号密码</div>
+                                </div>
+                                <div class="control"><button class="btn btn-secondary" style="width: auto; padding: 8px 16px;">修改</button></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">锁屏保护</div>
+                                    <div class="desc">离开一段时间后要求重新输入密码</div>
+                                </div>
+                                <div class="control"><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+                            </div>
+                        </div>
+
+                        <!-- System: General -->
+                        <div class="settings-panel" id="settings-system-general">
+                            <h3>通用</h3>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">开机自启动</div>
+                                    <div class="desc">登录系统时自动启动 EAIC</div>
+                                </div>
+                                <div class="control"><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">关闭窗口时最小化到托盘</div>
+                                    <div class="desc">保留后台运行并接收通知</div>
+                                </div>
+                                <div class="control"><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">下载路径</div>
+                                    <div class="desc">文件默认保存位置</div>
+                                </div>
+                                <div class="control"><input type="text" value="~/Downloads/EAIC" style="width: 180px; padding: 6px;" /></div>
+                            </div>
+                        </div>
+
+                        <!-- System: Advanced -->
+                        <div class="settings-panel" id="settings-system-advanced">
+                            <h3>高级</h3>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">清理缓存</div>
+                                    <div class="desc">清除本地 WebView 缓存和临时文件</div>
+                                </div>
+                                <div class="control"><button class="btn btn-secondary" style="width: auto; padding: 8px 16px;">清理</button></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">硬件加速</div>
+                                    <div class="desc">启用 GPU 加速以提升渲染性能</div>
+                                </div>
+                                <div class="control"><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">日志级别</div>
+                                    <div class="desc">诊断日志详细程度</div>
+                                </div>
+                                <div class="control">
+                                    <select style="padding: 6px;">
+                                        <option>信息</option>
+                                        <option>调试</option>
+                                        <option>警告</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System: Account -->
+                        <div class="settings-panel" id="settings-system-account">
+                            <h3>账号</h3>
+                            <div class="setting-row">
+                                <div class="left">
+                                    <div class="label">退出登录</div>
+                                    <div class="desc">清除本地保存的 token 并返回登录页</div>
+                                </div>
+                                <div class="control"><button class="btn" style="width: auto; padding: 8px 16px; background: var(--error);">退出登录</button></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1122,23 +1720,39 @@
                     下午的需求评审你参加吗？
                 </div>
             </div>
+
+            <!-- Tray Menu -->
+            <div class="tray-menu" id="tray-menu">
+                <div class="tray-menu-header">EAIC 正在运行</div>
+                <div class="tray-menu-item">打开主窗口</div>
+                <div class="tray-menu-item">标记为已读 <span class="tray-badge">3</span></div>
+                <div class="tray-menu-item" onclick="toggleSettings(); hideTrayMenu();">设置</div>
+                <div class="tray-menu-item" onclick="showScreen('about'); hideTrayMenu();">关于</div>
+                <div class="user-menu-divider"></div>
+                <div class="tray-menu-item" style="color: var(--error);" onclick="hideTrayMenu()">退出</div>
+            </div>
         </div>
     </main>
 
     <div class="hint">
-        💡 提示：点击左侧导航切换不同屏幕；在主界面点击底部用户区打开设置，点击「模拟通知」查看通知效果。
+        💡 提示：点击左侧导航切换不同屏幕；在主界面点击底部用户区打开菜单，点击「打开设置面板」查看完整设置，点击「模拟系统通知」查看通知效果。
     </div>
 
     <script>
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.prototype-nav button').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            event.target.classList.add('active');
+            document.querySelectorAll('.prototype-nav button').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`.prototype-nav button[onclick="showScreen('${id}')"]`);
+            if (btn) btn.classList.add('active');
+            hideUserMenu();
+            hideTrayMenu();
         }
 
         function toggleSettings() {
             document.getElementById('settings-overlay').classList.toggle('active');
+            hideUserMenu();
+            hideTrayMenu();
         }
 
         function toggleNotification() {
@@ -1154,6 +1768,56 @@
         function toggleSidebar() {
             document.querySelectorAll('.sidebar').forEach(s => s.classList.toggle('collapsed'));
         }
+
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('user-menu');
+            menu.classList.toggle('active');
+            hideTrayMenu();
+        }
+
+        function hideUserMenu() {
+            document.getElementById('user-menu').classList.remove('active');
+        }
+
+        function setStatus(status) {
+            const labels = { online: '在线', away: '离开', dnd: '勿扰', offline: '离线' };
+            document.querySelectorAll('.status-dot').forEach(dot => {
+                dot.className = 'status-dot ' + status;
+            });
+            document.querySelectorAll('.user-info .status').forEach(el => el.textContent = labels[status]);
+            hideUserMenu();
+        }
+
+        function switchSettings(panelId) {
+            document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('settings-' + panelId).classList.add('active');
+            document.querySelectorAll('.settings-item').forEach(i => i.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        }
+
+        function toggleTrayMenu() {
+            const menu = document.getElementById('tray-menu');
+            menu.classList.toggle('active');
+            hideUserMenu();
+        }
+
+        function hideTrayMenu() {
+            document.getElementById('tray-menu').classList.remove('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const userMenu = document.getElementById('user-menu');
+            const trayMenu = document.getElementById('tray-menu');
+            if (!e.target.closest('.user-area') && !e.target.closest('.user-menu')) userMenu.classList.remove('active');
+            if (!e.target.closest('.tray-menu')) trayMenu.classList.remove('active');
+        });
     </script>
 </body>
 </html>
