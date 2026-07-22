@@ -129,7 +129,7 @@
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             padding: 0 16px;
             -webkit-app-region: drag;
             user-select: none;
@@ -141,6 +141,7 @@
             gap: 8px;
             font-weight: 600;
             font-size: 14px;
+            margin: 0 auto;
         }
 
         .titlebar-brand .logo-img {
@@ -357,28 +358,6 @@
         }
 
         .sidebar.collapsed { width: var(--sidebar-collapsed); }
-
-        .sidebar-header {
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .sidebar-header .logo-img {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-        }
-
-        .sidebar-header .app-name {
-            margin-left: 10px;
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .sidebar.collapsed .app-name { display: none; }
 
         .nav-items {
             flex: 1;
@@ -1292,14 +1271,14 @@
         <div class="window">
             <!-- Title Bar -->
             <div class="titlebar">
+                <div class="titlebar-controls">
+                    <span class="tb-close"></span>
+                    <span class="tb-min"></span>
+                    <span class="tb-max"></span>
+                </div>
                 <div class="titlebar-brand">
                     <img class="logo-img" src="logo.png" alt="EAIC" />
                     <span>EAIC</span>
-                </div>
-                <div class="titlebar-controls">
-                    <span class="tb-min"></span>
-                    <span class="tb-max"></span>
-                    <span class="tb-close"></span>
                 </div>
             </div>
 
@@ -1390,10 +1369,6 @@
             <!-- Main: Chat -->
             <section class="screen main-app" id="main-chat">
                 <aside class="sidebar" id="sidebar">
-                    <div class="sidebar-header">
-                        <img class="logo-img" src="logo.png" alt="EAIC" />
-                        <span class="app-name">EAIC</span>
-                    </div>
                     <div class="nav-items">
                         <div class="nav-item active" onclick="showScreen('main-chat')">
                             <span class="icon">💬</span>
@@ -1498,10 +1473,6 @@
             <!-- Main: Contacts -->
             <section class="screen main-app" id="main-contacts">
                 <aside class="sidebar" id="sidebar-contacts">
-                    <div class="sidebar-header">
-                        <img class="logo-img" src="logo.png" alt="EAIC" />
-                        <span class="app-name">EAIC</span>
-                    </div>
                     <div class="nav-items">
                         <div class="nav-item" onclick="showScreen('main-chat')">
                             <span class="icon">💬</span>
@@ -1538,10 +1509,6 @@
             <!-- Main: AI Sheets -->
             <section class="screen main-app" id="main-ai">
                 <aside class="sidebar" id="sidebar-ai">
-                    <div class="sidebar-header">
-                        <img class="logo-img" src="logo.png" alt="EAIC" />
-                        <span class="app-name">EAIC</span>
-                    </div>
                     <div class="nav-items">
                         <div class="nav-item" onclick="showScreen('main-chat')">
                             <span class="icon">💬</span>
@@ -1671,7 +1638,6 @@
             <!-- Main: WebView Loading -->
             <section class="screen main-app" id="main-loading">
                 <aside class="sidebar">
-                    <div class="sidebar-header"><div class="logo">E</div><span class="app-name">EAIC</span></div>
                     <div class="nav-items">
                         <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
                         <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
@@ -1691,7 +1657,6 @@
             <!-- Main: WebView Error -->
             <section class="screen main-app" id="main-error">
                 <aside class="sidebar">
-                    <div class="sidebar-header"><div class="logo">E</div><span class="app-name">EAIC</span></div>
                     <div class="nav-items">
                         <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
                         <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
@@ -1716,7 +1681,6 @@
             <!-- Main: Offline -->
             <section class="screen main-app" id="main-offline">
                 <aside class="sidebar">
-                    <div class="sidebar-header"><div class="logo">E</div><span class="app-name">EAIC</span></div>
                     <div class="nav-items">
                         <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
                         <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
