@@ -863,13 +863,184 @@
             margin: 0 auto 20px;
         }
 
-        .ai-sheets-content {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-radius: 8px;
+        .teable-embed {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            overflow: hidden;
         }
+
+        .teable-header {
+            height: 48px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: var(--surface);
+        }
+
+        .teable-breadcrumb {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .teable-breadcrumb span {
+            color: var(--text-2);
+            margin: 0 4px;
+        }
+
+        .teable-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .teable-actions button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .teable-actions button.primary {
+            background: var(--brand);
+            color: white;
+            border-color: var(--brand);
+        }
+
+        .teable-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .teable-sidebar {
+            width: 220px;
+            background: var(--surface-2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+        }
+
+        .teable-workspace {
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .teable-db {
+            padding: 8px 16px 8px 36px;
+            font-size: 13px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .teable-db:hover { background: var(--surface-3); }
+        .teable-db.active { background: var(--brand-light); color: var(--brand-dark); font-weight: 500; }
+
+        .teable-views {
+            margin-top: 12px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        .teable-view {
+            padding: 8px 16px 8px 36px;
+            font-size: 13px;
+            color: var(--text-2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .teable-view:hover { background: var(--surface-3); }
+        .teable-view.active { color: var(--text); background: var(--surface); font-weight: 500; }
+
+        .teable-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .teable-toolbar {
+            height: 44px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+        }
+
+        .teable-toolbar button {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .teable-grid {
+            flex: 1;
+            overflow: auto;
+            background: var(--surface);
+        }
+
+        .teable-grid table {
+            border-collapse: collapse;
+            min-width: 100%;
+            font-size: 13px;
+        }
+
+        .teable-grid th {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+        }
+
+        .teable-grid td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            color: var(--text);
+            white-space: nowrap;
+            background: var(--surface);
+        }
+
+        .teable-grid tr:hover td { background: var(--surface-2); }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .tag-warn { background: #FEF3C7; color: #92400E; }
+        .tag-success { background: #D1FAE5; color: #065F46; }
+        .tag-error { background: #FEE2E2; color: #991B1B; }
+
+        [data-theme="dark"] .tag-warn { background: #451A03; color: #FBBF24; }
+        [data-theme="dark"] .tag-success { background: #064E3B; color: #34D399; }
+        [data-theme="dark"] .tag-error { background: #450A0A; color: #F87171; }
 
         .about-content h2 {
             margin: 0 0 8px;
@@ -1398,8 +1569,101 @@
                             <button onclick="toggleSidebar()">切换边栏</button>
                         </div>
                     </div>
-                    <div class="webview-placeholder">
-                        <img class="ai-sheets-content" src="ai-sheets-content.png" alt="AI 表格 / 智能督办助手" />
+                    <div class="teable-embed">
+                        <div class="teable-header">
+                            <div class="teable-breadcrumb">
+                                多维表格<span>/</span>督办协作<span>/</span>督办事项主表
+                            </div>
+                            <div class="teable-actions">
+                                <button>⛶ 全屏</button>
+                                <button class="primary">+ 新建记录</button>
+                            </div>
+                        </div>
+                        <div class="teable-body">
+                            <div class="teable-sidebar">
+                                <div class="teable-workspace">
+                                    <span>📁</span> 督办协作 workspace
+                                </div>
+                                <div class="teable-db active">督办事项主表</div>
+                                <div class="teable-db">跟进记录表</div>
+                                <div class="teable-db">模板库</div>
+                                <div class="teable-views">
+                                    <div class="teable-view active"><span class="view-icon">▦</span> 网格视图</div>
+                                    <div class="teable-view"><span class="view-icon">☰</span> 表单视图</div>
+                                    <div class="teable-view"><span class="view-icon">▤</span> 看板视图</div>
+                                </div>
+                            </div>
+                            <div class="teable-main">
+                                <div class="teable-toolbar">
+                                    <button>🔍 筛选</button>
+                                    <button>⇅ 排序</button>
+                                    <button>☷ 分组</button>
+                                    <button>👁 隐藏字段</button>
+                                </div>
+                                <div class="teable-grid">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>序号</th>
+                                                <th>任务编号</th>
+                                                <th>交办事项</th>
+                                                <th>责任单位</th>
+                                                <th>完成时限</th>
+                                                <th>进度状态</th>
+                                                <th>经办人</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>SJ20260750</td>
+                                                <td>安全生产专项检查</td>
+                                                <td>区应急管理局</td>
+                                                <td>2026-07-30</td>
+                                                <td><span class="tag tag-warn">进行中</span></td>
+                                                <td>张三</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>SJ20260751</td>
+                                                <td>市容环境综合整治</td>
+                                                <td>区城管局</td>
+                                                <td>2026-08-05</td>
+                                                <td><span class="tag tag-warn">进行中</span></td>
+                                                <td>李四</td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td>SJ20260752</td>
+                                                <td>智慧交通二期调研</td>
+                                                <td>区交通局</td>
+                                                <td>2026-07-25</td>
+                                                <td><span class="tag tag-success">已完成</span></td>
+                                                <td>王五</td>
+                                            </tr>
+                                            <tr>
+                                                <td>4</td>
+                                                <td>SJ20260753</td>
+                                                <td>社区养老服务评估</td>
+                                                <td>区民政局</td>
+                                                <td>2026-08-10</td>
+                                                <td><span class="tag tag-warn">进行中</span></td>
+                                                <td>赵六</td>
+                                            </tr>
+                                            <tr>
+                                                <td>5</td>
+                                                <td>SJ20260754</td>
+                                                <td>防汛应急预案演练</td>
+                                                <td>区水务局</td>
+                                                <td>2026-07-20</td>
+                                                <td><span class="tag tag-error">已超期</span></td>
+                                                <td>张三</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
