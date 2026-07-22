@@ -143,11 +143,10 @@
             font-size: 14px;
         }
 
-        .titlebar-brand .logo {
-            width: 18px;
-            height: 18px;
-            background: var(--brand);
-            border-radius: 4px;
+        .titlebar-brand .logo-img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
         }
 
         .titlebar-controls {
@@ -177,18 +176,11 @@
             background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
         }
 
-        .splash-logo {
+        .splash-logo-img {
             width: 80px;
             height: 80px;
-            background: var(--brand);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 32px;
-            font-weight: 700;
             margin-bottom: 24px;
+            object-fit: contain;
         }
 
         .splash h1 {
@@ -374,16 +366,10 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .sidebar-header .logo {
+        .sidebar-header .logo-img {
             width: 28px;
             height: 28px;
-            background: var(--brand);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
+            object-fit: contain;
         }
 
         .sidebar-header .app-name {
@@ -869,18 +855,20 @@
             text-align: center;
         }
 
-        .about-logo {
+        .about-logo-img {
             width: 64px;
             height: 64px;
-            background: var(--brand);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: 700;
+            object-fit: contain;
+            display: block;
             margin: 0 auto 20px;
+        }
+
+        .ai-sheets-content {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-radius: 8px;
         }
 
         .about-content h2 {
@@ -1134,7 +1122,7 @@
             <!-- Title Bar -->
             <div class="titlebar">
                 <div class="titlebar-brand">
-                    <div class="logo"></div>
+                    <img class="logo-img" src="logo.png" alt="EAIC" />
                     <span>EAIC</span>
                 </div>
                 <div class="titlebar-controls">
@@ -1146,7 +1134,7 @@
 
             <!-- Splash -->
             <section class="screen splash active" id="splash">
-                <div class="splash-logo">E</div>
+                <img class="splash-logo-img" src="logo.png" alt="EAIC" />
                 <h1>EAIC</h1>
                 <p>企业智能协作平台</p>
                 <div class="splash-loader"></div>
@@ -1169,7 +1157,7 @@
                         <input type="text" value="https://mattermost.example.com" />
                         <div class="info-msg">安装包已预配置地址，你仍可修改</div>
                     </div>
-                    <button class="btn">下一步</button>
+                    <button class="btn" onclick="goToLogin()">下一步</button>
                 </div>
             </section>
 
@@ -1192,7 +1180,7 @@
                         </label>
                         <a href="#" class="link">忘记密码？</a>
                     </div>
-                    <button class="btn">登录</button>
+                    <button class="btn" onclick="doLogin()">登录</button>
                 </div>
             </section>
 
@@ -1216,13 +1204,13 @@
                         </label>
                         <a href="#" class="link">忘记密码？</a>
                     </div>
-                    <button class="btn">登录</button>
+                    <button class="btn" onclick="doLogin()">登录</button>
                 </div>
             </section>
 
             <!-- SSO Callback -->
             <section class="screen splash" id="sso-callback">
-                <div class="splash-logo">E</div>
+                <img class="splash-logo-img" src="logo.png" alt="EAIC" />
                 <h1>正在完成登录</h1>
                 <p>请稍候，正在与组织身份认证服务交换令牌</p>
                 <div class="splash-loader"></div>
@@ -1232,7 +1220,7 @@
             <section class="screen main-app" id="main-chat">
                 <aside class="sidebar" id="sidebar">
                     <div class="sidebar-header">
-                        <div class="logo">E</div>
+                        <img class="logo-img" src="logo.png" alt="EAIC" />
                         <span class="app-name">EAIC</span>
                     </div>
                     <div class="nav-items">
@@ -1284,7 +1272,7 @@
                         <div class="user-menu-item" onclick="toggleSettings(); hideUserMenu();">系统设置</div>
                         <div class="user-menu-item" onclick="showScreen('about'); hideUserMenu();">关于 EAIC</div>
                         <div class="user-menu-divider"></div>
-                        <div class="user-menu-item" style="color: var(--error);" onclick="hideUserMenu()">退出登录</div>
+                        <div class="user-menu-item" style="color: var(--error);" onclick="doLogout()">退出登录</div>
                     </div>
                 </aside>
                 <div class="content-area">
@@ -1340,7 +1328,7 @@
             <section class="screen main-app" id="main-contacts">
                 <aside class="sidebar" id="sidebar-contacts">
                     <div class="sidebar-header">
-                        <div class="logo">E</div>
+                        <img class="logo-img" src="logo.png" alt="EAIC" />
                         <span class="app-name">EAIC</span>
                     </div>
                     <div class="nav-items">
@@ -1380,7 +1368,7 @@
             <section class="screen main-app" id="main-ai">
                 <aside class="sidebar" id="sidebar-ai">
                     <div class="sidebar-header">
-                        <div class="logo">E</div>
+                        <img class="logo-img" src="logo.png" alt="EAIC" />
                         <span class="app-name">EAIC</span>
                     </div>
                     <div class="nav-items">
@@ -1411,7 +1399,7 @@
                         </div>
                     </div>
                     <div class="webview-placeholder">
-                        <p>WebView 嵌入：AI 表格 B/S 页面</p>
+                        <img class="ai-sheets-content" src="ai-sheets-content.png" alt="AI 表格 / 智能督办助手" />
                     </div>
                 </div>
             </section>
@@ -1492,7 +1480,7 @@
                         <span class="webview-title">关于 EAIC</span>
                     </div>
                     <div class="about-content">
-                        <div class="about-logo">E</div>
+                        <img class="about-logo-img" src="logo.png" alt="EAIC" />
                         <h2>EAIC</h2>
                         <div class="version">版本 1.0.0 (Build 2026.07.22)</div>
                         <div class="info">
@@ -1711,7 +1699,7 @@
             </div>
 
             <!-- Notification Toast -->
-            <div class="notification-toast" id="notification-toast" onclick="hideNotification()">
+            <div class="notification-toast" id="notification-toast" onclick="openFromNotification()">
                 <div class="notification-header">
                     <div class="notification-avatar">李</div>
                     <div class="notification-meta">
@@ -1727,7 +1715,7 @@
             <!-- Tray Menu -->
             <div class="tray-menu" id="tray-menu">
                 <div class="tray-menu-header">EAIC 正在运行</div>
-                <div class="tray-menu-item">打开主窗口</div>
+                <div class="tray-menu-item" onclick="showScreen('main-chat'); hideTrayMenu();">打开主窗口</div>
                 <div class="tray-menu-item">标记为已读 <span class="tray-badge">3</span></div>
                 <div class="tray-menu-item" onclick="toggleSettings(); hideTrayMenu();">设置</div>
                 <div class="tray-menu-item" onclick="showScreen('about'); hideTrayMenu();">关于</div>
@@ -1751,6 +1739,40 @@
             hideUserMenu();
             hideTrayMenu();
         }
+
+        function goToLogin() {
+            showScreen('onboarding-login');
+        }
+
+        function doLogin() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '登录中…';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                showScreen('main-chat');
+            }, 1000);
+        }
+
+        function doLogout() {
+            hideUserMenu();
+            showScreen('onboarding-login');
+        }
+
+        function openFromNotification() {
+            hideNotification();
+            showScreen('main-chat');
+        }
+
+        // Splash auto-advance to onboarding after 2 seconds
+        setTimeout(() => {
+            const splash = document.getElementById('splash');
+            if (splash && splash.classList.contains('active')) {
+                showScreen('onboarding-org');
+            }
+        }, 2000);
 
         function toggleSettings() {
             document.getElementById('settings-overlay').classList.toggle('active');
