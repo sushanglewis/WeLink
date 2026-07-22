@@ -1,6 +1,6 @@
-# 流程图：issue-11 企业 IM 桌面应用
+# 流程图: issue-11
 
-## 用户流程
+## 主流程：应用启动与登录
 
 ```mermaid
 flowchart TD
@@ -26,7 +26,7 @@ flowchart TD
     R --> S[切换到聊天并定位会话]
 ```
 
-## 业务流：应用启动与登录
+## 分支流程：登录认证
 
 ```mermaid
 sequenceDiagram
@@ -59,7 +59,7 @@ sequenceDiagram
     end
 ```
 
-## 时序：新消息通知与红点统一
+## 分支流程：新消息通知与红点统一
 
 ```mermaid
 sequenceDiagram
@@ -85,57 +85,26 @@ sequenceDiagram
     end
 ```
 
-## 架构图
+## 状态机：应用生命周期
 
-```mermaid
-graph TB
-    subgraph 桌面应用 Shell
-        A[Tauri Runtime]
-        B[原生导航 UI]
-        C[系统托盘]
-        D[系统通知]
-        E[设置窗口]
-        F[JS Bridge]
-        G[Token/配置存储]
-    end
-
-    subgraph WebView 层
-        H[聊天页面]
-        I[通讯录页面]
-        J[AI 表格页面]
-    end
-
-    subgraph 后端/服务
-        K[Mattermost 服务端]
-        L[企业邮箱 SSO]
-    end
-
-    A --> B
-    A --> C
-    A --> D
-    A --> E
-    A --> F
-    A --> G
-    B --> H
-    B --> I
-    B --> J
-    F --> H
-    F --> I
-    F --> J
-    H --> K
-    I --> K
-    J --> K
-    A -.->|账号同步登录| L
-    L -.->|返回 token| A
+```
+未启动 → 启动中 → 引导程序 → 登录中 → 主界面 → 后台运行 → 退出
+              ↓
+           已登录（本地有有效 token）
+              ↓
+           主界面
 ```
 
-## 模块边界
+## 状态机：登录状态
 
-| 模块 | 职责 | 技术 |
-|------|------|------|
-| Shell | 窗口管理、生命周期、原生能力调用 | Tauri + Rust |
-| Navigation | 一级导航渲染、状态管理 | 前端框架（Vue/React） |
-| WebView Container | WebView 创建、销毁、消息桥接 | Tauri WebView API |
-| Bridge | JS ↔ Native 通信协议 | Tauri Command + postMessage |
-| Settings | 应用设置持久化与 UI | 前端 + Tauri Store/FS |
-| Auth | SSO 流程、token 管理、加密存储 | Rust + keyring/DPAPI |
+- `unauthenticated` → `authenticating`（用户提交邮箱/密码）
+- `authenticating` → `authenticated`（认证成功，获取 token）
+- `authenticated` → `session_expired`（token 过期且刷新失败）
+- `session_expired` → `unauthenticated`（跳转回引导程序）
+
+## 状态机：WebView 标签状态
+
+- `loading` → `loaded`（页面加载完成，JS Bridge 就绪）
+- `loading` → `error`（加载失败或网络异常）
+- `error` → `loading`（用户点击重试）
+- `loaded` → `active` / `inactive`（用户切换导航项）

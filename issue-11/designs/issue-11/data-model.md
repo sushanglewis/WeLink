@@ -1,101 +1,87 @@
-# 数据模型：issue-11 企业 IM 桌面应用
+# 数据模型: issue-11
 
-## 核心实体
+## 实体
 
 ### AppConfig（应用配置）
 
-| 字段 | 类型 | 说明 | 约束 |
+| 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
-| `server_url` | string | Mattermost 服务端地址 | 必填，安装包预配置，用户不可见 |
-| `app_name` | string | 应用显示名称 | 必填，如「WeLink」 |
-| `brand_primary_color` | string | 主品牌色 | 可选，HEX 格式 |
-| `sso_provider` | enum | SSO 类型 | `email_oidc` / `saml` / `oauth2`；**当前阶段预留，不使用** |
-| `sso_login_url` | string | SSO 登录入口 | 由服务端或配置提供；**当前阶段预留，不使用** |
-| `enable_auto_start` | boolean | 是否默认开机自启 | 默认 `false` |
-| `allow_multiple_instances` | boolean | 是否允许多开 | 默认 `false` |
+| `server_url` | string | 必填，安装包预配置 | Mattermost 服务端地址 |
+| `app_name` | string | 必填 | 应用显示名称，如「EAIC」 |
+| `brand_primary_color` | string | 可选，HEX | 主品牌色 |
+| `sso_provider` | enum | 预留字段 | `email_oidc` / `saml` / `oauth2`；当前阶段不使用 |
+| `sso_login_url` | string | 预留字段 | 第三方 SSO 登录入口；当前阶段不使用 |
+| `enable_auto_start` | boolean | 默认 `false` | 是否默认开机自启 |
+| `allow_multiple_instances` | boolean | 默认 `false` | 是否允许多开 |
 
 ### UserSession（用户会话）
 
-| 字段 | 类型 | 说明 | 约束 |
+| 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
-| `user_id` | string | Mattermost 用户 ID | 登录后写入 |
-| `access_token` | string | Mattermost access token | 加密存储于 keychain/DPAPI |
-| `refresh_token` | string | refresh token | 加密存储 |
-| `expires_at` | datetime | 令牌过期时间 | 用于预刷新 |
-| `email` | string | 企业邮箱 | 登录后写入 |
+| `user_id` | string | 登录后写入 | Mattermost 用户 ID |
+| `access_token` | string | 加密存储 | Mattermost access token |
+| `refresh_token` | string | 加密存储 | 用于长期保持登录 |
+| `expires_at` | datetime | 用于预刷新 | access token 过期时间 |
+| `email` | string | 登录后写入 | 企业邮箱 |
+| `remember_me` | boolean | 默认 `true` | 是否长期保持登录 |
 
 ### NavigationItem（一级导航项）
 
-| 字段 | 类型 | 说明 | 约束 |
+| 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
-| `id` | string | 导航项标识 | `contacts` / `chat` / `ai-sheets` |
-| `label` | string | 显示名称 | 中文化，如「通讯录」「聊天」「AI 表格」 |
-| `position` | enum | 导航位置 | 默认 `sidebar`（左侧边栏） |
-| `icon` | string | 图标名称/SVG | 必填 |
-| `type` | enum | 内容类型 | `webview` / `native` |
-| `url_path` | string | WebView 加载路径 | `type=webview` 时必填 |
-| `order` | integer | 排序 | 必填 |
+| `id` | string | 必填 | `contacts` / `chat` / `ai-sheets` |
+| `label` | string | 必填 | 显示名称，如「通讯录」「聊天」「AI 表格」 |
+| `position` | enum | 默认 `sidebar` | 导航位置 |
+| `icon` | string | 必填 | 图标名称/SVG |
+| `type` | enum | 必填 | `webview` / `native` |
+| `url_path` | string | `type=webview` 时必填 | WebView 加载路径 |
+| `order` | integer | 必填 | 排序 |
 
 ### WebViewTab（WebView 标签/视图）
 
-| 字段 | 类型 | 说明 | 约束 |
+| 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
-| `id` | string | 标签唯一标识 | 必填 |
-| `navigation_id` | string | 所属导航项 | 关联 NavigationItem |
-| `url` | string | 当前加载 URL | 必填 |
-| `title` | string | 页面标题 | 可同步自 WebView |
-| `unread_count` | integer | 未读消息数 | 由 WebView 通过 Bridge 上报 |
-| `is_active` | boolean | 是否当前展示 | 同一时刻仅一个为 `true` |
+| `id` | string | 必填 | 标签唯一标识 |
+| `navigation_id` | string | 必填 | 所属导航项 |
+| `url` | string | 必填 | 当前加载 URL |
+| `title` | string | 可同步自 WebView | 页面标题 |
+| `unread_count` | integer | 由 Bridge 上报 | 未读消息数 |
+| `is_active` | boolean | 同一时刻仅一个为 `true` | 是否当前展示 |
 
 ### Notification（系统通知）
 
-| 字段 | 类型 | 说明 | 约束 |
+| 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
-| `id` | string | 通知唯一标识 | 必填 |
-| `title` | string | 通知标题 | 必填 |
-| `body` | string | 通知内容 | 必填 |
-| `channel_id` | string | 频道/会话 ID | 用于点击跳转 |
-| `source` | enum | 通知来源 | `webview` / `native` |
-| `sender_name` | string | 发送者名称 | 可选 |
-| `created_at` | datetime | 通知时间 | 必填 |
+| `id` | string | 必填 | 通知唯一标识 |
+| `title` | string | 必填 | 通知标题 |
+| `body` | string | 必填 | 通知内容 |
+| `channel_id` | string | 必填 | 频道/会话 ID，用于点击跳转 |
+| `source` | enum | 必填 | `webview` / `native` |
+| `sender_name` | string | 可选 | 发送者名称 |
+| `created_at` | datetime | 必填 | 通知时间 |
 
 ### AppSettings（应用设置）
 
-| 字段 | 类型 | 说明 | 约束 |
+| 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
-| `language` | string | 界面语言 | 默认 `zh-CN` |
-| `theme` | enum | 主题 | `light` / `dark` / `system` |
-| `notification_enabled` | boolean | 是否启用通知 | 默认 `true` |
-| `notification_sound` | boolean | 是否播放声音 | 默认 `true` |
-| `auto_start` | boolean | 开机自启 | 默认 `false` |
-| `minimize_to_tray` | boolean | 关闭时最小化到托盘 | 默认 `true` |
+| `language` | string | 默认 `zh-CN` | 界面语言 |
+| `theme` | enum | 默认 `system` | `light` / `dark` / `system` |
+| `notification_enabled` | boolean | 默认 `true` | 是否启用通知 |
+| `notification_sound` | boolean | 默认 `true` | 是否播放声音 |
+| `auto_start` | boolean | 默认 `false` | 开机自启 |
+| `minimize_to_tray` | boolean | 默认 `true` | 关闭时最小化到托盘 |
+| `download_path` | string | 默认系统下载文件夹 | 文件默认下载目录 |
 
-## 状态转换
+## 关系
 
-### 应用生命周期
+- `UserSession` 属于一个 `AppConfig`：同一应用配置下可存在多个用户会话，但当前仅单账号登录。
+- `WebViewTab` 关联一个 `NavigationItem`：每个导航项对应一个 WebView 标签。
+- `Notification` 关联一个 `channel_id`：用于点击后定位到具体会话。
 
-```
-未启动 → 启动中 → 登录页 → 登录中 → 主界面 → 后台运行 → 退出
-              ↓
-           已登录（本地有有效 token）
-              ↓
-           主界面
-```
+## 约束
 
-### 登录状态
-
-| 状态 | 转换条件 |
-|------|----------|
-| `unauthenticated` | 初始状态，或 token 过期/无效 |
-| `authenticating` | 用户输入企业邮箱/密码，提交认证 |
-| `authenticated` | 认证成功，获取 token |
-| `session_expired` | token 过期且刷新失败 |
-
-### WebView 标签状态
-
-| 状态 | 转换条件 |
-|------|----------|
-| `loading` | 切换导航项，开始加载 URL |
-| `loaded` | 页面加载完成，JS Bridge 就绪 |
-| `error` | 加载失败或网络异常 |
-| `active` / `inactive` | 用户切换导航项 |
+- `server_url` 在安装包中预配置，用户不可见或仅允许管理员修改。
+- `access_token` 和 `refresh_token` 必须加密存储于系统 keychain/DPAPI。
+- `remember_me=true` 时，`refresh_token` 长期有效直到用户手动退出登录。
+- 同一时刻仅一个 `WebViewTab.is_active=true`。
+- 应用默认单实例运行，`allow_multiple_instances=false`。
