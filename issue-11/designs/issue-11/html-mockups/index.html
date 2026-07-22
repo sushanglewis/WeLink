@@ -483,21 +483,6 @@
             font-size: 14px;
         }
 
-        .webview-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .webview-actions button {
-            padding: 6px 12px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            color: var(--text);
-        }
-
         .webview-placeholder {
             flex: 1;
             background: var(--surface-2);
@@ -1300,6 +1285,7 @@
         </div>
         <div class="nav-group">
             <h3>交互演示</h3>
+            <button onclick="toggleSidebar()">切换侧边栏</button>
             <button onclick="toggleSettings()">打开设置面板</button>
             <button onclick="toggleNotification()">模拟系统通知</button>
             <button onclick="toggleTrayMenu()">模拟托盘菜单</button>
@@ -1413,16 +1399,16 @@
                 <aside class="sidebar" id="sidebar">
                     <div class="nav-items">
                         <div class="nav-item active" onclick="showScreen('main-chat')">
-                            <span class="icon">💬</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 12.7-7.4 8.5 8.5 0 0 1 4.3 7.4z"/></svg></span>
                             <span class="label">聊天</span>
                             <span class="nav-badge">3</span>
                         </div>
                         <div class="nav-item" onclick="showScreen('main-contacts')">
-                            <span class="icon">👥</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
                             <span class="label">通讯录</span>
                         </div>
                         <div class="nav-item" onclick="showScreen('main-ai')">
-                            <span class="icon">🤖</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span>
                             <span class="label">AI 表格</span>
                         </div>
                     </div>
@@ -1466,10 +1452,6 @@
                 <div class="content-area">
                     <div class="webview-toolbar">
                         <span class="webview-title">聊天</span>
-                        <div class="webview-actions">
-                            <button onclick="toggleNotification()">模拟通知</button>
-                            <button onclick="toggleSidebar()">切换边栏</button>
-                        </div>
                     </div>
                     <div class="webview-placeholder chat">
                         <div class="chat-mock">
@@ -1517,16 +1499,16 @@
                 <aside class="sidebar" id="sidebar-contacts">
                     <div class="nav-items">
                         <div class="nav-item" onclick="showScreen('main-chat')">
-                            <span class="icon">💬</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 12.7-7.4 8.5 8.5 0 0 1 4.3 7.4z"/></svg></span>
                             <span class="label">聊天</span>
                             <span class="nav-badge">3</span>
                         </div>
                         <div class="nav-item active" onclick="showScreen('main-contacts')">
-                            <span class="icon">👥</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
                             <span class="label">通讯录</span>
                         </div>
                         <div class="nav-item" onclick="showScreen('main-ai')">
-                            <span class="icon">🤖</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span>
                             <span class="label">AI 表格</span>
                         </div>
                     </div>
@@ -1538,9 +1520,6 @@
                 <div class="content-area">
                     <div class="webview-toolbar">
                         <span class="webview-title">通讯录</span>
-                        <div class="webview-actions">
-                            <button onclick="toggleSidebar()">切换边栏</button>
-                        </div>
                     </div>
                     <div class="webview-placeholder">
                         <p>WebView 嵌入：通讯录 B/S 页面</p>
@@ -1553,16 +1532,16 @@
                 <aside class="sidebar" id="sidebar-ai">
                     <div class="nav-items">
                         <div class="nav-item" onclick="showScreen('main-chat')">
-                            <span class="icon">💬</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 12.7-7.4 8.5 8.5 0 0 1 4.3 7.4z"/></svg></span>
                             <span class="label">聊天</span>
                             <span class="nav-badge">3</span>
                         </div>
                         <div class="nav-item" onclick="showScreen('main-contacts')">
-                            <span class="icon">👥</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
                             <span class="label">通讯录</span>
                         </div>
                         <div class="nav-item active" onclick="showScreen('main-ai')">
-                            <span class="icon">🤖</span>
+                            <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span>
                             <span class="label">AI 表格</span>
                         </div>
                     </div>
@@ -1574,9 +1553,6 @@
                 <div class="content-area">
                     <div class="webview-toolbar">
                         <span class="webview-title">AI 表格</span>
-                        <div class="webview-actions">
-                            <button onclick="toggleSidebar()">切换边栏</button>
-                        </div>
                     </div>
                     <div class="teable-embed">
                         <div class="teable-header">
@@ -1681,9 +1657,9 @@
             <section class="screen main-app" id="main-loading">
                 <aside class="sidebar">
                     <div class="nav-items">
-                        <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
-                        <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
-                        <div class="nav-item"><span class="icon">🤖</span><span class="label">AI 表格</span></div>
+                        <div class="nav-item active"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 12.7-7.4 8.5 8.5 0 0 1 4.3 7.4z"/></svg></span><span class="label">聊天</span><span class="nav-badge">3</span></div>
+                        <div class="nav-item"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="label">通讯录</span></div>
+                        <div class="nav-item"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span><span class="label">AI 表格</span></div>
                     </div>
                     <div class="user-area"><div class="user-avatar">张<span class="status-dot online"></span></div><div class="user-info"><div class="name">张三</div><div class="status">在线</div></div></div>
                 </aside>
@@ -1700,9 +1676,9 @@
             <section class="screen main-app" id="main-error">
                 <aside class="sidebar">
                     <div class="nav-items">
-                        <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
-                        <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
-                        <div class="nav-item"><span class="icon">🤖</span><span class="label">AI 表格</span></div>
+                        <div class="nav-item active"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 12.7-7.4 8.5 8.5 0 0 1 4.3 7.4z"/></svg></span><span class="label">聊天</span><span class="nav-badge">3</span></div>
+                        <div class="nav-item"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="label">通讯录</span></div>
+                        <div class="nav-item"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span><span class="label">AI 表格</span></div>
                     </div>
                     <div class="user-area"><div class="user-avatar">张<span class="status-dot online"></span></div><div class="user-info"><div class="name">张三</div><div class="status">在线</div></div></div>
                 </aside>
@@ -1724,9 +1700,9 @@
             <section class="screen main-app" id="main-offline">
                 <aside class="sidebar">
                     <div class="nav-items">
-                        <div class="nav-item active"><span class="icon">💬</span><span class="label">聊天</span><span class="nav-badge">3</span></div>
-                        <div class="nav-item"><span class="icon">👥</span><span class="label">通讯录</span></div>
-                        <div class="nav-item"><span class="icon">🤖</span><span class="label">AI 表格</span></div>
+                        <div class="nav-item active"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 12.7-7.4 8.5 8.5 0 0 1 4.3 7.4z"/></svg></span><span class="label">聊天</span><span class="nav-badge">3</span></div>
+                        <div class="nav-item"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="label">通讯录</span></div>
+                        <div class="nav-item"><span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span><span class="label">AI 表格</span></div>
                     </div>
                     <div class="user-area"><div class="user-avatar">张<span class="status-dot offline"></span></div><div class="user-info"><div class="name">张三</div><div class="status">离线</div></div></div>
                 </aside>
@@ -2003,7 +1979,7 @@
     </aside>
 
     <div class="hint">
-        💡 提示：点击左侧导航切换不同屏幕；在主界面点击底部用户区打开菜单，点击「打开设置面板」查看完整设置，点击「模拟系统通知」查看通知效果。
+        💡 提示：点击左侧「启动与登录 / 主界面」导航切换屏幕；使用「交互演示」中的按钮体验侧边栏、设置、通知、托盘；右侧查看当前页面 PRD 说明。
     </div>
 
     <script>
