@@ -9,8 +9,8 @@
 | `server_url` | string | Mattermost 服务端地址 | 必填，安装包预配置，用户不可见 |
 | `app_name` | string | 应用显示名称 | 必填，如「WeLink」 |
 | `brand_primary_color` | string | 主品牌色 | 可选，HEX 格式 |
-| `sso_provider` | enum | SSO 类型 | `email_oidc` / `saml` / `oauth2` |
-| `sso_login_url` | string | SSO 登录入口 | 必填，由服务端或配置提供 |
+| `sso_provider` | enum | SSO 类型 | `email_oidc` / `saml` / `oauth2`；**当前阶段预留，不使用** |
+| `sso_login_url` | string | SSO 登录入口 | 由服务端或配置提供；**当前阶段预留，不使用** |
 | `enable_auto_start` | boolean | 是否默认开机自启 | 默认 `false` |
 | `allow_multiple_instances` | boolean | 是否允许多开 | 默认 `false` |
 
@@ -87,8 +87,8 @@
 | 状态 | 转换条件 |
 |------|----------|
 | `unauthenticated` | 初始状态，或 token 过期/无效 |
-| `authenticating` | 用户点击登录，跳转 SSO |
-| `authenticated` | SSO 回调成功，获取 token |
+| `authenticating` | 用户输入企业邮箱/密码，提交认证 |
+| `authenticated` | 认证成功，获取 token |
 | `session_expired` | token 过期且刷新失败 |
 
 ### WebView 标签状态

@@ -7,18 +7,23 @@ flowchart TD
     A[安装应用] --> B[首次启动]
     B --> C{本地有有效 token?}
     C -->|是| D[进入主界面]
-    C -->|否| E[显示企业品牌登录页]
-    E --> F[点击企业邮箱登录]
-    F --> G[SSO 认证]
-    G -->|成功| H[获取并保存 token]
-    H --> D
-    D --> I[左侧导航切换功能]
-    I --> J[聊天 WebView]
-    I --> K[通讯录 WebView]
-    I --> L[AI 表格 WebView]
-    J --> M[收到新消息]
-    M --> N[系统通知 + 托盘红点]
-    N --> O[点击通知/托盘唤出应用]
+    C -->|否| E[显示 EAIC 品牌引导程序]
+    E --> F[确认/输入组织 URL]
+    F --> G[输入企业邮箱/密码]
+    G --> H{记住我?}
+    H -->|是| I[保存 refresh token]
+    H -->|否| J[仅保存 session token]
+    I --> K[登录成功]
+    J --> K
+    K --> D
+    D --> L[左侧导航切换功能]
+    L --> M[聊天 WebView]
+    L --> N[通讯录 WebView]
+    L --> O[AI 表格 WebView]
+    M --> P[收到新消息]
+    P --> Q[系统通知 + 托盘红点]
+    Q --> R[点击通知/托盘唤出应用]
+    R --> S[切换到聊天并定位会话]
 ```
 
 ## 业务流：应用启动与登录
@@ -27,8 +32,8 @@ flowchart TD
 sequenceDiagram
     autonumber
     participant U as 用户
-    participant App as Tauri 桌面应用
-    participant SSO as 企业邮箱 SSO
+    participant App as EAIC 桌面应用
+    participant Auth as 认证服务
     participant MM as Mattermost 服务端
 
     U->>App: 启动应用
@@ -39,14 +44,17 @@ sequenceDiagram
         MM-->>App: 返回用户信息
         App->>U: 展示主界面
     else token 无效/缺失
-        App->>U: 展示企业品牌登录页
-        U->>App: 点击「企业邮箱登录」
-        App->>SSO: 打开 SSO 授权页
-        U->>SSO: 完成邮箱认证
-        SSO-->>App: 回调授权码 / token
-        App->>MM: 使用授权码换取 Mattermost token
-        MM-->>App: 返回 token
+        App->>U: 展示 EAIC 品牌引导程序
+        U->>App: 确认/输入组织 URL
+        U->>App: 输入企业邮箱/密码
+        App->>Auth: 提交邮箱/密码认证
+        Auth-->>App: 返回 access token + refresh token
         App->>App: 加密保存 token
+        alt 记住我（默认勾选）
+            App->>App: 保存 refresh token，长期有效
+        else 不记住我
+            App->>App: 仅保存 session token
+        end
         App->>U: 展示主界面
     end
 ```
@@ -59,7 +67,7 @@ sequenceDiagram
     participant MM as Mattermost 服务端
     participant WV as 聊天 WebView
     participant Bridge as Tauri JS Bridge
-    participant App as 桌面应用 Shell
+    participant App as EAIC 桌面应用 Shell
     participant Sidebar as 左侧边栏导航
     participant OS as 操作系统
 
@@ -69,10 +77,11 @@ sequenceDiagram
     App->>Sidebar: 更新对应导航项红点/未读数
     App->>App: 更新托盘红点
     alt 需要弹窗
-        App->>OS: 发送系统通知
+        App->>OS: 发送系统通知（含 channelId）
         OS-->>App: 用户点击通知
         App->>App: 唤出窗口并切换至聊天标签
-        App->>WV: 通知已处理
+        App->>WV: postMessage('navigate-to-channel', {channelId})
+        WV->>WV: 定位到对应会话/频道
     end
 ```
 
@@ -116,8 +125,8 @@ graph TB
     H --> K
     I --> K
     J --> K
-    A -.->|SSO 登录| L
-    L -.->|回调 token| A
+    A -.->|账号同步登录| L
+    L -.->|返回 token| A
 ```
 
 ## 模块边界
