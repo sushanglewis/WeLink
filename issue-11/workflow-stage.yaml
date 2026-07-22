@@ -9,17 +9,17 @@ current_run:
   current_stage: product-design-docs
   status: in_progress
   started_at: '2026-07-20T02:48:59Z'
-  last_updated_at: '2026-07-22T02:10:39Z'
+  last_updated_at: '2026-07-22T06:20:25Z'
   issue_number: '11'
   variables:
     process_slug: issue-11
     session_id: 2026-07-20-issue-11
     design_id: issue-11
     issue_number: '11'
-    change_name: 'issue-11-desktop-app'
+    change_name: issue-11-desktop-app
     pr_number: ''
     feature_slug: ''
-  change_name: 'issue-11-desktop-app'
+  change_name: issue-11-desktop-app
   pr_number: ''
   feature_slug: ''
   execution_mode: team
@@ -100,6 +100,7 @@ nodes:
   - issue-11/designs/issue-11/flows.md
   - issue-11/designs/issue-11/scenarios.md
   - issue-11/designs/issue-11/ui-handoff.md
+  - issue-11/designs/issue-11/html-mockups/index.html
   handoff_file: issue-11/handoffs/lc-handoff-product-design-docs.md
 recovery:
   last_validated_checkpoint: ''
