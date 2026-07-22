@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAIC 桌面应用 UX 原型</title>
+    <style>
+        :root {
+            --brand: #2563eb;
+            --brand-dark: #1d4ed8;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --surface-2: #f9fafb;
+            --text: #111827;
+            --text-2: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --error: #ef4444;
+            --sidebar-width: 240px;
+            --sidebar-collapsed: 72px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .prototype-nav {
+            width: 200px;
+            background: #1f2937;
+            color: #fff;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .prototype-nav h3 {
+            margin: 0 0 16px;
+            font-size: 14px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .prototype-nav button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            color: #d1d5db;
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .prototype-nav button:hover,
+        .prototype-nav button.active {
+            background: #374151;
+            color: #fff;
+        }
+
+        .prototype-stage {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            overflow: auto;
+        }
+
+        .window {
+            width: 960px;
+            height: 640px;
+            background: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .titlebar {
+            height: 40px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            -webkit-app-region: drag;
+            user-select: none;
+        }
+
+        .titlebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .titlebar-brand .logo {
+            width: 18px;
+            height: 18px;
+            background: var(--brand);
+            border-radius: 4px;
+        }
+
+        .titlebar-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .titlebar-controls span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .tb-min { background: #fbbf24; }
+        .tb-max { background: #34d399; }
+        .tb-close { background: #f87171; }
+
+        .screen { display: none; flex: 1; overflow: hidden; }
+        .screen.active { display: flex; }
+
+        /* Splash */
+        .splash {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .splash-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--brand);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .splash h1 {
+            margin: 0;
+            font-size: 28px;
+            color: var(--text);
+        }
+
+        .splash p {
+            margin: 8px 0 0;
+            color: var(--text-2);
+        }
+
+        /* Onboarding */
+        .onboarding {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface);
+            padding: 40px;
+        }
+
+        .onboarding-card {
+            width: 420px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+        }
+
+        .onboarding-card h2 {
+            margin: 0 0 8px;
+            font-size: 22px;
+        }
+
+        .onboarding-card .subtitle {
+            color: var(--text-2);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .org-preview {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--surface-2);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .org-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--brand);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="email"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--brand);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: var(--brand-dark); }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--brand);
+            border: 1px solid var(--border);
+        }
+
+        .error-msg {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        /* Main App */
+        .main-app { flex-direction: row; }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #1f2937;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.2s;
+        }
+
+        .sidebar.collapsed { width: var(--sidebar-collapsed); }
+
+        .sidebar-header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header .logo {
+            width: 28px;
+            height: 28px;
+            background: var(--brand);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .sidebar-header .app-name {
+            margin-left: 10px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .sidebar.collapsed .app-name { display: none; }
+
+        .nav-items {
+            flex: 1;
+            padding: 12px 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #d1d5db;
+            position: relative;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .nav-item .icon {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-item .label {
+            margin-left: 12px;
+            font-size: 14px;
+        }
+
+        .sidebar.collapsed .nav-item .label { display: none; }
+
+        .nav-badge {
+            position: absolute;
+            right: 10px;
+            background: var(--error);
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .sidebar.collapsed .nav-badge {
+            right: 6px;
+            top: 6px;
+        }
+
+        .user-area {
+            padding: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4b5563;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border: 2px solid #1f2937;
+            border-radius: 50%;
+        }
+
+        .user-info {
+            margin-left: 10px;
+            flex: 1;
+        }
+
+        .user-info .name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .user-info .status {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .sidebar.collapsed .user-info { display: none; }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+        }
+
+        .webview-toolbar {
+            height: 44px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            justify-content: space-between;
+        }
+
+        .webview-title {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .webview-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .webview-actions button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .webview-placeholder {
+            flex: 1;
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--text-2);
+        }
+
+        .webview-placeholder.chat {
+            background: #fff;
+            align-items: stretch;
+            justify-content: stretch;
+            padding: 0;
+        }
+
+        .chat-mock {
+            display: flex;
+            height: 100%;
+        }
+
+        .chat-list {
+            width: 240px;
+            border-right: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .chat-list-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .chat-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-item.active { background: #eff6ff; }
+
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #dbeafe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--brand);
+            font-weight: 600;
+        }
+
+        .chat-preview {
+            flex: 1;
+        }
+
+        .chat-preview .name {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .chat-preview .msg {
+            font-size: 12px;
+            color: var(--text-2);
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            background: #f8fafc;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .message-bubble {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            max-width: 70%;
+            font-size: 13px;
+        }
+
+        .chat-input {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        /* Settings Modal */
+        .settings-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .settings-overlay.active { display: flex; }
+
+        .settings-modal {
+            width: 680px;
+            height: 480px;
+            background: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            display: flex;
+            overflow: hidden;
+        }
+
+        .settings-sidebar {
+            width: 180px;
+            background: var(--surface-2);
+            border-right: 1px solid var(--border);
+            padding: 16px 0;
+        }
+
+        .settings-category {
+            padding: 10px 16px;
+            font-size: 13px;
+            color: var(--text-2);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .settings-item {
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .settings-item.active {
+            background: #eff6ff;
+            color: var(--brand);
+            font-weight: 500;
+        }
+
+        .settings-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .settings-content h3 {
+            margin: 0 0 20px;
+            font-size: 18px;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .setting-row .left {
+            flex: 1;
+        }
+
+        .setting-row .label {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .setting-row .desc {
+            font-size: 13px;
+            color: var(--text-2);
+        }
+
+        .setting-row .control {
+            margin-left: 16px;
+        }
+
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: #d1d5db;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle.on { background: var(--brand); }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s;
+        }
+
+        .toggle.on::after { left: 22px; }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-2);
+        }
+
+        /* About */
+        .about-content {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .about-logo {
+            width: 64px;
+            height: 64px;
+            background: var(--brand);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+
+        .about-content h2 {
+            margin: 0 0 8px;
+        }
+
+        .about-content .version {
+            color: var(--text-2);
+            margin-bottom: 24px;
+        }
+
+        .about-content .info {
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-2);
+        }
+
+        /* Notification */
+        .notification-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 320px;
+            background: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 14px;
+            display: none;
+            z-index: 200;
+            border: 1px solid var(--border);
+        }
+
+        .notification-toast.active { display: block; }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .notification-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #dbeafe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .notification-meta {
+            flex: 1;
+        }
+
+        .notification-meta .name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .notification-meta .app {
+            font-size: 11px;
+            color: var(--text-2);
+        }
+
+        .notification-body {
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 20px;
+            left: 220px;
+            right: 20px;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <nav class="prototype-nav">
+        <h3>屏幕导航</h3>
+        <button class="active" onclick="showScreen('splash')">启动页 Splash</button>
+        <button onclick="showScreen('onboarding-org')">引导 - 组织 URL</button>
+        <button onclick="showScreen('onboarding-login')">引导 - 登录</button>
+        <button onclick="showScreen('main-chat')">主界面 - 聊天</button>
+        <button onclick="showScreen('main-contacts')">主界面 - 通讯录</button>
+        <button onclick="showScreen('main-ai')">主界面 - AI 表格</button>
+        <button onclick="showScreen('about')">关于页</button>
+    </nav>
+
+    <main class="prototype-stage">
+        <div class="window">
+            <!-- Title Bar -->
+            <div class="titlebar">
+                <div class="titlebar-brand">
+                    <div class="logo"></div>
+                    <span>EAIC</span>
+                </div>
+                <div class="titlebar-controls">
+                    <span class="tb-min"></span>
+                    <span class="tb-max"></span>
+                    <span class="tb-close"></span>
+                </div>
+            </div>
+
+            <!-- Splash -->
+            <section class="screen splash active" id="splash">
+                <div class="splash-logo">E</div>
+                <h1>EAIC</h1>
+                <p>企业智能协作平台</p>
+            </section>
+
+            <!-- Onboarding: Org URL -->
+            <section class="screen onboarding" id="onboarding-org">
+                <div class="onboarding-card">
+                    <h2>连接到你的组织</h2>
+                    <p class="subtitle">请输入你的组织地址，开始使用 EAIC</p>
+                    <div class="org-preview">
+                        <div class="org-avatar">企</div>
+                        <div>
+                            <div style="font-weight: 600;">示例企业</div>
+                            <div style="font-size: 12px; color: var(--text-2);">example.eaic.com</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>组织地址</label>
+                        <input type="text" value="https://mattermost.example.com" />
+                    </div>
+                    <button class="btn">下一步</button>
+                </div>
+            </section>
+
+            <!-- Onboarding: Login -->
+            <section class="screen onboarding" id="onboarding-login">
+                <div class="onboarding-card">
+                    <h2>登录到 EAIC</h2>
+                    <p class="subtitle">使用已同步的企业邮箱和密码</p>
+                    <div class="form-group">
+                        <label>企业邮箱</label>
+                        <input type="email" value="zhangsan@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" value="********" />
+                        <div class="error-msg" style="display:none;">邮箱或密码错误</div>
+                    </div>
+                    <div class="form-row">
+                        <label><input type="checkbox" checked /> 记住我</label>
+                        <a href="#" style="color: var(--brand); text-decoration: none;">忘记密码？</a>
+                    </div>
+                    <button class="btn">登录</button>
+                </div>
+            </section>
+
+            <!-- Main: Chat -->
+            <section class="screen main-app" id="main-chat">
+                <aside class="sidebar" id="sidebar">
+                    <div class="sidebar-header">
+                        <div class="logo">E</div>
+                        <span class="app-name">EAIC</span>
+                    </div>
+                    <div class="nav-items">
+                        <div class="nav-item active" onclick="showScreen('main-chat')">
+                            <span class="icon">💬</span>
+                            <span class="label">聊天</span>
+                            <span class="nav-badge">3</span>
+                        </div>
+                        <div class="nav-item" onclick="showScreen('main-contacts')">
+                            <span class="icon">👥</span>
+                            <span class="label">通讯录</span>
+                        </div>
+                        <div class="nav-item" onclick="showScreen('main-ai')">
+                            <span class="icon">🤖</span>
+                            <span class="label">AI 表格</span>
+                        </div>
+                    </div>
+                    <div class="user-area" onclick="toggleSettings()">
+                        <div class="user-avatar">
+                            张
+                            <span class="status-dot"></span>
+                        </div>
+                        <div class="user-info">
+                            <div class="name">张三</div>
+                            <div class="status">在线</div>
+                        </div>
+                    </div>
+                </aside>
+                <div class="content-area">
+                    <div class="webview-toolbar">
+                        <span class="webview-title">聊天</span>
+                        <div class="webview-actions">
+                            <button onclick="toggleNotification()">模拟通知</button>
+                            <button onclick="toggleSidebar()">切换边栏</button>
+                        </div>
+                    </div>
+                    <div class="webview-placeholder chat">
+                        <div class="chat-mock">
+                            <div class="chat-list">
+                                <div class="chat-list-header">消息</div>
+                                <div class="chat-item active">
+                                    <div class="chat-avatar">李</div>
+                                    <div class="chat-preview">
+                                        <div class="name">李四</div>
+                                        <div class="msg">下午的需求评审...</div>
+                                    </div>
+                                </div>
+                                <div class="chat-item">
+                                    <div class="chat-avatar">产</div>
+                                    <div class="chat-preview">
+                                        <div class="name">产品讨论组</div>
+                                        <div class="msg">王五：方案已确认</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-main">
+                                <div class="chat-header">李四</div>
+                                <div class="chat-messages">
+                                    <div class="message">
+                                        <div class="chat-avatar">李</div>
+                                        <div class="message-bubble">下午的需求评审你参加吗？</div>
+                                    </div>
+                                    <div class="message">
+                                        <div class="chat-avatar">张</div>
+                                        <div class="message-bubble">参加，我提前准备一下。</div>
+                                    </div>
+                                </div>
+                                <div class="chat-input">
+                                    <input type="text" placeholder="输入消息..." />
+                                    <button class="btn" style="width: auto; padding: 10px 20px;">发送</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main: Contacts -->
+            <section class="screen main-app" id="main-contacts">
+                <aside class="sidebar" id="sidebar-contacts">
+                    <div class="sidebar-header">
+                        <div class="logo">E</div>
+                        <span class="app-name">EAIC</span>
+                    </div>
+                    <div class="nav-items">
+                        <div class="nav-item" onclick="showScreen('main-chat')">
+                            <span class="icon">💬</span>
+                            <span class="label">聊天</span>
+                            <span class="nav-badge">3</span>
+                        </div>
+                        <div class="nav-item active" onclick="showScreen('main-contacts')">
+                            <span class="icon">👥</span>
+                            <span class="label">通讯录</span>
+                        </div>
+                        <div class="nav-item" onclick="showScreen('main-ai')">
+                            <span class="icon">🤖</span>
+                            <span class="label">AI 表格</span>
+                        </div>
+                    </div>
+                    <div class="user-area" onclick="toggleSettings()">
+                        <div class="user-avatar">张<span class="status-dot"></span></div>
+                        <div class="user-info"><div class="name">张三</div><div class="status">在线</div></div>
+                    </div>
+                </aside>
+                <div class="content-area">
+                    <div class="webview-toolbar">
+                        <span class="webview-title">通讯录</span>
+                    </div>
+                    <div class="webview-placeholder">
+                        <p>WebView 嵌入：通讯录 B/S 页面</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main: AI Sheets -->
+            <section class="screen main-app" id="main-ai">
+                <aside class="sidebar" id="sidebar-ai">
+                    <div class="sidebar-header">
+                        <div class="logo">E</div>
+                        <span class="app-name">EAIC</span>
+                    </div>
+                    <div class="nav-items">
+                        <div class="nav-item" onclick="showScreen('main-chat')">
+                            <span class="icon">💬</span>
+                            <span class="label">聊天</span>
+                            <span class="nav-badge">3</span>
+                        </div>
+                        <div class="nav-item" onclick="showScreen('main-contacts')">
+                            <span class="icon">👥</span>
+                            <span class="label">通讯录</span>
+                        </div>
+                        <div class="nav-item active" onclick="showScreen('main-ai')">
+                            <span class="icon">🤖</span>
+                            <span class="label">AI 表格</span>
+                        </div>
+                    </div>
+                    <div class="user-area" onclick="toggleSettings()">
+                        <div class="user-avatar">张<span class="status-dot"></span></div>
+                        <div class="user-info"><div class="name">张三</div><div class="status">在线</div></div>
+                    </div>
+                </aside>
+                <div class="content-area">
+                    <div class="webview-toolbar">
+                        <span class="webview-title">AI 表格</span>
+                    </div>
+                    <div class="webview-placeholder">
+                        <p>WebView 嵌入：AI 表格 B/S 页面</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About -->
+            <section class="screen" id="about">
+                <div class="content-area">
+                    <div class="webview-toolbar">
+                        <span class="webview-title">关于 EAIC</span>
+                    </div>
+                    <div class="about-content">
+                        <div class="about-logo">E</div>
+                        <h2>EAIC</h2>
+                        <div class="version">版本 1.0.0 (Build 2026.07.22)</div>
+                        <div class="info">
+                            <p><strong>企业：</strong>示例科技有限公司</p>
+                            <p><strong>版权：</strong>© 2026 示例科技 保留所有权利</p>
+                            <p><strong>许可：</strong>第三方开源组件许可声明</p>
+                            <p><strong>技术支持：</strong>IT 服务台 it@example.com</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Modal -->
+            <div class="settings-overlay" id="settings-overlay" onclick="if(event.target === this) toggleSettings()">
+                <div class="settings-modal">
+                    <button class="close-btn" onclick="toggleSettings()">×</button>
+                    <div class="settings-sidebar">
+                        <div class="settings-category">个人设置</div>
+                        <div class="settings-item active">通用</div>
+                        <div class="settings-item">通知</div>
+                        <div class="settings-item">显示</div>
+                        <div class="settings-item">安全</div>
+                        <div class="settings-category">系统设置</div>
+                        <div class="settings-item">通用</div>
+                        <div class="settings-item">高级</div>
+                        <div class="settings-item">账号</div>
+                    </div>
+                    <div class="settings-content">
+                        <h3>通用</h3>
+                        <div class="setting-row">
+                            <div class="left">
+                                <div class="label">头像</div>
+                                <div class="desc">点击更换个人头像</div>
+                            </div>
+                            <div class="control"><div class="user-avatar" style="background: var(--brand); color: white;">张</div></div>
+                        </div>
+                        <div class="setting-row">
+                            <div class="left">
+                                <div class="label">全名</div>
+                                <div class="desc">在团队中显示的名称</div>
+                            </div>
+                            <div class="control"><input type="text" value="张三" style="width: 140px; padding: 6px;" /></div>
+                        </div>
+                        <div class="setting-row">
+                            <div class="left">
+                                <div class="label">用户名</div>
+                                <div class="desc">zhangsan（只读）</div>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <div class="left">
+                                <div class="label">邮箱</div>
+                                <div class="desc">zhangsan@example.com（只读）</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 24px; text-align: right;">
+                            <button class="btn" style="width: auto; padding: 8px 24px;">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Toast -->
+            <div class="notification-toast" id="notification-toast" onclick="hideNotification()">
+                <div class="notification-header">
+                    <div class="notification-avatar">李</div>
+                    <div class="notification-meta">
+                        <div class="name">李四</div>
+                        <div class="app">EAIC</div>
+                    </div>
+                </div>
+                <div class="notification-body">
+                    下午的需求评审你参加吗？
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="hint">
+        💡 提示：点击左侧导航切换不同屏幕；在主界面点击底部用户区打开设置，点击「模拟通知」查看通知效果。
+    </div>
+
+    <script>
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.prototype-nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleSettings() {
+            document.getElementById('settings-overlay').classList.toggle('active');
+        }
+
+        function toggleNotification() {
+            const toast = document.getElementById('notification-toast');
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 4000);
+        }
+
+        function hideNotification() {
+            document.getElementById('notification-toast').classList.remove('active');
+        }
+
+        function toggleSidebar() {
+            document.querySelectorAll('.sidebar').forEach(s => s.classList.toggle('collapsed'));
+        }
+    </script>
+</body>
+</html>
