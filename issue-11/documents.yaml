@@ -1,7 +1,7 @@
 process_slug: issue-11
 issue_number: '11'
 current_stage: product-design-docs
-last_updated: '2026-07-22T02:10:48Z'
+last_updated: '2026-07-22T03:11:24Z'
 documents:
 - path: designs/issue-11/data-model.md
   stage: product-design-docs

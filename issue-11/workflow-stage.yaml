@@ -16,10 +16,10 @@ current_run:
     session_id: 2026-07-20-issue-11
     design_id: issue-11
     issue_number: '11'
-    change_name: ''
+    change_name: 'issue-11-desktop-app'
     pr_number: ''
     feature_slug: ''
-  change_name: ''
+  change_name: 'issue-11-desktop-app'
   pr_number: ''
   feature_slug: ''
   execution_mode: team
