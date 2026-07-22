@@ -900,6 +900,7 @@
 
         .teable-sidebar {
             width: 220px;
+            flex-shrink: 0;
             background: var(--surface-2);
             border-right: 1px solid var(--border);
             display: flex;
@@ -1214,11 +1215,52 @@
             padding: 0 5px;
         }
 
+.prototype-annotations {
+            width: 320px;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .prototype-annotations-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .prototype-annotations-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .prototype-annotations-content h4 {
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .prototype-annotations-content ul {
+            margin: 0 0 16px;
+            padding-left: 18px;
+        }
+
+        .prototype-annotations-content li {
+            margin-bottom: 6px;
+        }
+
         .hint {
             position: fixed;
             bottom: 20px;
             left: 220px;
-            right: 20px;
+            right: 340px;
             background: #fef3c7;
             border: 1px solid #f59e0b;
             border-radius: 6px;
@@ -1953,6 +1995,13 @@
         </div>
     </main>
 
+    <aside class="prototype-annotations">
+        <div class="prototype-annotations-header">当前页面 PRD 说明</div>
+        <div class="prototype-annotations-content" id="annotations-content">
+            选择左侧屏幕查看对应 PRD 说明。
+        </div>
+    </aside>
+
     <div class="hint">
         💡 提示：点击左侧导航切换不同屏幕；在主界面点击底部用户区打开菜单，点击「打开设置面板」查看完整设置，点击「模拟系统通知」查看通知效果。
     </div>
@@ -1966,7 +2015,31 @@
             if (btn) btn.classList.add('active');
             hideUserMenu();
             hideTrayMenu();
+            updateAnnotations(id);
         }
+
+        const annotations = {
+            'splash': `<h4>启动页 / Splash</h4><ul><li>应用启动时展示企业品牌 Logo 与名称 EAIC。</li><li>检查本地 token：有效则自动进入主界面；无效/缺失则进入引导程序。</li><li>提供加载进度反馈，本页无用户交互。</li></ul>`,
+            'onboarding-org': `<h4>引导 - 组织 URL</h4><ul><li>安装包预配置服务器地址，用户可查看/修改。</li><li>校验 URL 格式与可连接性（HTTPS、服务器可达）。</li><li>校验通过后进入企业邮箱/密码登录页。</li></ul>`,
+            'onboarding-login': `<h4>引导 - 登录</h4><ul><li>使用已同步到 EAIC 的企业邮箱/密码登录，无需注册。</li><li>「记住我」默认勾选，登录成功后加密保存 refresh token。</li><li>点击登录按钮显示 loading，成功后进入主界面（默认聊天）。</li></ul>`,
+            'onboarding-login-error': `<h4>登录 - 错误态</h4><ul><li>账号/密码错误、网络断开、组织 URL 不可达时触发。</li><li>在对应输入框下方显示 inline 红色错误提示。</li><li>用户可修正后重新提交。</li></ul>`,
+            'sso-callback': `<h4>SSO 回调加载页</h4><ul><li>当前阶段为后续迭代预留。</li><li>第三方 SSO/OAuth 完成后，展示 token 交换等待状态。</li><li>完成后自动进入主界面。</li></ul>`,
+            'main-chat': `<h4>主界面 - 聊天</h4><ul><li>左侧一级导航默认选中「聊天」。</li><li>WebView 嵌入现有 B/S 聊天页面，支持消息收发。</li><li>JS Bridge 同步未读数到导航红点与托盘红点。</li><li>点击系统通知可唤出应用并定位到对应会话。</li></ul>`,
+            'main-contacts': `<h4>主界面 - 通讯录</h4><ul><li>WebView 嵌入现有 B/S 通讯录页面。</li><li>导航项显示选中态，支持未读好友请求红点。</li></ul>`,
+            'main-ai': `<h4>主界面 - AI 表格</h4><ul><li>以 Teable/多维表格方式嵌入，左侧 Panel 固定 220px。</li><li>顶部显示面包屑、全屏与新建记录操作。</li><li>左侧展示 workspace、database、view；右侧为数据网格。</li><li>示例数据参考 issue-6 督办主表字段。</li></ul>`,
+            'main-loading': `<h4>WebView 加载态</h4><ul><li>切换导航或首次加载 WebView 时显示居中 spinner。</li><li>加载超过阈值后自动切换到错误态。</li><li>用户可取消或切换其他导航。</li></ul>`,
+            'main-error': `<h4>WebView 错误态</h4><ul><li>URL 不可达、HTTP 错误、超时或证书错误时显示。</li><li>展示错误代码与「重试」「返回」操作。</li><li>网络恢复后可自动重试一次。</li></ul>`,
+            'main-offline': `<h4>网络离线态</h4><ul><li>检测到网络断开时顶部显示离线 banner。</li><li>用户在线状态同步变为「离线」。</li><li>网络恢复后自动重连 WebSocket 并刷新当前 WebView。</li></ul>`,
+            'about': `<h4>关于 EAIC</h4><ul><li>展示版本号、版权、企业信息、第三方开源许可声明。</li><li>提供 IT 服务台联系方式。</li><li>入口位于用户头像菜单。</li></ul>`
+        };
+
+        function updateAnnotations(id) {
+            const container = document.getElementById('annotations-content');
+            container.innerHTML = annotations[id] || '<p>暂无该页面的 PRD 说明。</p>';
+        }
+
+        // Initialize annotations for the default screen
+        updateAnnotations('splash');
 
         function goToLogin() {
             showScreen('onboarding-login');
