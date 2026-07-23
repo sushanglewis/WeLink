@@ -9,7 +9,7 @@ current_run:
   current_stage: product-design-docs
   status: in_progress
   started_at: '2026-07-20T02:48:59Z'
-  last_updated_at: '2026-07-23T07:49:09Z'
+  last_updated_at: '2026-07-23T09:14:36Z'
   issue_number: '11'
   variables:
     process_slug: issue-11
@@ -43,7 +43,7 @@ nodes:
   gate_passed: true
   approved_by: human-pm
   artifacts:
-  - issue-11/requirements/prd.md
+  - issue-11/prd.md
   - issue-11/requirements/requirements.md
   - issue-11/requirements/user-stories.md
   handoff_file: null
@@ -57,7 +57,7 @@ nodes:
   artifacts:
   - issue-11/requirements/requirements.md
   - issue-11/requirements/user-stories.md
-  - issue-11/requirements/prd.md
+  - issue-11/prd.md
   handoff_file: null
 - stage_id: product-design-docs
   node_id: product-design-docs-2026-07-20T03:36:23Z

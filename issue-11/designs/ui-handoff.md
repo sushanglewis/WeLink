@@ -5,7 +5,7 @@
 > **状态**：已 PM 确认，可交付给 UX 设计师开展 GUI 原型设计。  
 > **确认时间**：2026-07-21  
 > **目标读者**：UX 设计师、前端工程师、产品经理、QA。  
-> **关联 PRD**：`issue-11/requirements/prd.md`  
+> **关联 PRD**：`issue-11/prd.md`  
 > **关联用户故事**：`issue-11/requirements/user-stories.md`  
 > **关联流程/数据模型**：`issue-11/designs/flows.md`、`issue-11/designs/data-model.md`  
 > **交互原型**：`issue-11/designs/html-mockups/index.html`
@@ -756,7 +756,7 @@ EAIC 的桌面通知与托盘红点逻辑如下：
 
 ## 17. 参考
 
-- PRD：`issue-11/requirements/prd.md`
+- PRD：`issue-11/prd.md`
 - 用户故事：`issue-11/requirements/user-stories.md`
 - 流程图：`issue-11/designs/flows.md`
 - 数据模型：`issue-11/designs/data-model.md`

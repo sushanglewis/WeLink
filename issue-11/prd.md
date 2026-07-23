@@ -1,6 +1,7 @@
 # PRD: issue-11 企业 IM 桌面应用（EAIC）
 
 <!-- status: approved -->
+<!-- version: v0.5 -->
 
 > **目标读者**：产品经理、UX 设计师、研发工程师、QA、企业 IT/管理员。  
 > **关联文档**：
