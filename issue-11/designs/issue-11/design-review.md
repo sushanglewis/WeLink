@@ -61,6 +61,8 @@
 
 ## 关联文档
 
+> **快速入口**：请先阅读 [`issue-11/README.md`](../../README.md) 了解全文阅读地图。
+
 - [场景分析](./scenarios.md)
 - [功能目录](./feature-catalog.md)
 - [数据模型](./data-model.md)
