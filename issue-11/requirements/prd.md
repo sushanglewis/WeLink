@@ -4,11 +4,11 @@
 
 > **目标读者**：产品经理、UX 设计师、研发工程师、QA、企业 IT/管理员。  
 > **关联文档**：
-> - 需求澄清：`issue-11/requirements/2026-07-20-issue-11/requirements.md`
-> - 用户故事：`issue-11/requirements/2026-07-20-issue-11/user-stories.md`
-> - 设计文档：`issue-11/designs/issue-11/ui-handoff.md`
-> - 流程/数据模型：`issue-11/designs/issue-11/flows.md`、`issue-11/designs/issue-11/data-model.md`
-> - 交互原型：`issue-11/designs/issue-11/html-mockups/index.html`
+> - 需求澄清：`issue-11/requirements/requirements.md`
+> - 用户故事：`issue-11/requirements/user-stories.md`
+> - 设计文档：`issue-11/designs/ui-handoff.md`
+> - 流程/数据模型：`issue-11/designs/flows.md`、`issue-11/designs/data-model.md`
+> - 交互原型：`issue-11/designs/html-mockups/index.html`
 > - GitHub Issue：#11
 
 ---
@@ -444,13 +444,13 @@ sequenceDiagram
 
 ## 11. 参考
 
-- 需求澄清文档：`issue-11/requirements/2026-07-20-issue-11/requirements.md`
-- 用户故事：`issue-11/requirements/2026-07-20-issue-11/user-stories.md`
-- 设计文档：`issue-11/designs/issue-11/ui-handoff.md`
-- 流程图：`issue-11/designs/issue-11/flows.md`
-- 数据模型：`issue-11/designs/issue-11/data-model.md`
-- 功能目录：`issue-11/designs/issue-11/feature-catalog.md`
-- 交互原型：`issue-11/designs/issue-11/html-mockups/index.html`
+- 需求澄清文档：`issue-11/requirements/requirements.md`
+- 用户故事：`issue-11/requirements/user-stories.md`
+- 设计文档：`issue-11/designs/ui-handoff.md`
+- 流程图：`issue-11/designs/flows.md`
+- 数据模型：`issue-11/designs/data-model.md`
+- 功能目录：`issue-11/designs/feature-catalog.md`
+- 交互原型：`issue-11/designs/html-mockups/index.html`
 - 开源方案调研：`issue-11/docs/research/mattermost-desktop-mobile-oss-options.md`
 - 设计规范：`/Users/stylesu/Downloads/data-ui design/README.md`、`SKILL.md`、`colors_and_type.css`
 - GitHub Issue #11：https://github.com/sushanglewis/WeLink/issues/11

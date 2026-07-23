@@ -14,21 +14,21 @@
 
 ## Artifacts
 ### Produced
-- [x] issue-11/designs/issue-11/data-model.md
-- [x] issue-11/designs/issue-11/design-review.md
-- [x] issue-11/designs/issue-11/feasibility.md
-- [x] issue-11/designs/issue-11/feature-catalog.md
-- [x] issue-11/designs/issue-11/flows.md
-- [x] issue-11/designs/issue-11/html-mockups/index.html
-- [x] issue-11/designs/issue-11/scenarios.md
-- [x] issue-11/designs/issue-11/ui-handoff.md
+- [x] issue-11/designs/data-model.md
+- [x] issue-11/designs/design-review.md
+- [x] issue-11/designs/feasibility.md
+- [x] issue-11/designs/feature-catalog.md
+- [x] issue-11/designs/flows.md
+- [x] issue-11/designs/html-mockups/index.html
+- [x] issue-11/designs/scenarios.md
+- [x] issue-11/designs/ui-handoff.md
 ### Required
-- [x] issue-11/designs/issue-11/design-review.md
-- [x] issue-11/designs/issue-11/scenarios.md
-- [x] issue-11/designs/issue-11/feature-catalog.md
-- [x] issue-11/designs/issue-11/data-model.md
-- [x] issue-11/designs/issue-11/flows.md
-- [x] issue-11/designs/issue-11/feasibility.md
+- [x] issue-11/designs/design-review.md
+- [x] issue-11/designs/scenarios.md
+- [x] issue-11/designs/feature-catalog.md
+- [x] issue-11/designs/data-model.md
+- [x] issue-11/designs/flows.md
+- [x] issue-11/designs/feasibility.md
 
 ## Next Action
 in_progress

@@ -5,8 +5,7 @@
 ## 背景
 
 - Issue: #11
-- 关联需求: `issue-11/requirements/2026-07-20-issue-11/requirements.md`
-- 关联访谈: `issue-11/interviews/2026-07-20-issue-11/summary.md`
+- 关联需求: `issue-11/requirements/requirements.md`
 
 基于现有 Mattermost B/S 二开系统，打造企业自有品牌的 Windows/macOS 桌面应用 EAIC。核心目标是解决浏览器访问体验割裂、Mattermost 品牌暴露、设置不符合中国用户习惯的问题。
 
@@ -61,7 +60,7 @@
 
 ## 关联文档
 
-> **快速入口**：请先阅读 [`issue-11/README.md`](../../README.md) 了解全文阅读地图。
+> **快速入口**：请先阅读 [`documents.yaml`](../documents.yaml) 了解文档索引与审批状态。
 
 - [场景分析](./scenarios.md)
 - [功能目录](./feature-catalog.md)

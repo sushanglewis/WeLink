@@ -5,10 +5,10 @@
 > **状态**：已 PM 确认，可交付给 UX 设计师开展 GUI 原型设计。  
 > **确认时间**：2026-07-21  
 > **目标读者**：UX 设计师、前端工程师、产品经理、QA。  
-> **关联 PRD**：`issue-11/requirements/2026-07-20-issue-11/prd.md`  
-> **关联用户故事**：`issue-11/requirements/2026-07-20-issue-11/user-stories.md`  
-> **关联流程/数据模型**：`issue-11/designs/issue-11/flows.md`、`issue-11/designs/issue-11/data-model.md`  
-> **交互原型**：`issue-11/designs/issue-11/html-mockups/index.html`
+> **关联 PRD**：`issue-11/requirements/prd.md`  
+> **关联用户故事**：`issue-11/requirements/user-stories.md`  
+> **关联流程/数据模型**：`issue-11/designs/flows.md`、`issue-11/designs/data-model.md`  
+> **交互原型**：`issue-11/designs/html-mockups/index.html`
 
 ---
 
@@ -730,7 +730,7 @@ EAIC 的桌面通知与托盘红点逻辑如下：
 
 ## 16. 交互 Demo / 原型
 
-- **文件位置**：`issue-11/designs/issue-11/html-mockups/index.html`
+- **文件位置**：`issue-11/designs/html-mockups/index.html`
 - **使用方式**：用浏览器直接打开该 HTML 文件。
 - **已覆盖屏幕**：
   - 启动页 Splash
@@ -756,12 +756,12 @@ EAIC 的桌面通知与托盘红点逻辑如下：
 
 ## 17. 参考
 
-- PRD：`issue-11/requirements/2026-07-20-issue-11/prd.md`
-- 用户故事：`issue-11/requirements/2026-07-20-issue-11/user-stories.md`
-- 流程图：`issue-11/designs/issue-11/flows.md`
-- 数据模型：`issue-11/designs/issue-11/data-model.md`
-- 功能目录：`issue-11/designs/issue-11/feature-catalog.md`
-- 场景分析：`issue-11/designs/issue-11/scenarios.md`
-- 交互原型：`issue-11/designs/issue-11/html-mockups/index.html`
+- PRD：`issue-11/requirements/prd.md`
+- 用户故事：`issue-11/requirements/user-stories.md`
+- 流程图：`issue-11/designs/flows.md`
+- 数据模型：`issue-11/designs/data-model.md`
+- 功能目录：`issue-11/designs/feature-catalog.md`
+- 场景分析：`issue-11/designs/scenarios.md`
+- 交互原型：`issue-11/designs/html-mockups/index.html`
 - 设计规范：`/Users/stylesu/Downloads/data-ui design/README.md`、`SKILL.md`、`colors_and_type.css`
 - GitHub Issue #11：https://github.com/sushanglewis/WeLink/issues/11

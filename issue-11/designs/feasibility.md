@@ -71,6 +71,6 @@
 
 ## 参考
 
-- 需求文档：`issue-11/requirements/2026-07-20-issue-11/requirements.md`
+- 需求文档：`issue-11/requirements/requirements.md`
 - 开源方案调研：`issue-11/docs/research/mattermost-desktop-mobile-oss-options.md`
 - Tauri 官方文档：https://tauri.app/
