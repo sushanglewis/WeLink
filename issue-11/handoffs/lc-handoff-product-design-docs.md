@@ -1,190 +1,37 @@
-# 阶段交接文档：product-design-docs
+# Lincoln Handoff Report
 
-> **交接方向**：PM（lc-pm）→ UX 设计师（lc-designer）
-> **阶段**：`product-design-docs`
-> **产物状态**：已 PM 确认，可进入 `product-prototype` 阶段
-> **交接时间**：2026-07-21
+**Generated:** 2026-07-23T01:07:01Z
+**Branch:** issue-11
+**Run ID:** 20260720024858-ca2b8b4a
 
----
+## Current Stage
+- **Stage:** product-design-docs
+- **Name:** 产品设计文档
+- **Status:** in_progress
 
-## 1. 背景与目标
+## Waiting For
+- **Waiting for:** agent
 
-### 1.1 Issue 背景
+## Artifacts
+### Produced
+- [x] issue-11/designs/issue-11/data-model.md
+- [x] issue-11/designs/issue-11/design-review.md
+- [x] issue-11/designs/issue-11/feasibility.md
+- [x] issue-11/designs/issue-11/feature-catalog.md
+- [x] issue-11/designs/issue-11/flows.md
+- [x] issue-11/designs/issue-11/html-mockups/index.html
+- [x] issue-11/designs/issue-11/scenarios.md
+- [x] issue-11/designs/issue-11/ui-handoff.md
+### Required
+- [x] issue-11/designs/issue-11/design-review.md
+- [x] issue-11/designs/issue-11/scenarios.md
+- [x] issue-11/designs/issue-11/feature-catalog.md
+- [x] issue-11/designs/issue-11/data-model.md
+- [x] issue-11/designs/issue-11/flows.md
+- [x] issue-11/designs/issue-11/feasibility.md
 
-Issue-11 的目标是基于现有 Mattermost B/S 二开系统，为企业打造自有品牌的 Windows/macOS 桌面 IM 客户端 **EAIC**，解决浏览器访问体验割裂、Mattermost 品牌暴露、设置不符合中国用户习惯的问题。
-
-### 1.2 本阶段目标
-
-将已确认的 PM 需求转化为完整、一致、可评审的产品设计文档包，并输出面向 UX 设计师的交接规格，使其能够直接开展 GUI 原型设计。
-
-### 1.3 关键变更说明
-
-- **登录方式更新**：当前阶段不再使用第三方 OAuth/SSO，而是使用**已同步到 EAIC 的企业邮箱/密码**登录。员工无需注册，直接使用现有企业账号。
-- **记住我**：引导程序默认勾选「记住我」，保存 refresh token 长期有效直到手动退出。
-- **通知定位**：点击系统通知后，不仅切换到「聊天」导航，还需通过 JS Bridge 定位到具体会话/频道。
-- **引导程序**：首次启动使用两步引导程序（组织 URL → 企业邮箱/密码），替代单一登录页。
-
----
-
-## 2. 已确认的核心决策
-
-| 决策项 | 结论 | 说明 |
-|--------|------|------|
-| 应用名称 | **EAIC** | 窗口标题、启动图、关于页统一使用 |
-| 平台 | Windows 10+ / macOS 12+ | 双平台安装包 |
-| 架构 | 混合 C/S + B/S | 一级导航为 C/S 原生；聊天等核心功能通过 WebView 嵌入现有 B/S 页面 |
-| 用户体系 | 已同步企业账号 | 用户无需注册，使用企业邮箱/密码登录；第三方 SSO 后续迭代 |
-| 导航形式 | 左侧边栏 | 聊天 → 通讯录 → AI 表格；展开 240px，折叠 72px |
-| 通知 | C/S 与 B/S 统一 | 任何新消息都弹系统通知；点击定位到具体会话 |
-| 品牌 | 完全隐藏 Mattermost | 图标、标题、启动图、关于页全部替换为 EAIC 品牌 |
-| 设置 | 弹窗 + 左右分栏 | 个人设置和系统设置已收敛清单 |
-| 主题 | 浅色/深色/跟随系统 | 影响原生界面和 WebView 内 B/S 页面 |
+## Next Action
+in_progress
 
 ---
-
-## 3. 本阶段产物清单
-
-### 3.1 Required Artifacts（阶段门控要求）
-
-| 文件 | 路径 | 状态 |
-|------|------|------|
-| 设计评审 | `issue-11/designs/issue-11/design-review.md` | ✅ approved |
-| 场景分析 | `issue-11/designs/issue-11/scenarios.md` | ✅ approved |
-| 功能目录 | `issue-11/designs/issue-11/feature-catalog.md` | ✅ approved |
-| 数据模型 | `issue-11/designs/issue-11/data-model.md` | ✅ approved |
-| 流程图 | `issue-11/designs/issue-11/flows.md` | ✅ approved |
-| 可行性分析 | `issue-11/designs/issue-11/feasibility.md` | ✅ approved |
-
-### 3.2 补充产物（PM→UX 交接用）
-
-| 文件 | 路径 | 说明 |
-|------|------|------|
-| UI/UX 设计师交接文档 | `issue-11/designs/issue-11/ui-handoff.md` | 完整页面清单、字段、交互、状态规格 |
-| UI 设计交接文档 | `issue-11/handoffs/ui-handoff-product-design.md` | 面向 UI 设计师的简化版交接 |
-
----
-
-## 4. UX 设计师需要重点设计的界面
-
-### 4.1 启动/登录流程
-
-1. **Splash 启动页**：仅展示企业 Logo + 应用名称 EAIC。
-2. **引导程序 - 组织 URL**：
-   - 视觉上以组织首字母/Logo 为主，URL 输入弱化。
-   - URL 预配置但允许修改。
-   - 下一步进入身份认证。
-3. **引导程序 - 身份认证**：
-   - 企业邮箱输入框。
-   - 密码输入框。
-   - 「记住我」复选框（默认勾选）。
-   - 登录按钮。
-   - 忘记密码链接。
-   - 错误提示（输入框下方 inline）。
-
-### 4.2 主界面框架
-
-- **完全自定义标题栏**：应用图标 + 应用名称 + 窗口控制按钮。
-- **左侧边栏**：
-  - 顶部：企业 Logo / 应用名称（可折叠为仅图标）。
-  - 导航项：聊天、通讯录、AI 表格（图标 + 中文标签 + 红点/未读数）。
-  - 底部：用户头像 + 姓名 + 在线状态；点击弹出菜单。
-- **WebView 内容区**：与侧边栏之间有可见分割线，加载 B/S 页面。
-- **窗口尺寸**：默认 1280 × 800，最小 1024 × 640；支持最大化、全屏、缩放。
-
-### 4.3 系统通知
-
-- 触发条件：任何新消息。
-- 内容：发送者名称 + 消息摘要。
-- 点击行为：唤出窗口 → 切换到「聊天」→ 定位到对应会话/频道。
-
-### 4.4 设置弹窗
-
-- 弹窗形式，内部左右分栏（左侧分类导航，右侧内容区）。
-- **个人设置**：通用（头像、全名、用户名只读、邮箱只读）、通知、显示、安全。
-- **系统设置**：通用（开机自启、最小化到托盘、下载路径、语言）、高级（缓存清理）、账号（退出登录）。
-- 生效策略：主题/语言/通知开关/声音/系统设置立即生效；头像/全名/提及词/密码修改后需保存。
-
-### 4.5 关于页面
-
-- 版本号 + 版权信息 + 企业信息 + 第三方许可声明。
-
----
-
-## 5. 关键交互与状态
-
-### 5.1 在线状态
-
-- 侧边栏底部头像旁显示当前状态。
-- 支持切换：在线 / 离开 / 勿扰 / 离线。
-- 侧边栏折叠后仅保留头像 + 状态点。
-
-### 5.2 窗口关闭行为
-
-- 默认最小化到托盘（可配置为直接退出）。
-- 托盘右键菜单：打开主窗口 / 设置 / 关于 / 退出。
-
-### 5.3 WebView 切换
-
-- 切换导航项时 WebView 重新加载对应 B/S 页面。
-- 加载中显示加载指示器。
-- 加载失败显示错误页（含错误码、重试按钮）。
-
-### 5.4 异常状态
-
-- **网络断开**：显示离线提示，不强制退出；恢复后自动重连。
-- **Token 过期**：自动跳转回引导程序页面。
-- **单实例限制**：第二次启动唤起已有窗口。
-
----
-
-## 6. 品牌与视觉要求
-
-- **Logo/图标**：企业提供，替换所有 Mattermost 品牌痕迹。
-- **主色调**：企业提供 HEX 色值。
-- **深色模式**：需要独立深色模式，影响原生界面和 WebView 内 B/S 页面。
-- **字体**：优先系统默认中文字体。
-- **设计规范**：企业提供完整 VI 后补充。
-
----
-
-## 7. 待 UX 设计师产出
-
-1. **低保真原型**：启动/登录流程、主界面框架、设置流程。
-2. **高保真视觉稿**：
-   - Splash 启动页
-   - 引导程序（组织 URL、身份认证）
-   - 主界面（含侧边栏展开/折叠、WebView 内容区）
-   - 系统通知弹窗
-   - 个人设置 / 系统设置
-   - 关于页面
-3. **切图与标注**：图标、Logo、启动图、托盘图标（含浅色/深色适配）。
-4. **设计规范**：颜色、字体、间距、组件规范。
-
----
-
-## 8. 对 Mattermost 的改动边界
-
-- **服务端**：不改动 Mattermost 服务端。
-- **B/S 二开页面**：可能需要主题同步、JS Bridge 消息上报。
-- **桌面壳层**：新增 Tauri 原生 Shell，不 fork Mattermost Desktop。
-- **认证**：复用 Mattermost 认证 API，使用已同步账号体系。
-
----
-
-## 9. 下一阶段
-
-UX 设计师完成视觉稿后，由 PM 确认，进入 `product-prototype` 阶段，产出：
-
-- `issue-11/designs/issue-11/ui-spec.md`
-- `issue-11/designs/issue-11/fields.md`
-- `issue-11/designs/issue-11/prototype.pen`
-
----
-
-## 10. 参考链接
-
-- 需求文档：`issue-11/requirements/2026-07-20-issue-11/requirements.md`
-- 用户故事：`issue-11/requirements/2026-07-20-issue-11/user-stories.md`
-- PRD：`issue-11/requirements/2026-07-20-issue-11/prd.md`
-- 设计评审：`issue-11/designs/issue-11/design-review.md`
-- UI/UX 交接文档：`issue-11/designs/issue-11/ui-handoff.md`
+*This file is auto-generated by `scripts/stage_loader.py --action handoff-report`*

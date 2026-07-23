@@ -769,6 +769,24 @@
             color: var(--text-2);
         }
 
+        .readonly-badge {
+            display: inline-block;
+            font-size: 11px;
+            color: var(--text-2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 6px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .keyword-note {
+            font-size: 12px;
+            color: var(--text-2);
+            line-height: 1.5;
+            margin-top: 8px;
+        }
+
         .setting-row .control {
             margin-left: 16px;
         }
@@ -1774,14 +1792,14 @@
                             </div>
                             <div class="setting-row">
                                 <div class="left">
-                                    <div class="label">用户名</div>
-                                    <div class="desc">zhangsan（只读）</div>
+                                    <div class="label">用户名<span class="readonly-badge">只读</span></div>
+                                    <div class="desc">zhangsan（来自组织架构，不可修改）</div>
                                 </div>
                             </div>
                             <div class="setting-row">
                                 <div class="left">
-                                    <div class="label">邮箱</div>
-                                    <div class="desc">zhangsan@example.com（只读）</div>
+                                    <div class="label">账号（企业邮箱）<span class="readonly-badge">只读</span></div>
+                                    <div class="desc">zhangsan@example.com（来自企业 AD，不可修改）</div>
                                 </div>
                             </div>
                             <div style="margin-top: 24px; text-align: right;">
@@ -1815,11 +1833,12 @@
                             </div>
                             <div class="setting-row">
                                 <div class="left">
-                                    <div class="label">提及关键词</div>
-                                    <div class="desc">包含以下关键词时触发通知</div>
+                                    <div class="label">触发通知的关键词</div>
+                                    <div class="desc">包含以下关键词时触发桌面通知</div>
                                 </div>
-                                <div class="control"><input type="text" value="@张三 @all" style="width: 160px; padding: 6px;" /></div>
+                                <div class="control"><input type="text" value="@张三 @all @channel" style="width: 180px; padding: 6px;" /></div>
                             </div>
+                            <div class="keyword-note">这些关键词与 Mattermost 端设置保持一致，用于决定哪些消息会被标记为提及，进而触发 EAIC 桌面通知与托盘红点。</div>
                         </div>
 
                         <!-- Personal: Display -->
@@ -1874,6 +1893,7 @@
                         <!-- System: General -->
                         <div class="settings-panel" id="settings-system-general">
                             <h3>通用</h3>
+                            <div class="keyword-note" style="margin-bottom: 12px;">以下设置与 Mattermost 桌面端原生设置对齐，并补充企业桌面应用所需的本地行为项。</div>
                             <div class="setting-row">
                                 <div class="left">
                                     <div class="label">开机自启动</div>
