@@ -1,7 +1,7 @@
 process_slug: issue-11
 issue_number: '11'
 current_stage: product-design-docs
-last_updated: '2026-07-23T10:50:11Z'
+last_updated: '2026-07-23T10:59:52Z'
 documents:
 - path: designs/data-model.md
   stage: product-design-docs
@@ -33,7 +33,7 @@ documents:
   gate_passed: true
   human_confirmed: true
   approved_by: human-pm
-- path: designs/html-mockups/index.html
+- path: designs/page-map.md
   stage: product-design-docs
   status: in_progress
   gate_passed: true
@@ -45,7 +45,13 @@ documents:
   gate_passed: true
   human_confirmed: true
   approved_by: human-pm
-- path: designs/ui-handoff.md
+- path: handoffs/pm-to-ux/master-handoff-pm-to-ux-v1.0.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
+- path: handoffs/pm-to-ux/pm-to-ux.handoff.yaml
   stage: product-design-docs
   status: in_progress
   gate_passed: true

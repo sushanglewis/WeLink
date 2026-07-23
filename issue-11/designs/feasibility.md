@@ -5,7 +5,7 @@
 ### 价值
 
 - 补齐 PC 端独立应用入口，提升产品完整度和企业形象。
-- 预配置服务器 URL + 已同步账号体系显著降低员工使用门槛。
+- 预配置组织地址 `lgdg.cc` + 已同步账号体系显著降低员工使用门槛。
 - 隐藏 Mattermost 品牌，强化 EAIC 企业自有 IM 认知。
 
 ### 成本
@@ -72,5 +72,4 @@
 ## 参考
 
 - 需求文档：`issue-11/requirements/requirements.md`
-- 开源方案调研：`issue-11/docs/research/mattermost-desktop-mobile-oss-options.md`
 - Tauri 官方文档：https://tauri.app/

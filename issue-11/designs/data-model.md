@@ -6,11 +6,9 @@
 
 | 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
-| `server_url` | string | 必填，安装包预配置 | Mattermost 服务端地址 |
+| `server_url` | string | 必填，安装包预配置 | 组织地址，默认 `https://lgdg.cc` |
 | `app_name` | string | 必填 | 应用显示名称，如「EAIC」 |
 | `brand_primary_color` | string | 可选，HEX | 主品牌色 |
-| `sso_provider` | enum | 预留字段 | `email_oidc` / `saml` / `oauth2`；当前阶段不使用 |
-| `sso_login_url` | string | 预留字段 | 第三方 SSO 登录入口；当前阶段不使用 |
 | `enable_auto_start` | boolean | 默认 `false` | 是否默认开机自启 |
 | `allow_multiple_instances` | boolean | 默认 `false` | 是否允许多开 |
 
@@ -80,7 +78,7 @@
 
 ## 约束
 
-- `server_url` 在安装包中预配置，用户不可见或仅允许管理员修改。
+- `server_url` 在安装包中预配置为 `https://lgdg.cc`，用户在引导程序中仅做确认。
 - `access_token` 和 `refresh_token` 必须加密存储于系统 keychain/DPAPI。
 - `remember_me=true` 时，`refresh_token` 长期有效直到用户手动退出登录。
 - 同一时刻仅一个 `WebViewTab.is_active=true`。

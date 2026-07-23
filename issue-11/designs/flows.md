@@ -8,7 +8,7 @@ flowchart TD
     B --> C{本地有有效 token?}
     C -->|是| D[进入主界面]
     C -->|否| E[显示 EAIC 品牌引导程序]
-    E --> F[确认/输入组织 URL]
+    E --> F[确认组织地址]
     F --> G[输入企业邮箱/密码]
     G --> H{记住我?}
     H -->|是| I[保存 refresh token]
@@ -45,7 +45,7 @@ sequenceDiagram
         App->>U: 展示主界面
     else token 无效/缺失
         App->>U: 展示 EAIC 品牌引导程序
-        U->>App: 确认/输入组织 URL
+        U->>App: 确认组织地址
         U->>App: 输入企业邮箱/密码
         App->>Auth: 提交邮箱/密码认证
         Auth-->>App: 返回 access token + refresh token

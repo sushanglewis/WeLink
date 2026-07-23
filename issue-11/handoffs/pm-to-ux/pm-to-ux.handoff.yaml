@@ -1,0 +1,61 @@
+schema_version: "2.0.0"
+handoff:
+  type: pm-to-ux
+  version: "1.0"
+  from_role: lc-pm
+  to_role: lc-designer
+  process_slug: issue-11
+  issue_number: "11"
+  design_id: issue-11
+  change_name: issue-11-desktop-app
+  generated_at: "2026-07-23T12:00:00Z"
+  master_handoff: handoffs/pm-to-ux/master-handoff-pm-to-ux-v1.0.md
+context_pack:
+  tier_1:
+    - prd.md
+  tier_2:
+    - designs/page-map.md
+    - designs/scenarios.md
+    - designs/feature-catalog.md
+    - designs/flows.md
+    - designs/data-model.md
+    - designs/feasibility.md
+    - designs/design-review.md
+  tier_3:
+    - requirements/user-stories.md
+    - requirements/requirements.md
+design_constraints:
+  platform:
+    - windows
+    - macos
+  min_window_size: "1024x640"
+  default_window_size: "1280x800"
+  sidebar_expanded_width: 240
+  sidebar_collapsed_width: 72
+  primary_color: "#00AE68"
+  background_color_light: "#F7F8FA"
+  background_color_dark: "#171918"
+  font_stack: "PingFang SC, Noto Sans SC, Microsoft YaHei, ui-sans-serif, sans-serif"
+  border_radius: "8px"
+key_decisions:
+  - technology_stack: "Tauri v2 + Rust + Web frontend"
+  - architecture: "Hybrid C/S + B/S with WebView embedding"
+  - login_method: "Enterprise email/password synced to EAIC"
+  - navigation: "Left sidebar with Chat -> Contacts -> AI Sheets"
+  - notification_trigger: "App online, not foreground-focused, desktop notifications enabled, new message received"
+  - message_preview_default: true
+  - organization_url: "https://lgdg.cc"
+  - language_setting_location: "Personal settings (Display)"
+  - sso_scope: "Not in MVP; no SSO/OAuth entry in onboarding"
+out_of_scope:
+  - Mobile apps
+  - Offline message push resend
+  - Native voice/video calls
+  - Third-party OAuth/SSO integration
+  - Full IM protocol C/S migration
+next_stage_artifacts:
+  required:
+    - designs/ui-spec.md
+    - designs/fields.md
+  optional:
+    - designs/prototype.pen
