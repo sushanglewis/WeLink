@@ -42,7 +42,6 @@
 
 | 决策 | 选项 | 理由 |
 |------|------|------|
-| 技术栈 | Tauri v2 + Rust + Web 前端 | 轻量、原生能力强、双平台支持、无需 fork Mattermost Desktop |
 | 架构 | 混合 C/S + B/S | 原生导航 + WebView 嵌入，平衡体验与成本 |
 | 登录方式 | 已同步企业邮箱/密码 | 用户无需注册，复用企业身份体系 |
 | 导航形式 | 左侧边栏 | 对标飞书/钉钉，符合国内用户习惯 |
@@ -54,16 +53,17 @@
 
 请按以下顺序阅读：
 
-1. **PRD**（单一事实来源）：`issue-11/prd.md`
-2. **页面地图**（信息架构与页面流转）：`issue-11/designs/page-map.md`
-3. **场景分析**：`issue-11/designs/scenarios.md`
-4. **功能目录**：`issue-11/designs/feature-catalog.md`
-5. **流程图**：`issue-11/designs/flows.md`
-6. **数据模型**：`issue-11/designs/data-model.md`
-7. **可行性分析**：`issue-11/designs/feasibility.md`
-8. **设计评审**：`issue-11/designs/design-review.md`
-9. **用户故事**：`issue-11/requirements/user-stories.md`
-10. **需求澄清文档**：`issue-11/requirements/requirements.md`
+1. **PRD**（单一事实来源，含第 6 章逐页字段与交互详细规格）：`issue-11/prd.md`
+2. **交互原型（参考）**：`issue-11/designs/html-mockups/index.html`
+3. **页面地图**（信息架构与页面流转）：`issue-11/designs/page-map.md`
+4. **场景分析**：`issue-11/designs/scenarios.md`
+5. **功能目录**：`issue-11/designs/feature-catalog.md`
+6. **流程图**：`issue-11/designs/flows.md`
+7. **数据模型**：`issue-11/designs/data-model.md`
+8. **可行性分析**：`issue-11/designs/feasibility.md`
+9. **设计评审**：`issue-11/designs/design-review.md`
+10. **用户故事**：`issue-11/requirements/user-stories.md`
+11. **需求澄清文档**：`issue-11/requirements/requirements.md`
 
 ## 6. 对 UX 设计师的核心要求
 

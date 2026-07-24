@@ -1,7 +1,7 @@
 process_slug: issue-11
 issue_number: '11'
 current_stage: product-design-docs
-last_updated: '2026-07-23T10:59:52Z'
+last_updated: '2026-07-24T01:35:17Z'
 documents:
 - path: designs/data-model.md
   stage: product-design-docs
@@ -28,6 +28,12 @@ documents:
   human_confirmed: true
   approved_by: human-pm
 - path: designs/flows.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
+- path: designs/html-mockups/index.html
   stage: product-design-docs
   status: in_progress
   gate_passed: true

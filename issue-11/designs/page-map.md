@@ -96,7 +96,8 @@ flowchart TD
 
 ## 5. 参考
 
-- PRD：`issue-11/prd.md`
+- PRD：`issue-11/prd.md`（第 6 章「页面与交互详细规格」为逐页字段、交互、异常状态的唯一事实来源）
+- 交互原型：`issue-11/designs/html-mockups/index.html`
 - 场景分析：`issue-11/designs/scenarios.md`
 - 功能目录：`issue-11/designs/feature-catalog.md`
 - 流程图：`issue-11/designs/flows.md`

@@ -41,7 +41,6 @@
 
 | 决策 | 选项 | 理由 |
 |------|------|------|
-| 技术栈 | Tauri v2 + Rust + Web 前端 | 轻量、原生能力强、双平台支持、无需 fork Mattermost Desktop |
 | 架构 | 混合 C/S + B/S | 原生导航 + WebView 嵌入，平衡体验与成本 |
 | 登录方式 | 已同步企业邮箱/密码 | 用户无需注册，复用企业身份体系；本阶段仅支持企业邮箱/密码登录 |
 | 导航形式 | 左侧边栏 | 对标飞书/钉钉，符合国内用户习惯 |
@@ -61,12 +60,13 @@
 
 > **快速入口**：请先阅读 [`documents.yaml`](../documents.yaml) 了解文档索引与审批状态。
 
+- [PRD](../prd.md)（含第 6 章逐页字段与交互详细规格）
 - [场景分析](./scenarios.md)
 - [功能目录](./feature-catalog.md)
 - [数据模型](./data-model.md)
 - [流程图](./flows.md)
+- [页面地图](./page-map.md)
 - [可行性分析](./feasibility.md)
-- [UI/UX 交接文档](./ui-handoff.md)
 
 ---
 
