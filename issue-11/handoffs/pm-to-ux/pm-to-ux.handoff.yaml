@@ -1,7 +1,7 @@
 schema_version: "2.0.0"
 handoff:
   type: pm-to-ux
-  version: "1.0"
+  version: "1.1"
   from_role: lc-pm
   to_role: lc-designer
   process_slug: issue-11

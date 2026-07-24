@@ -22,6 +22,7 @@
 | `expires_at` | datetime | 用于预刷新 | access token 过期时间 |
 | `email` | string | 登录后写入 | 企业邮箱 |
 | `remember_me` | boolean | 默认 `true` | 是否长期保持登录 |
+| `status` | enum | 默认 `online` | 用户在线状态：`online` / `away` / `dnd` / `offline`；由 C/S 层与托盘联动管理，是否同步到 Mattermost 原生状态由研发确定 |
 
 ### NavigationItem（一级导航项）
 
@@ -62,13 +63,16 @@
 
 | 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
-| `language` | string | 默认 `zh-CN` | 界面语言 |
+| `language` | string | 默认 `zh-CN` | 界面语言。C/S 层展示为 `zh-CN`，与 Mattermost Web 端 `zh-Hans` 对应；语言映射关系由研发在实现时统一处理 |
 | `theme` | enum | 默认 `system` | `light` / `dark` / `system` |
-| `notification_enabled` | boolean | 默认 `true` | 是否启用通知 |
-| `notification_sound` | boolean | 默认 `true` | 是否播放声音 |
+| `notification_enabled` | boolean | 默认 `true` | 是否启用桌面通知 |
+| `notification_sound` | boolean | 默认 `true` | 是否播放通知声音 |
+| `message_preview_enabled` | boolean | 默认 `true` | 系统通知是否展示消息内容预览 |
 | `auto_start` | boolean | 默认 `false` | 开机自启 |
 | `minimize_to_tray` | boolean | 默认 `true` | 关闭时最小化到托盘 |
 | `download_path` | string | 默认系统下载文件夹 | 文件默认下载目录 |
+
+> **缓存清理**：PRD 中「清理缓存」为按钮操作，不持久化为设置字段；是否实现取决于 Mattermost 原生是否提供缓存清理能力，若原生不支持则本次 MVP 不实现。清理范围由研发在技术方案中确定。
 
 ## 关系
 

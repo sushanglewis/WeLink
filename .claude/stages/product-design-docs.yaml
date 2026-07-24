@@ -25,12 +25,12 @@ skills:
   - openspec:propose
 artifacts:
   required:
-  - '{process_slug}/designs/{design_id}/design-review.md'
-  - '{process_slug}/designs/{design_id}/scenarios.md'
-  - '{process_slug}/designs/{design_id}/feature-catalog.md'
-  - '{process_slug}/designs/{design_id}/data-model.md'
-  - '{process_slug}/designs/{design_id}/flows.md'
-  - '{process_slug}/designs/{design_id}/feasibility.md'
+  - '{process_slug}/designs/design-review.md'
+  - '{process_slug}/designs/scenarios.md'
+  - '{process_slug}/designs/feature-catalog.md'
+  - '{process_slug}/designs/data-model.md'
+  - '{process_slug}/designs/flows.md'
+  - '{process_slug}/designs/feasibility.md'
 context:
   goal: 将已确认的需求转化为面向人类 PM 评审的简洁产品设计文档包。
   constraints: '- 仅通过 scripts/stage_loader.py 更新 {process_slug}/workflow-stage.yaml。
