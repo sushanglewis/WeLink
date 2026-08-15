@@ -93,6 +93,11 @@ nodes:
   - issue-14/requirements/2026-08-15-issue-14/requirements.md
   - issue-14/requirements/2026-08-15-issue-14/user-stories.md
   - issue-14/requirements/2026-08-15-issue-14/prd.md
+  - issue-14/pages/docs/requirements.html
+  - issue-14/pages/docs/user-stories.html
+  - issue-14/pages/docs/prd.html
+  - issue-14/pages/docs/snapshots/prd-v1.0.html
+  - issue-14/assets/style.css
   handoff_file: null
 recovery:
   last_validated_checkpoint: ''

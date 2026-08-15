@@ -1,8 +1,14 @@
 process_slug: issue-14
 issue_number: '14'
 current_stage: product-design-docs
-last_updated: '2026-08-15T09:12:05Z'
+last_updated: '2026-08-15T09:17:30Z'
 documents:
+- path: assets/style.css
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
 - path: interviews/2026-08-15-issue-14/metadata.json
   stage: ingest
   status: completed
@@ -23,6 +29,30 @@ documents:
   approved_by: system
 - path: interviews/2026-08-15-issue-14/transcript.md
   stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: pages/docs/prd.html
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: pages/docs/requirements.html
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: pages/docs/snapshots/prd-v1.0.html
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: pages/docs/user-stories.html
+  stage: clarify
   status: completed
   gate_passed: true
   human_confirmed: false
