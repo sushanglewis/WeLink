@@ -98,6 +98,7 @@ nodes:
   - issue-14/pages/docs/prd.html
   - issue-14/pages/docs/snapshots/prd-v1.0.html
   - issue-14/assets/style.css
+  - issue-14/docs/research/integration-research.md
   handoff_file: null
 recovery:
   last_validated_checkpoint: ''
