@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="原型 · 人类确认节点（HITL · 龙小构 → 产品经理）">
+<meta name="nav-group" content="原型">
+<title>原型 · 人类确认节点（HITL）</title>
+<style>
+:root{
+    --brand:#00AE68; --brand-dark:#008D55; --brand-light:#E8F7F0;
+    --bg:#F2F4F6; --surface:#FFFFFF; --surface-2:#F5F6F7; --surface-3:#EDF0F2;
+    --text:#171918; --text-2:#6B7280; --text-3:#9CA3AF;
+    --border:#E5E8EB; --error:#F53F3F; --warning:#F59E0B;
+    --radius:8px;
+    --c-ke:#00AE68; --c-chan:#3B82F6; --c-yan:#8B5CF6; --c-gou:#F59E0B;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+    margin:0;
+    font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",ui-sans-serif,sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px;
+}
+
+.app{height:100vh; display:flex; flex-direction:column; background:var(--surface); overflow:hidden;}
+.appbar{
+    height:44px; flex-shrink:0; display:flex; align-items:center; gap:10px;
+    padding:0 14px; background:var(--surface); border-bottom:1px solid var(--border);
+}
+.appbar .logo{width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.appbar .app-name{font-size:13px; font-weight:700;}
+.appbar .crumb{font-size:13px; color:var(--text-3);}
+.backlink{
+    margin-left:auto; font-size:12px; color:var(--text-2); text-decoration:none;
+    border:1px solid var(--border); border-radius:6px; padding:4px 10px; background:var(--surface);
+}
+.backlink:hover{background:var(--surface-2); color:var(--text);}
+
+.appbody{flex:1; display:flex; min-height:0;}
+
+/* 主区 */
+.chat{flex:1; display:flex; flex-direction:column; min-width:0;}
+.ch-head{
+    flex-shrink:0; padding:10px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px;
+}
+.ch-title{font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px;}
+.ch-topic{font-size:12px; color:var(--text-2);}
+.ch-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+.av-stack{display:flex;}
+.av-stack .a{
+    width:24px;height:24px;border-radius:50%;border:2px solid var(--surface);margin-left:-6px;
+    color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;
+}
+.av-stack .a:first-child{margin-left:0;}
+.run-chip{
+    font-size:11px; font-weight:600; color:var(--brand-dark);
+    background:var(--brand-light); border-radius:10px; padding:3px 10px;
+}
+
+.ch-scroll{flex:1; overflow-y:auto; padding:14px 0 8px;}
+.msg{display:flex; gap:10px; padding:6px 20px;}
+.msg:hover{background:var(--surface-2);}
+.avatar{
+    width:36px;height:36px;border-radius:50%;color:#fff;font-size:14px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;
+}
+.avatar .status-dot{
+    position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;
+    background:var(--brand);border:2px solid var(--surface);
+}
+.avatar .status-dot.away{background:var(--warning);}
+.m-body{flex:1; min-width:0;}
+.m-head{display:flex; align-items:center; gap:6px;}
+.m-name{font-size:14px; font-weight:600;}
+.bot-tag{font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--text-2);background:var(--surface-3);border-radius:3px;padding:1px 4px;}
+.role-tag{font-size:10px; color:var(--text-3);}
+.m-time{font-size:11px; color:var(--text-3);}
+.m-text{font-size:14px; line-height:1.65; margin-top:2px;}
+.mention{color:var(--brand-dark); background:var(--brand-light); border-radius:4px; padding:0 4px; font-weight:600;}
+.m-sub{font-size:12px; color:var(--text-3); margin-top:4px;}
+
+/* 研究摘要卡（龙小研） */
+.mini-card{
+    margin:8px 0 4px; max-width:600px;
+    border:1px solid var(--border); border-left:3px solid var(--c-yan);
+    border-radius:8px; background:var(--surface); padding:10px 14px;
+}
+.mini-card .mc-title{font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px;}
+.mini-card .mc-chip{font-size:10px; font-weight:700; color:#fff; background:var(--c-yan); border-radius:4px; padding:2px 6px;}
+.mini-card .mc-body{font-size:13px; color:var(--text-2); line-height:1.65; margin-top:6px;}
+.cmp{display:flex; gap:10px; margin-top:8px;}
+.cmp .opt{
+    flex:1; border:1px solid var(--border); border-radius:6px; padding:8px 10px;
+    font-size:12px; line-height:1.55; background:var(--surface-2);
+}
+.cmp .opt.rec{background:var(--brand-light); border-color:rgba(0,174,104,.35);}
+.cmp .opt b{display:block; font-size:12px; margin-bottom:2px;}
+.cmp .opt .rec-tag{font-size:10px; font-weight:700; color:var(--brand-dark);}
+
+/* 决策卡（龙小构 · HITL） */
+.decision{
+    margin:8px 0 4px; max-width:640px;
+    border:1px solid var(--border); border-left:3px solid var(--c-gou);
+    border-radius:8px; background:var(--surface);
+    box-shadow:0 4px 14px rgba(245,158,11,.10);
+}
+.decision .d-head{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 14px; border-bottom:1px solid var(--border);
+    font-size:13px; font-weight:700;
+}
+.decision .d-chip{font-size:10px; font-weight:700; color:#fff; background:var(--c-gou); border-radius:4px; padding:2px 6px;}
+.decision .d-status{
+    margin-left:auto; font-size:11px; font-weight:600;
+    color:#92400E; background:#FEF3C7; border-radius:10px; padding:2px 8px;
+    display:flex; align-items:center; gap:5px;
+}
+.decision .d-status .pulse{
+    width:6px; height:6px; border-radius:50%; background:var(--warning);
+    animation:pw 1.6s infinite;
+}
+@keyframes pw{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4);}50%{box-shadow:0 0 0 4px rgba(245,158,11,0);}}
+.decision .d-body{padding:12px 14px; font-size:13px; line-height:1.7;}
+.d-kv{display:flex; gap:10px; padding:4px 0;}
+.d-kv .k{width:64px; flex-shrink:0; color:var(--text-2); font-weight:500;}
+.d-kv .v{flex:1;}
+.d-kv .v code{
+    font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:12px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:4px; padding:1px 5px;
+}
+.d-actions{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 14px; border-top:1px solid var(--border);
+    background:var(--surface-2); border-radius:0 0 8px 8px;
+}
+.btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    height:34px; padding:0 18px; border-radius:6px;
+    font-size:13px; font-weight:600; font-family:inherit;
+    cursor:pointer; border:1px solid transparent;
+}
+.btn.primary{background:var(--brand); color:#fff;}
+.btn.primary:hover{background:var(--brand-dark);}
+.btn.default{background:var(--surface); border-color:var(--border); color:var(--text);}
+.btn.default:hover{background:var(--surface-3);}
+.d-actions .d-note{margin-left:auto; font-size:12px; color:var(--text-3);}
+
+/* 人类回复引用条 */
+.reply-bar{
+    margin:6px 0 0; max-width:640px;
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--text-2);
+    border-left:3px solid var(--border); padding:4px 10px;
+    background:var(--surface-2); border-radius:0 6px 6px 0;
+}
+
+/* 右侧 Thread 上下文面板 */
+.rpanel{
+    width:280px; flex-shrink:0;
+    border-left:1px solid var(--border); background:var(--surface);
+    display:flex; flex-direction:column; min-height:0;
+}
+.rp-head{
+    padding:12px 16px; border-bottom:1px solid var(--border);
+    font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px;
+}
+.rp-head .rp-sub{font-size:11px; color:var(--text-3); font-weight:400;}
+.rp-scroll{flex:1; overflow-y:auto; padding:12px 16px;}
+.rp-sec{font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--text-3); text-transform:uppercase; margin:14px 0 8px;}
+.rp-sec:first-child{margin-top:0;}
+.ctx-card{
+    border:1px solid var(--border); border-radius:8px; padding:10px 12px;
+    background:var(--surface-2); font-size:12px; line-height:1.6; color:var(--text-2);
+}
+.ctx-card b{color:var(--text);}
+.ctx-card .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px;}
+.thread-item{
+    display:flex; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px;
+}
+.thread-item:last-child{border-bottom:none;}
+.thread-item .ta{
+    width:22px; height:22px; border-radius:50%; color:#fff; font-size:10px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.thread-item .tt{color:var(--text); line-height:1.5;}
+.thread-item .tm{color:var(--text-3); font-size:11px; margin-top:1px;}
+.wait-line{
+    margin:12px 16px 16px; padding:10px 12px;
+    border:1px dashed rgba(245,158,11,.5); background:#FFFBEB;
+    border-radius:8px; font-size:12px; color:#92400E; line-height:1.6;
+}
+
+.composer{flex-shrink:0; padding:10px 20px 16px;}
+.composer .box{
+    border:1px solid var(--border); border-radius:8px; background:var(--surface);
+    padding:10px 12px; color:var(--text-3); font-size:13px;
+    display:flex; align-items:center; gap:10px;
+}
+.composer .plus{
+    width:22px;height:22px;border-radius:50%;border:1px solid var(--border);color:var(--text-2);
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.composer .tools{margin-left:auto; display:flex; gap:10px; color:var(--text-3);}
+</style>
+</head>
+<body>
+<div class="app">
+
+    <div class="appbar">
+        <div class="logo">W</div>
+        <span class="app-name">WeLink</span>
+        <span class="crumb">Mattermost · 龙冈数据团队</span>
+        <a class="backlink" href="overview.html">&#8249; 原型总览</a>
+    </div>
+
+    <div class="appbody">
+
+        <!-- 主聊天区 -->
+        <main class="chat">
+            <div class="ch-head">
+                <div>
+                    <div class="ch-title"># ISSUE-14 协作频道</div>
+                    <div class="ch-topic">用户问题升级 · 数据同步失败自动恢复</div>
+                </div>
+                <div class="ch-right">
+                    <span class="run-chip">Playbook Run #128</span>
+                    <div class="av-stack">
+                        <span class="a" style="background:var(--c-ke)">客</span>
+                        <span class="a" style="background:var(--c-chan)">产</span>
+                        <span class="a" style="background:var(--c-yan)">研</span>
+                        <span class="a" style="background:var(--c-gou)">构</span>
+                        <span class="a" style="background:#6B7280">李</span>
+                        <span class="a" style="background:#111827">张</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ch-scroll">
+
+                <!-- 龙小研：研究结论 -->
+                <div class="msg">
+                    <div class="avatar" style="background:var(--c-yan)">研<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head">
+                            <span class="m-name">龙小研</span><span class="bot-tag">BOT</span>
+                            <span class="role-tag">方案研究</span><span class="m-time">11:20</span>
+                        </div>
+                        <div class="m-text">方案研究完成，已对比两条路径，推荐方案 A。<span class="mention">@龙小构</span> 请进行架构评审。</div>
+                        <div class="mini-card">
+                            <div class="mc-title"><span class="mc-chip">方案研究</span> 同步失败自动恢复 · 候选方案对比</div>
+                            <div class="cmp">
+                                <div class="opt rec">
+                                    <b>方案 A · Playbooks API <span class="rec-tag">推荐</span></b>
+                                    龙小客经 Outgoing Webhook 调用 Playbooks API 创建 run 与协作频道；同步守护任务自动重试 + 补偿，失败超阈值即告警。
+                                </div>
+                                <div class="opt">
+                                    <b>方案 B · 手动建群 + Webhook</b>
+                                    人工建群后由 Webhook 搬运上下文；链路简单但依赖人工，建群耗时不可控。
+                                </div>
+                            </div>
+                            <div class="mc-body">依据：Playbooks API 原生支持 run 创建与成员邀请；与现有 OpenClaw skill 编排兼容；满足 ≤10s 建群指标。</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 龙小构：架构评审 + HITL 决策卡 -->
+                <div class="msg">
+                    <div class="avatar" style="background:var(--c-gou)">构<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head">
+                            <span class="m-name">龙小构</span><span class="bot-tag">BOT</span>
+                            <span class="role-tag">架构评审</span><span class="m-time">11:26</span>
+                        </div>
+                        <div class="m-text">架构评审完成：方案 A 与现有架构兼容，无核心框架改动。按 SOP，生成 Issue 前需要人类确认——<span class="mention">@产品经理-张</span> 请审核。</div>
+
+                        <div class="decision">
+                            <div class="d-head">
+                                <span class="d-chip">架构评审</span> 建议方案：Playbooks API + 同步守护任务
+                                <span class="d-status"><span class="pulse"></span>等待人类确认 · 6 分钟</span>
+                            </div>
+                            <div class="d-body">
+                                <div class="d-kv"><span class="k">方案</span><span class="v">由龙小客通过 Outgoing Webhook 调用 <code>/plugins/playbooks/api/v0/runs</code> 创建协作频道；新增同步守护任务负责自动重试与数据补偿。</span></div>
+                                <div class="d-kv"><span class="k">影响面</span><span class="v">新增 1 个 Outgoing Webhook、2 个 Bot 权限（posts + playbooks）；不改动 OpenClaw 核心框架。</span></div>
+                                <div class="d-kv"><span class="k">风险兜底</span><span class="v">Bot mention 不触发通知时，自动改用私信 + Webhook 双通道兜底。</span></div>
+                                <div class="d-kv"><span class="k">确认后</span><span class="v">自动生成 GitHub Issue，同步 Teable 记录，并通知相关成员。</span></div>
+                            </div>
+                            <div class="d-actions">
+                                <button class="btn primary" type="button">&#10003; 确认通过</button>
+                                <button class="btn default" type="button">需要修改</button>
+                                <span class="d-note">仅 <span class="mention">@产品经理-张</span> 可操作 · 超时 30 分钟将私信提醒</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户-李 的轻量追问（上下文） -->
+                <div class="msg">
+                    <div class="avatar" style="background:#6B7280">李<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head"><span class="m-name">用户-李</span><span class="m-time">11:29</span></div>
+                        <div class="reply-bar">回复 龙小产：验收标准第 2 条「失败自动重试 ≤ 3 次」</div>
+                        <div class="m-text">补充一下：如果重试期间又产生新数据，补偿时要一并带上。</div>
+                        <div class="m-sub">龙小产 已记录到 REQ-0142 · 不影响本次方案评审</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="composer">
+                <div class="box">
+                    <span class="plus">＋</span>
+                    发送消息到 #ISSUE-14 协作频道…
+                    <span class="tools"><span>@</span><span>&#128522;</span><span>&#128206;</span></span>
+                </div>
+            </div>
+        </main>
+
+        <!-- 右侧 Thread 上下文 -->
+        <aside class="rpanel">
+            <div class="rp-head">Thread 上下文 <span class="rp-sub">root #p8k2… · 14 条回复</span></div>
+            <div class="rp-scroll">
+                <div class="rp-sec">原始问题</div>
+                <div class="ctx-card">
+                    <b>用户-李 · 客服频道</b><br>
+                    WeLink 数据同步自 8/14 起持续失败，错误码 <span class="mono">SYNC_401</span>，3 个工作区日报汇总停摆。
+                </div>
+
+                <div class="rp-sec">关联产物</div>
+                <div class="ctx-card">
+                    Teable · <b>REQ-0142</b> 需求记录<br>
+                    研究笔记 · <b>方案对比 A/B</b><br>
+                    置信度 · <b>0.62</b>（低于阈值 0.8，触发升级）
+                </div>
+
+                <div class="rp-sec">协作时间线</div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-ke)">客</span><div><div class="tt">龙小客 触发 Playbook 建群</div><div class="tm">10:02</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-chan)">产</span><div><div class="tt">龙小产 完成需求澄清，写入 Teable</div><div class="tm">10:08 · 用户已确认</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-yan)">研</span><div><div class="tt">龙小研 输出方案研究（推荐 A）</div><div class="tm">11:20</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-gou)">构</span><div><div class="tt">龙小构 完成架构评审，请求人类确认</div><div class="tm">11:26 · 当前节点</div></div></div>
+            </div>
+            <div class="wait-line">
+                <b>HITL 等待中</b><br>
+                已 mention <b>@产品经理-张</b>（离开）；若 5 分钟内未响应，将自动发送私信 + Webhook 兜底通知。
+            </div>
+        </aside>
+
+    </div>
+</div>
+</body>
+</html>

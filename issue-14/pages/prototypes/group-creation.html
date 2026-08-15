@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="原型 · 智能升级与协作频道创建（Playbook 建群）">
+<meta name="nav-group" content="原型">
+<title>原型 · 智能升级与协作频道创建</title>
+<style>
+:root{
+    --brand:#00AE68; --brand-dark:#008D55; --brand-light:#E8F7F0;
+    --bg:#F2F4F6; --surface:#FFFFFF; --surface-2:#F5F6F7; --surface-3:#EDF0F2;
+    --text:#171918; --text-2:#6B7280; --text-3:#9CA3AF;
+    --border:#E5E8EB; --error:#F53F3F; --warning:#F59E0B;
+    --radius:8px;
+    --c-ke:#00AE68; --c-chan:#3B82F6; --c-yan:#8B5CF6; --c-gou:#F59E0B;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+    margin:0;
+    font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",ui-sans-serif,sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px;
+}
+
+.app{height:100vh; display:flex; flex-direction:column; background:var(--surface); overflow:hidden; position:relative;}
+.appbar{
+    height:44px; flex-shrink:0; display:flex; align-items:center; gap:10px;
+    padding:0 14px; background:var(--surface); border-bottom:1px solid var(--border);
+}
+.appbar .logo{width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.appbar .app-name{font-size:13px; font-weight:700;}
+.appbar .crumb{font-size:13px; color:var(--text-3);}
+.backlink{
+    margin-left:auto; font-size:12px; color:var(--text-2); text-decoration:none;
+    border:1px solid var(--border); border-radius:6px; padding:4px 10px; background:var(--surface);
+}
+.backlink:hover{background:var(--surface-2); color:var(--text);}
+.appbody{flex:1; display:flex; min-height:0;}
+
+/* ---------- 背景：客服频道（虚化） ---------- */
+.bg-chat{flex:1; display:flex; min-width:0; filter:saturate(.85);}
+.bg-side{
+    width:224px; flex-shrink:0; border-right:1px solid var(--border);
+    padding:10px 8px; background:var(--surface);
+}
+.bg-side .fs{height:28px; border:1px solid var(--border); border-radius:6px; background:var(--surface-2); margin:0 4px 10px;}
+.bg-side .si{display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:6px; font-size:13px; color:var(--text);}
+.bg-side .si.on{background:var(--brand-light); color:var(--brand-dark); font-weight:600;}
+.bg-side .hash{color:var(--text-3);}
+.bg-main{flex:1; display:flex; flex-direction:column; min-width:0;}
+.bg-head{padding:12px 20px; border-bottom:1px solid var(--border); font-size:15px; font-weight:700;}
+.bg-msgs{flex:1; padding:14px 20px; overflow:hidden;}
+.bmsg{display:flex; gap:10px; padding:6px 0;}
+.bav{width:36px;height:36px;border-radius:50%;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bline1{font-size:13px; font-weight:600; display:flex; gap:6px; align-items:center;}
+.bline1 .tm{font-size:11px; color:var(--text-3); font-weight:400;}
+.bline2{font-size:13px; color:var(--text-2); line-height:1.6; margin-top:2px;}
+.bot-tag{font-size:9px;font-weight:700;color:var(--text-2);background:var(--surface-3);border-radius:3px;padding:1px 4px;}
+
+/* ---------- 遮罩 + 弹窗 ---------- */
+.overlay{
+    position:absolute; inset:0; z-index:10;
+    background:rgba(17,24,39,.36);
+    display:flex; align-items:center; justify-content:center;
+    animation:fadein .18s ease;
+}
+@keyframes fadein{from{opacity:0;}to{opacity:1;}}
+.modal{
+    width:560px; max-height:calc(100vh - 48px);
+    background:var(--surface); border-radius:12px;
+    box-shadow:0 24px 64px rgba(17,24,39,.30);
+    display:flex; flex-direction:column; overflow:hidden;
+    animation:pop .22s cubic-bezier(.2,.9,.3,1.2);
+}
+@keyframes pop{from{opacity:0; transform:translateY(10px) scale(.97);}to{opacity:1; transform:none;}}
+
+.m-hero{
+    padding:14px 24px 12px; text-align:center;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg, var(--brand-light) 0%, var(--surface) 100%);
+}
+.ok-ring{
+    width:40px; height:40px; margin:0 auto 8px;
+    border-radius:50%; background:var(--brand);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 6px rgba(0,174,104,.15);
+}
+.ok-ring svg{display:block;}
+.m-hero h2{margin:0; font-size:17px; font-weight:700;}
+.m-hero .ch-chip{
+    display:inline-flex; align-items:center; gap:6px; margin-top:6px;
+    font-size:13px; font-weight:600; color:var(--brand-dark);
+    background:var(--surface); border:1px solid rgba(0,174,104,.35);
+    border-radius:16px; padding:3px 12px;
+}
+.m-hero .m-sub{margin-top:6px; font-size:12px; color:var(--text-2);}
+
+.m-scroll{overflow-y:auto; padding:12px 24px 8px;}
+.m-sec{font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--text-3); margin:2px 0 8px; text-transform:uppercase;}
+
+.member-grid{display:grid; grid-template-columns:1fr 1fr; gap:5px 12px;}
+.member{
+    display:flex; align-items:center; gap:10px;
+    padding:6px 10px; border:1px solid var(--border); border-radius:8px;
+    background:var(--surface);
+}
+.member .av{
+    width:28px; height:28px; border-radius:50%;
+    color:#fff; font-size:12px; font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+    position:relative; flex-shrink:0;
+}
+.member .av .sd{
+    position:absolute; right:-1px; bottom:-1px;
+    width:9px; height:9px; border-radius:50%;
+    background:var(--brand); border:2px solid var(--surface);
+}
+.member .av .sd.away{background:var(--warning);}
+.member .nm{font-size:13px; font-weight:600; display:flex; align-items:center; gap:5px;}
+.member .bot-tag{font-size:9px;}
+.member .rl{font-size:11px; color:var(--text-3);}
+
+.init-msg{
+    border:1px dashed var(--border); border-radius:8px;
+    background:var(--surface-2); padding:8px 12px;
+    font-size:12px; color:var(--text-2); line-height:1.6;
+    display:flex; gap:10px;
+}
+.init-msg .pb-ic{
+    width:26px; height:26px; border-radius:6px; flex-shrink:0;
+    background:var(--brand); color:#fff; font-size:12px;
+    display:flex; align-items:center; justify-content:center;
+}
+.init-msg b{color:var(--text);}
+
+/* 步骤条 */
+.stepper{display:flex; align-items:flex-start; margin:6px 0 2px; padding:4px 2px 0;}
+.step{flex:1; text-align:center; position:relative;}
+.step:before{
+    content:""; position:absolute; top:8px; left:-50%; width:100%; height:2px;
+    background:var(--border);
+}
+.step:first-child:before{display:none;}
+.step.done:before{background:var(--brand);}
+.step .dot{
+    width:16px; height:16px; margin:0 auto; border-radius:50%;
+    background:var(--surface); border:2px solid var(--border);
+    position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:center;
+    font-size:9px; color:#fff;
+}
+.step.done .dot{background:var(--brand); border-color:var(--brand);}
+.step.cur .dot{border-color:var(--c-chan); box-shadow:0 0 0 4px rgba(59,130,246,.18);}
+.step.cur .dot:after{content:""; width:6px; height:6px; border-radius:50%; background:var(--c-chan);}
+.step .sl{font-size:10px; color:var(--text-3); margin-top:5px; line-height:1.3;}
+.step.done .sl{color:var(--brand-dark); font-weight:600;}
+.step.cur .sl{color:var(--c-chan); font-weight:700;}
+.next-note{
+    margin-top:8px; font-size:12px; color:var(--text-2);
+    background:var(--surface-2); border-radius:8px; padding:7px 12px;
+    display:flex; align-items:center; gap:8px;
+}
+.next-note .na{
+    width:20px; height:20px; border-radius:50%; background:var(--c-chan);
+    color:#fff; font-size:10px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+
+.m-foot{
+    flex-shrink:0; display:flex; align-items:center; gap:10px;
+    padding:12px 24px; border-top:1px solid var(--border);
+}
+.btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    height:36px; padding:0 20px; border-radius:6px;
+    font-size:13px; font-weight:600; font-family:inherit;
+    cursor:pointer; border:1px solid transparent; text-decoration:none;
+}
+.btn.primary{background:var(--brand); color:#fff;}
+.btn.primary:hover{background:var(--brand-dark);}
+.btn.default{background:var(--surface); border-color:var(--border); color:var(--text);}
+.btn.default:hover{background:var(--surface-2);}
+.m-foot .elapsed{margin-left:auto; font-size:12px; color:var(--text-3);}
+.m-foot .elapsed b{color:var(--brand-dark);}
+</style>
+</head>
+<body>
+<div class="app">
+
+    <div class="appbar">
+        <div class="logo">W</div>
+        <span class="app-name">WeLink</span>
+        <span class="crumb">Mattermost · 龙冈数据团队</span>
+        <a class="backlink" href="overview.html">&#8249; 原型总览</a>
+    </div>
+
+    <div class="appbody">
+
+        <!-- 背景频道（被弹窗遮住） -->
+        <div class="bg-chat">
+            <div class="bg-side">
+                <div class="fs"></div>
+                <div class="si on"><span class="hash">#</span>客服支持</div>
+                <div class="si"><span class="hash">#</span>产品讨论</div>
+                <div class="si"><span class="hash">#</span>发布公告</div>
+            </div>
+            <div class="bg-main">
+                <div class="bg-head"># 客服支持</div>
+                <div class="bg-msgs">
+                    <div class="bmsg">
+                        <div class="bav" style="background:#6B7280">李</div>
+                        <div>
+                            <div class="bline1">用户-李 <span class="tm">09:58</span></div>
+                            <div class="bline2">@龙小客 我们的数据同步从昨天下午开始一直失败，报错 SYNC_401，日报都出不来了，麻烦看下</div>
+                        </div>
+                    </div>
+                    <div class="bmsg">
+                        <div class="bav" style="background:var(--c-ke)">客</div>
+                        <div>
+                            <div class="bline1">龙小客 <span class="bot-tag">BOT</span> <span class="tm">09:58</span></div>
+                            <div class="bline2">收到。该错误码指向服务端同步任务鉴权异常，超出我的处理范围（置信度 0.62），正在为您升级为内部处理…</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 建群弹窗 -->
+        <div class="overlay">
+            <div class="modal" role="dialog" aria-modal="true" aria-label="已创建协作频道">
+
+                <div class="m-hero">
+                    <div class="ok-ring">
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 11.5l4.5 4.5L18 6.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <h2>已创建协作频道</h2>
+                    <div class="ch-chip"># issue-14-user-bug</div>
+                    <div class="m-sub">Playbook「用户问题升级 SOP」 · Run #128 · 由 <b>龙小客</b> 通过 Outgoing Webhook 触发</div>
+                </div>
+
+                <div class="m-scroll">
+                    <div class="m-sec">成员 · 6（4 位数字员工 + 2 位人类）</div>
+                    <div class="member-grid">
+                        <div class="member"><span class="av" style="background:var(--c-ke)">客<span class="sd"></span></span><div><div class="nm">龙小客 <span class="bot-tag">BOT</span></div><div class="rl">数字员工 · 客服答疑</div></div></div>
+                        <div class="member"><span class="av" style="background:var(--c-chan)">产<span class="sd"></span></span><div><div class="nm">龙小产 <span class="bot-tag">BOT</span></div><div class="rl">数字员工 · 需求澄清</div></div></div>
+                        <div class="member"><span class="av" style="background:var(--c-yan)">研<span class="sd"></span></span><div><div class="nm">龙小研 <span class="bot-tag">BOT</span></div><div class="rl">数字员工 · 方案研究</div></div></div>
+                        <div class="member"><span class="av" style="background:var(--c-gou)">构<span class="sd"></span></span><div><div class="nm">龙小构 <span class="bot-tag">BOT</span></div><div class="rl">数字员工 · 架构评审</div></div></div>
+                        <div class="member"><span class="av" style="background:#6B7280">李<span class="sd"></span></span><div><div class="nm">用户-李</div><div class="rl">客户 · 问题提出人</div></div></div>
+                        <div class="member"><span class="av" style="background:#111827">张<span class="sd away"></span></span><div><div class="nm">产品经理-张</div><div class="rl">人类 · 确认人</div></div></div>
+                    </div>
+
+                    <div class="m-sec" style="margin-top:12px;">频道初始消息</div>
+                    <div class="init-msg">
+                        <span class="pb-ic">P</span>
+                        <span><b>龙小客</b> 触发 Playbook，创建本频道，并将客服频道对话上下文（12 条消息）同步至此。<br>本 issue 的全部讨论请在同一 thread 内进行，数字员工将自动接力处理。</span>
+                    </div>
+
+                    <div class="m-sec" style="margin-top:12px;">SOP 进度</div>
+                    <div class="stepper">
+                        <div class="step done"><div class="dot">&#10003;</div><div class="sl">智能升级<br>触发</div></div>
+                        <div class="step done"><div class="dot">&#10003;</div><div class="sl">创建协作<br>频道</div></div>
+                        <div class="step cur"><div class="dot"></div><div class="sl">需求澄清</div></div>
+                        <div class="step"><div class="dot"></div><div class="sl">方案研究</div></div>
+                        <div class="step"><div class="dot"></div><div class="sl">架构评审</div></div>
+                        <div class="step"><div class="dot"></div><div class="sl">生成<br>Issue</div></div>
+                    </div>
+                    <div class="next-note">
+                        <span class="na">产</span>
+                        <span>下一步：<b>龙小产</b> 将 @用户-李 发起需求澄清（背景 / 问题 / 验收标准），并写入 Teable 需求表。</span>
+                    </div>
+                </div>
+
+                <div class="m-foot">
+                    <a class="btn primary" href="clarification.html">进入频道</a>
+                    <a class="btn default" href="#">查看 Playbook 运行详情</a>
+                    <span class="elapsed">触发至建群耗时 <b>6.8s</b>（指标 ≤ 10s）</span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

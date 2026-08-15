@@ -7,9 +7,9 @@ current_run:
   run_id: 20260815085835-a378a667
   branch: issue-14
   current_stage: product-design-docs
-  status: not_started
+  status: in_progress
   started_at: '2026-08-15T08:58:35Z'
-  last_updated_at: '2026-08-15T09:12:05Z'
+  last_updated_at: '2026-08-15T09:56:10Z'
   issue_number: '14'
   variables:
     process_slug: issue-14
@@ -99,6 +99,22 @@ nodes:
   - issue-14/pages/docs/snapshots/prd-v1.0.html
   - issue-14/assets/style.css
   - issue-14/docs/research/integration-research.md
+  handoff_file: null
+- stage_id: product-design-docs
+  node_id: product-design-docs-prototypes-2026-08-15
+  status: in_progress
+  started_at: '2026-08-15T09:56:10Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - issue-14/pages/prototypes/overview.html
+  - issue-14/pages/prototypes/clarification.html
+  - issue-14/pages/prototypes/hitl-confirm.html
+  - issue-14/pages/prototypes/group-creation.html
+  - issue-14/pages/prototypes/agent-collab.html
+  - issue-14/assets/js/package-data.js
+  - issue-14/index.html
   handoff_file: null
 recovery:
   last_validated_checkpoint: ''

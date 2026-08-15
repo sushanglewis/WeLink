@@ -56,7 +56,8 @@ window.LINC_PACKAGE = {
     "prd": true,
     "requirements": true,
     "user-stories": true,
-    "research": true
+    "research": true,
+    "prototype-web": true
   },
   "nav": [
     {
@@ -101,6 +102,56 @@ window.LINC_PACKAGE = {
           "status": "completed",
           "stage": "clarify",
           "human_confirmed": false
+        }
+      ]
+    },
+    {
+      "group": "原型",
+      "items": [
+        {
+          "path": "pages/prototypes/overview.html",
+          "label": "原型总览",
+          "title": "原型总览 · Issue #14 数字员工平台",
+          "status": "completed",
+          "stage": "product-design-docs",
+          "human_confirmed": false,
+          "purpose": "4 个场景原型的导航落地页，含数字员工色彩图例与线框缩略图"
+        },
+        {
+          "path": "pages/prototypes/group-creation.html",
+          "label": "智能升级与建群",
+          "title": "原型 · 智能升级与协作频道创建（Playbook 建群）",
+          "status": "completed",
+          "stage": "product-design-docs",
+          "human_confirmed": false,
+          "purpose": "龙小客触发 Playbook 创建 issue 协作频道：成员列表、初始系统消息、SOP 步骤条与下一步指示"
+        },
+        {
+          "path": "pages/prototypes/clarification.html",
+          "label": "需求澄清",
+          "title": "原型 · 需求澄清（龙小产 × 用户）",
+          "status": "completed",
+          "stage": "product-design-docs",
+          "human_confirmed": false,
+          "purpose": "龙小产在协作频道内与用户多轮澄清，生成结构化需求卡片并写入 Teable，等待用户确认"
+        },
+        {
+          "path": "pages/prototypes/hitl-confirm.html",
+          "label": "人类确认（HITL）",
+          "title": "原型 · 人类确认节点（HITL · 龙小构 → 产品经理）",
+          "status": "completed",
+          "stage": "product-design-docs",
+          "human_confirmed": false,
+          "purpose": "龙小构发出架构评审决策卡并 @产品经理-张，确认通过/需要修改双按钮，右侧 Thread 上下文面板"
+        },
+        {
+          "path": "pages/prototypes/agent-collab.html",
+          "label": "多智能体接力协作",
+          "title": "原型 · 多智能体接力协作（单 Thread）",
+          "status": "completed",
+          "stage": "product-design-docs",
+          "human_confirmed": false,
+          "purpose": "四位数字员工在同一 thread 内 mention 接力，右侧进度面板呈现 SOP 步骤、参与者与产物链接"
         }
       ]
     }
