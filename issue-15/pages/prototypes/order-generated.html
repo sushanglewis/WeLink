@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="原型 · 成单与 Teable 同步（闭环终态）">
+<meta name="nav-group" content="原型">
+<title>原型 · 成单与 Teable 同步</title>
+<style>
+:root{
+    --brand:#00AE68; --brand-dark:#008D55; --brand-light:#E8F7F0;
+    --bg:#F2F4F6; --surface:#FFFFFF; --surface-2:#F5F6F7; --surface-3:#EDF0F2;
+    --text:#171918; --text-2:#6B7280; --text-3:#9CA3AF;
+    --border:#E5E8EB; --error:#F53F3F; --warning:#F59E0B;
+    --radius:8px;
+    --c-sup:#00AE68; --c-dem:#3B82F6; --c-sys:#F59E0B;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+    margin:0;
+    font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",ui-sans-serif,sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px;
+}
+
+.app{height:100vh; display:flex; flex-direction:column; background:var(--surface); overflow:hidden;}
+.appbar{
+    height:44px; flex-shrink:0; display:flex; align-items:center; gap:10px;
+    padding:0 14px; background:var(--surface); border-bottom:1px solid var(--border);
+}
+.appbar .logo{width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.appbar .app-name{font-size:13px; font-weight:700;}
+.appbar .crumb{font-size:13px; color:var(--text-3);}
+.backlink{
+    margin-left:auto; font-size:12px; color:var(--text-2); text-decoration:none;
+    border:1px solid var(--border); border-radius:6px; padding:4px 10px; background:var(--surface);
+}
+.backlink:hover{background:var(--surface-2); color:var(--text);}
+.appbody{flex:1; display:flex; min-height:0;}
+
+.chat{flex:1; display:flex; flex-direction:column; min-width:0;}
+.ch-head{
+    flex-shrink:0; padding:10px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px;
+}
+.ch-title{font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px;}
+.ch-title .lock{color:var(--text-3); font-size:13px;}
+.ch-topic{font-size:12px; color:var(--text-2);}
+.ch-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+.av-stack{display:flex;}
+.av-stack .a{
+    width:24px;height:24px;border-radius:50%;border:2px solid var(--surface);margin-left:-6px;
+    color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;
+}
+.av-stack .a:first-child{margin-left:0;}
+.run-chip{
+    font-size:11px; font-weight:600; color:var(--brand-dark);
+    background:var(--brand-light); border-radius:10px; padding:3px 10px;
+}
+
+.ch-scroll{flex:1; overflow-y:auto; padding:14px 0 8px;}
+.msg{display:flex; gap:10px; padding:6px 20px;}
+.msg:hover{background:var(--surface-2);}
+.avatar{
+    width:36px;height:36px;border-radius:50%;color:#fff;font-size:14px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;
+}
+.avatar .status-dot{
+    position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;
+    background:var(--brand);border:2px solid var(--surface);
+}
+.m-body{flex:1; min-width:0;}
+.m-head{display:flex; align-items:center; gap:6px;}
+.m-name{font-size:14px; font-weight:600;}
+.bot-tag{font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--text-2);background:var(--surface-3);border-radius:3px;padding:1px 4px;}
+.org-tag{font-size:10px; color:var(--text-3);}
+.m-time{font-size:11px; color:var(--text-3);}
+.m-text{font-size:14px; line-height:1.65; margin-top:2px;}
+.mention{color:var(--brand-dark); background:var(--brand-light); border-radius:4px; padding:0 4px; font-weight:600;}
+.m-sub{font-size:12px; color:var(--text-3); margin-top:4px;}
+.reply-bar{
+    margin:6px 0 0; max-width:660px;
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--text-2);
+    border-left:3px solid var(--border); padding:4px 10px;
+    background:var(--surface-2); border-radius:0 6px 6px 0;
+}
+.confirm-stamp{
+    display:inline-flex; align-items:center; gap:5px; margin-top:6px;
+    font-size:11px; font-weight:700; color:var(--brand-dark);
+    background:var(--brand-light); border:1px solid rgba(0,174,104,.35);
+    border-radius:10px; padding:2px 9px;
+}
+
+/* 系统消息 */
+.sys-msg{
+    display:flex; gap:8px; align-items:center; justify-content:center;
+    padding:8px 20px; font-size:12px; color:var(--text-3);
+}
+.sys-msg .pb-ic{
+    width:18px; height:18px; border-radius:5px; background:var(--c-sys); color:#fff;
+    font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;
+}
+.sys-msg b{color:var(--text-2);}
+
+/* 订单卡 */
+.order{
+    margin:8px 0 4px; max-width:660px;
+    border:1px solid rgba(0,174,104,.4); border-radius:10px; background:var(--surface);
+    box-shadow:0 8px 24px rgba(0,174,104,.12);
+    overflow:hidden;
+}
+.o-hero{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 16px;
+    background:linear-gradient(180deg, var(--brand-light) 0%, var(--surface) 100%);
+    border-bottom:1px solid var(--border);
+}
+.ok-ring{
+    width:36px; height:36px; flex-shrink:0;
+    border-radius:50%; background:var(--brand);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 5px rgba(0,174,104,.15);
+}
+.o-hero .ot{font-size:15px; font-weight:700;}
+.o-hero .ono{
+    font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:12px;
+    color:var(--brand-dark); font-weight:700; margin-top:1px;
+}
+.o-status{
+    margin-left:auto; font-size:11px; font-weight:700; color:var(--brand-dark);
+    background:var(--surface); border:1px solid rgba(0,174,104,.4);
+    border-radius:12px; padding:3px 10px;
+}
+.o-body{padding:12px 16px;}
+.o-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; font-size:12px; line-height:1.6;}
+.o-grid .f{display:flex; gap:6px;}
+.o-grid .k{color:var(--text-2); flex-shrink:0;}
+.o-grid .v{color:var(--text);}
+.o-grid .v b{font-weight:700;}
+.o-grid .full{grid-column:1 / -1;}
+.o-parties{
+    display:flex; align-items:center; gap:10px; margin-bottom:10px;
+    font-size:12px;
+}
+.o-party{
+    flex:1; display:flex; align-items:center; gap:8px;
+    border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface-2);
+}
+.o-party .pa{
+    width:24px; height:24px; border-radius:50%; color:#fff; font-size:10px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.o-party .pn{font-weight:700;}
+.o-party .pr{color:var(--text-3); font-size:11px;}
+.o-deal{color:var(--text-3); font-weight:700;}
+
+/* Teable 同步回执 */
+.teable-sync{
+    margin:0 16px 12px; display:flex; align-items:center; gap:10px;
+    border:1px solid var(--border); border-radius:8px;
+    background:var(--surface-2); padding:8px 12px;
+    font-size:12px; color:var(--text-2);
+}
+.teable-sync .t-ic{
+    width:24px; height:24px; border-radius:6px; background:#2E63E7; color:#fff;
+    font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.teable-sync b{color:var(--text);}
+.teable-sync .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px;}
+.teable-sync .t-link{
+    margin-left:auto; font-size:11px; font-weight:600; color:#2E63E7;
+    border:1px solid rgba(46,99,231,.35); background:rgba(46,99,231,.06);
+    border-radius:6px; padding:3px 9px; text-decoration:none; white-space:nowrap;
+}
+
+/* 祝贺消息 */
+.congrats{
+    margin:8px 0 4px; max-width:660px;
+    border:1px dashed rgba(0,174,104,.45); border-radius:8px;
+    background:var(--brand-light); padding:10px 14px;
+    font-size:13px; color:var(--text); line-height:1.7;
+}
+.congrats b{color:var(--brand-dark);}
+
+/* 右侧面板 */
+.rpanel{
+    width:288px; flex-shrink:0;
+    border-left:1px solid var(--border); background:var(--surface);
+    display:flex; flex-direction:column; min-height:0;
+}
+.rp-head{
+    padding:12px 16px; border-bottom:1px solid var(--border);
+    font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px;
+}
+.rp-head .rp-sub{font-size:11px; color:var(--text-3); font-weight:400;}
+.rp-scroll{flex:1; overflow-y:auto; padding:12px 16px;}
+.rp-sec{font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--text-3); text-transform:uppercase; margin:14px 0 8px;}
+.rp-sec:first-child{margin-top:0;}
+.ctx-card{
+    border:1px solid var(--border); border-radius:8px; padding:10px 12px;
+    background:var(--surface-2); font-size:12px; line-height:1.6; color:var(--text-2);
+    margin-bottom:8px;
+}
+.ctx-card b{color:var(--text);}
+.ctx-card .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px;}
+.tb-fields{font-size:12px; line-height:1.8; color:var(--text-2);}
+.tb-fields .tf{display:flex; gap:8px;}
+.tb-fields .tk{width:64px; flex-shrink:0; color:var(--text-3);}
+.tb-fields .tv{color:var(--text);}
+.tb-fields .tv .st{font-size:10px; font-weight:700; color:var(--brand-dark); background:var(--brand-light); border-radius:4px; padding:1px 6px;}
+.thread-item{
+    display:flex; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px;
+}
+.thread-item:last-child{border-bottom:none;}
+.thread-item .ta{
+    width:22px; height:22px; border-radius:50%; color:#fff; font-size:10px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.thread-item .tt{color:var(--text); line-height:1.5;}
+.thread-item .tm{color:var(--text-3); font-size:11px; margin-top:1px;}
+.state-flow{display:flex; flex-direction:column; gap:0; font-size:12px;}
+.sf-i{display:flex; align-items:center; gap:8px; padding:4px 0; color:var(--text-3);}
+.sf-i .sd{width:10px; height:10px; border-radius:50%; background:var(--surface-3); flex-shrink:0;}
+.sf-i.done{color:var(--text);}
+.sf-i.done .sd{background:var(--brand);}
+.sf-i.cur{color:var(--text); font-weight:700;}
+.sf-i.cur .sd{background:var(--brand); box-shadow:0 0 0 3px rgba(0,174,104,.2);}
+
+.composer{flex-shrink:0; padding:10px 20px 16px;}
+.composer .box{
+    border:1px solid var(--border); border-radius:8px; background:var(--surface);
+    padding:10px 12px; color:var(--text-3); font-size:13px;
+    display:flex; align-items:center; gap:10px;
+}
+.composer .plus{
+    width:22px;height:22px;border-radius:50%;border:1px solid var(--border);color:var(--text-2);
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.composer .tools{margin-left:auto; display:flex; gap:10px; color:var(--text-3);}
+
+.next-scene{
+    flex-shrink:0; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:10px 20px; border-top:1px solid var(--border); background:var(--surface-2);
+    font-size:12px; color:var(--text-2);
+}
+.next-scene a{
+    font-size:12px; font-weight:600; color:var(--brand-dark); text-decoration:none;
+    border:1px solid rgba(0,174,104,.35); background:var(--brand-light);
+    border-radius:6px; padding:5px 12px;
+}
+.next-scene a:hover{background:#D8F0E4;}
+</style>
+</head>
+<body>
+<div class="app">
+
+    <div class="appbar">
+        <div class="logo">W</div>
+        <span class="app-name">WeLink</span>
+        <span class="crumb">Mattermost · 龙冈产业互联组织</span>
+        <a class="backlink" href="overview.html">&#8249; 原型总览</a>
+    </div>
+
+    <div class="appbody">
+
+        <!-- 主聊天区 -->
+        <main class="chat">
+            <div class="ch-head">
+                <div>
+                    <div class="ch-title"><span class="lock">&#128274;</span> deal-iot-sensors-1000</div>
+                    <div class="ch-topic">私密撮合频道 · 闭环终态 · 订单已生成</div>
+                </div>
+                <div class="ch-right">
+                    <span class="run-chip">Playbook Run #56 · 已完成</span>
+                    <div class="av-stack">
+                        <span class="a" style="background:var(--c-sup)">供</span>
+                        <span class="a" style="background:var(--c-dem)">采</span>
+                        <span class="a" style="background:#111827">陈</span>
+                        <span class="a" style="background:#6B7280">王</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ch-scroll">
+
+                <!-- 陈总确认 -->
+                <div class="msg">
+                    <div class="avatar" style="background:#111827">陈<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head"><span class="m-name">陈总</span><span class="org-tag">智联传感科技有限公司</span><span class="m-time">10:35</span></div>
+                        <div class="reply-bar">回复 智联小供：成单确认 · 合作方案 v1</div>
+                        <div class="m-text">确认通过。两批交付已安排产线排期，下周可出首批。</div>
+                        <div class="m-sub"><span class="confirm-stamp">&#10003; 已电子留痕 · 确认人 陈总 · 10:35</span></div>
+                    </div>
+                </div>
+
+                <!-- 系统：双人确认完成 -->
+                <div class="sys-msg">
+                    <span class="pb-ic">P</span>
+                    <span><b>双人确认完成（2/2）</b> · 王科长 10:32 · 陈总 10:35 · 满足成单条件，正在生成订单…</span>
+                </div>
+
+                <!-- Playbook：订单卡 -->
+                <div class="msg">
+                    <div class="avatar" style="background:var(--c-sys)">P<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head">
+                            <span class="m-name">撮合 Playbook</span><span class="bot-tag">BOT</span>
+                            <span class="org-tag">系统</span><span class="m-time">10:35</span>
+                        </div>
+
+                        <div class="order">
+                            <div class="o-hero">
+                                <div class="ok-ring">
+                                    <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M4 11.5l4.5 4.5L18 6.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div>
+                                    <div class="ot">订单已生成 · 合作意向书</div>
+                                    <div class="ono">ORD-2026-0818-001</div>
+                                </div>
+                                <span class="o-status">状态：已确认</span>
+                            </div>
+                            <div class="o-body">
+                                <div class="o-parties">
+                                    <div class="o-party"><span class="pa" style="background:var(--c-dem)">采</span><div><div class="pn">龙冈市工业和信息化局</div><div class="pr">买方 · 确认人 王科长</div></div></div>
+                                    <span class="o-deal">&#8596;</span>
+                                    <div class="o-party"><span class="pa" style="background:var(--c-sup)">供</span><div><div class="pn">智联传感科技有限公司</div><div class="pr">卖方 · 确认人 陈总</div></div></div>
+                                </div>
+                                <div class="o-grid">
+                                    <div class="f full"><span class="k">标的</span><span class="v">ZL-S800 工业物联网传感器 <b>1,000 套</b>（LoRa/NB-IoT · IP65）</span></div>
+                                    <div class="f"><span class="k">金额</span><span class="v"><b>¥420,000</b>（含税）</span></div>
+                                    <div class="f"><span class="k">交付</span><span class="v">两批 500/500 · 签约后第 15 / 30 天</span></div>
+                                    <div class="f"><span class="k">付款</span><span class="v">30% 预付 + 70% 验收后 15 日内</span></div>
+                                    <div class="f"><span class="k">质保</span><span class="v">3 年 · 延期违约 0.5‰/日</span></div>
+                                    <div class="f full"><span class="k">溯源</span><span class="v">方案 v1 · 话题 POST-20260818-004 · Playbook Run #56</span></div>
+                                </div>
+                            </div>
+                            <div class="teable-sync">
+                                <span class="t-ic">T</span>
+                                <span>已同步至 Teable · <b>「合作订单」表</b> · 记录 <span class="mono">recIoT0818001</span> · 10:35:42</span>
+                                <a class="t-link" href="#">在 Teable 中打开 &#8599;</a>
+                            </div>
+                        </div>
+
+                        <div class="congrats">
+                            <b>合作达成。</b>恭喜 <span class="mention">@王科长</span> 与 <span class="mention">@陈总</span> —— 从广场发布到成单共耗时 <b>21 分钟</b>，全程 agent 协作、双人确认、留痕可审计。履约阶段的状态变更（已确认 → 履约中 → 完成）将持续同步至本频道与 Teable。
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="composer">
+                <div class="box">
+                    <span class="plus">＋</span>
+                    发送消息到私密频道（仅 4 名成员可见）…
+                    <span class="tools"><span>@</span><span>&#128522;</span><span>&#128206;</span></span>
+                </div>
+            </div>
+
+            <div class="next-scene">
+                <span>闭环演示结束：发布 → 匹配 → 建群 → 交换 → 方案 → 双人 HITL → 成单同步，共 6 幕。</span>
+                <a href="overview.html">回到原型总览 &#8635;</a>
+            </div>
+        </main>
+
+        <!-- 右侧面板 -->
+        <aside class="rpanel">
+            <div class="rp-head">全链路留痕 <span class="rp-sub">可审计 · 可回放</span></div>
+            <div class="rp-scroll">
+                <div class="rp-sec">闭环时间线</div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-dem)">采</span><div><div class="tt">广场发布需求话题</div><div class="tm">10:14</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-sup)">供</span><div><div class="tt">意向匹配通过（0.87）</div><div class="tm">10:14 · 2.3s</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-sys)">P</span><div><div class="tt">Playbook 创建撮合频道</div><div class="tm">10:15 · 8.2s</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-sup)">供</span><div><div class="tt">信息卡交换 · 方案 v1 定稿</div><div class="tm">10:16 – 10:21</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:#6B7280">王</span><div><div class="tt">王科长确认通过（1/2）</div><div class="tm">10:32</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:#111827">陈</span><div><div class="tt">陈总确认通过（2/2）</div><div class="tm">10:35</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-sys)">P</span><div><div class="tt">订单生成并同步 Teable</div><div class="tm">10:35 · 闭环完成</div></div></div>
+
+                <div class="rp-sec">Teable 记录预览</div>
+                <div class="ctx-card">
+                    <b>「合作订单」表</b> · <span class="mono">recIoT0818001</span>
+                    <div class="tb-fields" style="margin-top:6px;">
+                        <div class="tf"><span class="tk">订单号</span><span class="tv mono">ORD-2026-0818-001</span></div>
+                        <div class="tf"><span class="tk">买方</span><span class="tv">龙冈市工信局</span></div>
+                        <div class="tf"><span class="tk">卖方</span><span class="tv">智联传感科技</span></div>
+                        <div class="tf"><span class="tk">金额</span><span class="tv">¥420,000</span></div>
+                        <div class="tf"><span class="tk">状态</span><span class="tv"><span class="st">已确认</span></span></div>
+                    </div>
+                </div>
+
+                <div class="rp-sec">订单状态机</div>
+                <div class="state-flow">
+                    <div class="sf-i cur"><span class="sd"></span>已确认（当前）</div>
+                    <div class="sf-i"><span class="sd"></span>履约中 · 首批交付第 15 天</div>
+                    <div class="sf-i"><span class="sd"></span>完成 · 验收 + 尾款</div>
+                    <div class="sf-i"><span class="sd"></span>已归档</div>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+</div>
+</body>
+</html>

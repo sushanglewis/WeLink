@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="原型 · 双人 HITL 确认（@王科长 @陈总）">
+<meta name="nav-group" content="原型">
+<title>原型 · 双人 HITL 确认</title>
+<style>
+:root{
+    --brand:#00AE68; --brand-dark:#008D55; --brand-light:#E8F7F0;
+    --bg:#F2F4F6; --surface:#FFFFFF; --surface-2:#F5F6F7; --surface-3:#EDF0F2;
+    --text:#171918; --text-2:#6B7280; --text-3:#9CA3AF;
+    --border:#E5E8EB; --error:#F53F3F; --warning:#F59E0B;
+    --radius:8px;
+    --c-sup:#00AE68; --c-dem:#3B82F6; --c-sys:#F59E0B;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+    margin:0;
+    font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",ui-sans-serif,sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px;
+}
+
+.app{height:100vh; display:flex; flex-direction:column; background:var(--surface); overflow:hidden;}
+.appbar{
+    height:44px; flex-shrink:0; display:flex; align-items:center; gap:10px;
+    padding:0 14px; background:var(--surface); border-bottom:1px solid var(--border);
+}
+.appbar .logo{width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.appbar .app-name{font-size:13px; font-weight:700;}
+.appbar .crumb{font-size:13px; color:var(--text-3);}
+.backlink{
+    margin-left:auto; font-size:12px; color:var(--text-2); text-decoration:none;
+    border:1px solid var(--border); border-radius:6px; padding:4px 10px; background:var(--surface);
+}
+.backlink:hover{background:var(--surface-2); color:var(--text);}
+.appbody{flex:1; display:flex; min-height:0;}
+
+.chat{flex:1; display:flex; flex-direction:column; min-width:0;}
+.ch-head{
+    flex-shrink:0; padding:10px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px;
+}
+.ch-title{font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px;}
+.ch-title .lock{color:var(--text-3); font-size:13px;}
+.ch-topic{font-size:12px; color:var(--text-2);}
+.ch-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+.av-stack{display:flex;}
+.av-stack .a{
+    width:24px;height:24px;border-radius:50%;border:2px solid var(--surface);margin-left:-6px;
+    color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;
+}
+.av-stack .a:first-child{margin-left:0;}
+.run-chip{
+    font-size:11px; font-weight:600; color:#92400E;
+    background:#FEF3C7; border-radius:10px; padding:3px 10px;
+}
+
+.ch-scroll{flex:1; overflow-y:auto; padding:14px 0 8px;}
+.msg{display:flex; gap:10px; padding:6px 20px;}
+.msg:hover{background:var(--surface-2);}
+.avatar{
+    width:36px;height:36px;border-radius:50%;color:#fff;font-size:14px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;
+}
+.avatar .status-dot{
+    position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;
+    background:var(--brand);border:2px solid var(--surface);
+}
+.avatar .status-dot.away{background:var(--warning);}
+.m-body{flex:1; min-width:0;}
+.m-head{display:flex; align-items:center; gap:6px;}
+.m-name{font-size:14px; font-weight:600;}
+.bot-tag{font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--text-2);background:var(--surface-3);border-radius:3px;padding:1px 4px;}
+.org-tag{font-size:10px; color:var(--text-3);}
+.m-time{font-size:11px; color:var(--text-3);}
+.m-text{font-size:14px; line-height:1.65; margin-top:2px;}
+.mention{color:var(--brand-dark); background:var(--brand-light); border-radius:4px; padding:0 4px; font-weight:600;}
+.m-sub{font-size:12px; color:var(--text-3); margin-top:4px;}
+
+/* HITL 决策卡（双人版） */
+.decision{
+    margin:8px 0 4px; max-width:660px;
+    border:1px solid var(--border); border-left:3px solid var(--c-sys);
+    border-radius:8px; background:var(--surface);
+    box-shadow:0 4px 14px rgba(245,158,11,.10);
+}
+.decision .d-head{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 14px; border-bottom:1px solid var(--border);
+    font-size:13px; font-weight:700;
+}
+.decision .d-chip{font-size:10px; font-weight:700; color:#fff; background:var(--c-sys); border-radius:4px; padding:2px 6px;}
+.decision .d-status{
+    margin-left:auto; font-size:11px; font-weight:600;
+    color:#92400E; background:#FEF3C7; border-radius:10px; padding:2px 8px;
+    display:flex; align-items:center; gap:5px;
+}
+.decision .d-status .pulse{
+    width:6px; height:6px; border-radius:50%; background:var(--warning);
+    animation:pw 1.6s infinite;
+}
+@keyframes pw{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4);}50%{box-shadow:0 0 0 4px rgba(245,158,11,0);}}
+.decision .d-body{padding:12px 14px; font-size:13px; line-height:1.7;}
+.d-kv{display:flex; gap:10px; padding:4px 0;}
+.d-kv .k{width:64px; flex-shrink:0; color:var(--text-2); font-weight:500;}
+.d-kv .v{flex:1;}
+.d-kv .v b{font-weight:700;}
+.d-kv .v code{
+    font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:12px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:4px; padding:1px 5px;
+}
+
+/* 双人确认进度 */
+.confirm-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;}
+.cfm{
+    border:1px solid var(--border); border-radius:8px; padding:8px 12px;
+    display:flex; align-items:center; gap:10px; font-size:12px;
+}
+.cfm .ca{
+    width:28px; height:28px; border-radius:50%; color:#fff; font-size:12px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative;
+}
+.cfm .cn{font-weight:700; font-size:13px;}
+.cfm .cr{color:var(--text-3); font-size:11px;}
+.cfm .cs{margin-left:auto; font-size:11px; font-weight:700; display:flex; align-items:center; gap:5px;}
+.cfm.ok{border-color:rgba(0,174,104,.4); background:var(--brand-light);}
+.cfm.ok .cs{color:var(--brand-dark);}
+.cfm.wait{background:#FFFBEB; border-color:rgba(245,158,11,.4);}
+.cfm.wait .cs{color:#92400E;}
+.cfm.wait .cs .pulse{width:6px; height:6px; border-radius:50%; background:var(--warning); animation:pw 1.6s infinite;}
+
+.d-actions{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 14px; border-top:1px solid var(--border);
+    background:var(--surface-2); border-radius:0 0 8px 8px;
+}
+.btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    height:34px; padding:0 18px; border-radius:6px;
+    font-size:13px; font-weight:600; font-family:inherit;
+    cursor:pointer; border:1px solid transparent;
+}
+.btn.primary{background:var(--brand); color:#fff;}
+.btn.primary:hover{background:var(--brand-dark);}
+.btn.default{background:var(--surface); border-color:var(--border); color:var(--text);}
+.btn.default:hover{background:var(--surface-3);}
+.d-actions .d-note{margin-left:auto; font-size:12px; color:var(--text-3); text-align:right; line-height:1.5;}
+
+/* 人类回复 */
+.reply-bar{
+    margin:6px 0 0; max-width:660px;
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--text-2);
+    border-left:3px solid var(--border); padding:4px 10px;
+    background:var(--surface-2); border-radius:0 6px 6px 0;
+}
+.confirm-stamp{
+    display:inline-flex; align-items:center; gap:5px; margin-top:6px;
+    font-size:11px; font-weight:700; color:var(--brand-dark);
+    background:var(--brand-light); border:1px solid rgba(0,174,104,.35);
+    border-radius:10px; padding:2px 9px;
+}
+
+/* 右侧面板 */
+.rpanel{
+    width:288px; flex-shrink:0;
+    border-left:1px solid var(--border); background:var(--surface);
+    display:flex; flex-direction:column; min-height:0;
+}
+.rp-head{
+    padding:12px 16px; border-bottom:1px solid var(--border);
+    font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px;
+}
+.rp-head .rp-sub{font-size:11px; color:var(--text-3); font-weight:400;}
+.rp-scroll{flex:1; overflow-y:auto; padding:12px 16px;}
+.rp-sec{font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--text-3); text-transform:uppercase; margin:14px 0 8px;}
+.rp-sec:first-child{margin-top:0;}
+.ctx-card{
+    border:1px solid var(--border); border-radius:8px; padding:10px 12px;
+    background:var(--surface-2); font-size:12px; line-height:1.6; color:var(--text-2);
+    margin-bottom:8px;
+}
+.ctx-card b{color:var(--text);}
+.ctx-card .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px;}
+.rule-line{display:flex; gap:8px; font-size:12px; color:var(--text-2); padding:5px 0; line-height:1.55;}
+.rule-line .rn{
+    width:16px; height:16px; border-radius:50%; background:var(--surface-3); color:var(--text-2);
+    font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    margin-top:1px;
+}
+.thread-item{
+    display:flex; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px;
+}
+.thread-item:last-child{border-bottom:none;}
+.thread-item .ta{
+    width:22px; height:22px; border-radius:50%; color:#fff; font-size:10px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.thread-item .tt{color:var(--text); line-height:1.5;}
+.thread-item .tm{color:var(--text-3); font-size:11px; margin-top:1px;}
+.wait-line{
+    margin:12px 16px 16px; padding:10px 12px;
+    border:1px dashed rgba(245,158,11,.5); background:#FFFBEB;
+    border-radius:8px; font-size:12px; color:#92400E; line-height:1.6;
+}
+
+.composer{flex-shrink:0; padding:10px 20px 16px;}
+.composer .box{
+    border:1px solid var(--border); border-radius:8px; background:var(--surface);
+    padding:10px 12px; color:var(--text-3); font-size:13px;
+    display:flex; align-items:center; gap:10px;
+}
+.composer .plus{
+    width:22px;height:22px;border-radius:50%;border:1px solid var(--border);color:var(--text-2);
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.composer .tools{margin-left:auto; display:flex; gap:10px; color:var(--text-3);}
+
+.next-scene{
+    flex-shrink:0; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:10px 20px; border-top:1px solid var(--border); background:var(--surface-2);
+    font-size:12px; color:var(--text-2);
+}
+.next-scene a{
+    font-size:12px; font-weight:600; color:var(--brand-dark); text-decoration:none;
+    border:1px solid rgba(0,174,104,.35); background:var(--brand-light);
+    border-radius:6px; padding:5px 12px;
+}
+.next-scene a:hover{background:#D8F0E4;}
+</style>
+</head>
+<body>
+<div class="app">
+
+    <div class="appbar">
+        <div class="logo">W</div>
+        <span class="app-name">WeLink</span>
+        <span class="crumb">Mattermost · 龙冈产业互联组织</span>
+        <a class="backlink" href="overview.html">&#8249; 原型总览</a>
+    </div>
+
+    <div class="appbody">
+
+        <!-- 主聊天区 -->
+        <main class="chat">
+            <div class="ch-head">
+                <div>
+                    <div class="ch-title"><span class="lock">&#128274;</span> deal-iot-sensors-1000</div>
+                    <div class="ch-topic">私密撮合频道 · HITL 节点 · 双人确认制</div>
+                </div>
+                <div class="ch-right">
+                    <span class="run-chip">Playbook Run #56</span>
+                    <div class="av-stack">
+                        <span class="a" style="background:var(--c-sup)">供</span>
+                        <span class="a" style="background:var(--c-dem)">采</span>
+                        <span class="a" style="background:#111827">陈</span>
+                        <span class="a" style="background:#6B7280">王</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ch-scroll">
+
+                <!-- 智联小供：HITL 决策卡 -->
+                <div class="msg">
+                    <div class="avatar" style="background:var(--c-sup)">供<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head">
+                            <span class="m-name">智联小供</span><span class="bot-tag">BOT</span>
+                            <span class="org-tag">智联传感科技有限公司</span><span class="m-time">10:26</span>
+                        </div>
+                        <div class="m-text">合作方案 v1 已经双方 agent 交叉校验通过。按规则，成单前需双方人类成员确认——<span class="mention">@王科长</span> <span class="mention">@陈总</span> 请审阅。</div>
+
+                        <div class="decision">
+                            <div class="d-head">
+                                <span class="d-chip">成单确认</span> 合作方案 v1 · 工业物联网传感器 1,000 套
+                                <span class="d-status"><span class="pulse"></span>1/2 已确认 · 等待 @陈总</span>
+                            </div>
+                            <div class="d-body">
+                                <div class="d-kv"><span class="k">标的</span><span class="v">ZL-S800 工业物联网传感器 <b>1,000 套</b>（LoRa/NB-IoT · IP65）</span></div>
+                                <div class="d-kv"><span class="k">金额</span><span class="v"><b><code>¥420,000</code></b>（含税 · 单价 ¥420/套）</span></div>
+                                <div class="d-kv"><span class="k">交付</span><span class="v">分两批 500/500 · 签约后第 15 / 30 天</span></div>
+                                <div class="d-kv"><span class="k">付款</span><span class="v">30% 预付 + 70% 验收合格后 15 日内 · 增值税专票</span></div>
+                                <div class="d-kv"><span class="k">质保违约</span><span class="v">3 年整机质保 · 延期按 0.5‰/日 赔付</span></div>
+                                <div class="d-kv"><span class="k">确认后</span><span class="v">自动生成订单 <code>ORD-2026-0818-001</code>，写入 Teable「合作订单」表，并通知频道全员。</span></div>
+
+                                <div class="confirm-grid">
+                                    <div class="cfm ok">
+                                        <span class="ca" style="background:#6B7280">王</span>
+                                        <div><div class="cn">王科长</div><div class="cr">工信局采购办负责人</div></div>
+                                        <span class="cs">&#10003; 已确认 · 10:32</span>
+                                    </div>
+                                    <div class="cfm wait">
+                                        <span class="ca" style="background:#111827">陈</span>
+                                        <div><div class="cn">陈总</div><div class="cr">智联传感 · 销售总监</div></div>
+                                        <span class="cs"><span class="pulse"></span>等待确认</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-actions">
+                                <button class="btn primary" type="button">&#10003; 确认通过</button>
+                                <button class="btn default" type="button">需要修改</button>
+                                <span class="d-note">仅 <span class="mention">@王科长</span> <span class="mention">@陈总</span> 本人可操作 · agent 无权代点<br>30 分钟未响应将私信提醒 · 24 小时升级备份联系人</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 王科长：确认回复 -->
+                <div class="msg">
+                    <div class="avatar" style="background:#6B7280">王<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head"><span class="m-name">王科长</span><span class="org-tag">龙冈市工业和信息化局</span><span class="m-time">10:32</span></div>
+                        <div class="reply-bar">回复 智联小供：成单确认 · 合作方案 v1</div>
+                        <div class="m-text">确认通过。方案与局里财务制度和项目排期一致，请按计划推进。</div>
+                        <div class="m-sub"><span class="confirm-stamp">&#10003; 已电子留痕 · 确认人 王科长 · 10:32</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="composer">
+                <div class="box">
+                    <span class="plus">＋</span>
+                    发送消息到私密频道（仅 4 名成员可见）…
+                    <span class="tools"><span>@</span><span>&#128522;</span><span>&#128206;</span></span>
+                </div>
+            </div>
+
+            <div class="next-scene">
+                <span>演示继续：陈总点击「确认通过」，进度达到 2/2，系统自动生成订单并同步 Teable。</span>
+                <a href="order-generated.html">下一幕 · 成单与 Teable 同步 &#8594;</a>
+            </div>
+        </main>
+
+        <!-- 右侧面板 -->
+        <aside class="rpanel">
+            <div class="rp-head">HITL 确认规则 <span class="rp-sub">不可跳过的硬规则</span></div>
+            <div class="rp-scroll">
+                <div class="rp-sec">双人确认制</div>
+                <div class="rule-line"><span class="rn">1</span><span>方案卡必须同时 mention 双方人类成员，缺一不进入确认态。</span></div>
+                <div class="rule-line"><span class="rn">2</span><span>双方都点「确认通过」才允许生成订单；agent 不得代点。</span></div>
+                <div class="rule-line"><span class="rn">3</span><span>任一方点「需要修改」即附意见回退，agent 修订为 v2 后重新确认。</span></div>
+
+                <div class="rp-sec">超时兜底</div>
+                <div class="ctx-card">
+                    <b>T+30min</b> · 私信提醒未确认人<br>
+                    <b>T+24h</b> · 升级至该企业备份联系人<br>
+                    <b>T+7d</b> · 撮合自动过期，频道归档并通知双方
+                </div>
+
+                <div class="rp-sec">当前确认状态</div>
+                <div class="thread-item"><span class="ta" style="background:#6B7280">王</span><div><div class="tt">王科长 · 确认通过</div><div class="tm">10:32 · 电子留痕</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:#111827">陈</span><div><div class="tt">陈总 · 等待确认</div><div class="tm">已 mention · 已送达 App 推送</div></div></div>
+
+                <div class="rp-sec">方案溯源</div>
+                <div class="ctx-card">
+                    方案 <b>v1</b> · 智联小供起草 10:19<br>
+                    工信小采交叉校验通过 10:21<br>
+                    关联话题 <span class="mono">POST-20260818-004</span>
+                </div>
+            </div>
+            <div class="wait-line">
+                <b>HITL 等待中</b><br>
+                已 mention <b>@陈总</b>（在线）；若 30 分钟内未响应，将自动发送私信 + Webhook 兜底通知。
+            </div>
+        </aside>
+
+    </div>
+</div>
+</body>
+</html>

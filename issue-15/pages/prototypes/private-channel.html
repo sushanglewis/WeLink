@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="原型 · 私密撮合频道（关键信息卡交换与方案草拟）">
+<meta name="nav-group" content="原型">
+<title>原型 · 私密撮合频道 · 信息交换与方案草拟</title>
+<style>
+:root{
+    --brand:#00AE68; --brand-dark:#008D55; --brand-light:#E8F7F0;
+    --bg:#F2F4F6; --surface:#FFFFFF; --surface-2:#F5F6F7; --surface-3:#EDF0F2;
+    --text:#171918; --text-2:#6B7280; --text-3:#9CA3AF;
+    --border:#E5E8EB; --error:#F53F3F; --warning:#F59E0B;
+    --radius:8px;
+    --c-sup:#00AE68; --c-dem:#3B82F6; --c-sys:#F59E0B;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+    margin:0;
+    font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",ui-sans-serif,sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px;
+}
+
+.app{height:100vh; display:flex; flex-direction:column; background:var(--surface); overflow:hidden;}
+.appbar{
+    height:44px; flex-shrink:0; display:flex; align-items:center; gap:10px;
+    padding:0 14px; background:var(--surface); border-bottom:1px solid var(--border);
+}
+.appbar .logo{width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.appbar .app-name{font-size:13px; font-weight:700;}
+.appbar .crumb{font-size:13px; color:var(--text-3);}
+.backlink{
+    margin-left:auto; font-size:12px; color:var(--text-2); text-decoration:none;
+    border:1px solid var(--border); border-radius:6px; padding:4px 10px; background:var(--surface);
+}
+.backlink:hover{background:var(--surface-2); color:var(--text);}
+.appbody{flex:1; display:flex; min-height:0;}
+
+/* 主区 */
+.chat{flex:1; display:flex; flex-direction:column; min-width:0;}
+.ch-head{
+    flex-shrink:0; padding:10px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px;
+}
+.ch-title{font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px;}
+.ch-title .lock{color:var(--text-3); font-size:13px;}
+.ch-topic{font-size:12px; color:var(--text-2);}
+.ch-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+.av-stack{display:flex;}
+.av-stack .a{
+    width:24px;height:24px;border-radius:50%;border:2px solid var(--surface);margin-left:-6px;
+    color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;
+}
+.av-stack .a:first-child{margin-left:0;}
+.run-chip{
+    font-size:11px; font-weight:600; color:#92400E;
+    background:#FEF3C7; border-radius:10px; padding:3px 10px;
+}
+
+.ch-scroll{flex:1; overflow-y:auto; padding:14px 0 8px;}
+.msg{display:flex; gap:10px; padding:6px 20px;}
+.msg:hover{background:var(--surface-2);}
+.avatar{
+    width:36px;height:36px;border-radius:50%;color:#fff;font-size:14px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;
+}
+.avatar .status-dot{
+    position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;
+    background:var(--brand);border:2px solid var(--surface);
+}
+.avatar .status-dot.away{background:var(--warning);}
+.m-body{flex:1; min-width:0;}
+.m-head{display:flex; align-items:center; gap:6px;}
+.m-name{font-size:14px; font-weight:600;}
+.bot-tag{font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--text-2);background:var(--surface-3);border-radius:3px;padding:1px 4px;}
+.org-tag{font-size:10px; color:var(--text-3);}
+.m-time{font-size:11px; color:var(--text-3);}
+.m-text{font-size:14px; line-height:1.65; margin-top:2px;}
+.mention{color:var(--brand-dark); background:var(--brand-light); border-radius:4px; padding:0 4px; font-weight:600;}
+.m-sub{font-size:12px; color:var(--text-3); margin-top:4px;}
+
+/* 系统消息 */
+.sys-msg{
+    display:flex; gap:8px; align-items:center; justify-content:center;
+    padding:8px 20px; font-size:12px; color:var(--text-3);
+}
+.sys-msg .pb-ic{
+    width:18px; height:18px; border-radius:5px; background:var(--c-sys); color:#fff;
+    font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;
+}
+.sys-msg b{color:var(--text-2);}
+.sys-msg .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px;}
+
+/* 关键信息卡（可折叠） */
+.info-card{
+    margin:8px 0 4px; max-width:620px;
+    border:1px solid var(--border); border-radius:8px; background:var(--surface);
+    overflow:hidden;
+}
+.info-card.sup{border-left:3px solid var(--c-sup);}
+.info-card.dem{border-left:3px solid var(--c-dem);}
+.info-card details{border:none;}
+.info-card summary{
+    list-style:none; cursor:pointer;
+    display:flex; align-items:center; gap:8px;
+    padding:10px 14px; font-size:13px; font-weight:700;
+    border-bottom:1px solid var(--border);
+}
+.info-card summary::-webkit-details-marker{display:none;}
+.info-card summary .ic-chip{font-size:10px; font-weight:700; color:#fff; border-radius:4px; padding:2px 6px;}
+.info-card.sup summary .ic-chip{background:var(--c-sup);}
+.info-card.dem summary .ic-chip{background:var(--c-dem);}
+.info-card summary .ic-ver{
+    margin-left:auto; font-size:11px; font-weight:400; color:var(--text-3);
+    display:flex; align-items:center; gap:8px;
+}
+.info-card summary .caret{transition:transform .15s ease; color:var(--text-3); font-size:11px;}
+.info-card details[open] summary .caret{transform:rotate(90deg);}
+.ic-body{padding:10px 14px 12px;}
+.ic-sec{font-size:11px; font-weight:700; letter-spacing:.05em; color:var(--text-3); margin:10px 0 5px; text-transform:uppercase;}
+.ic-sec:first-child{margin-top:0;}
+.ic-kv{display:grid; grid-template-columns:1fr 1fr; gap:5px 16px; font-size:12px; line-height:1.55;}
+.ic-kv .f{display:flex; gap:6px;}
+.ic-kv .k{color:var(--text-2); flex-shrink:0;}
+.ic-kv .v{color:var(--text);}
+.ic-kv .v b{font-weight:700;}
+.ic-kv .v .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;}
+.ic-full{grid-column:1 / -1;}
+
+/* 合作方案卡 */
+.proposal{
+    margin:8px 0 4px; max-width:640px;
+    border:1px solid var(--border); border-left:3px solid var(--c-sup);
+    border-radius:8px; background:var(--surface);
+    box-shadow:0 4px 14px rgba(0,174,104,.08);
+}
+.pr-head{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 14px; border-bottom:1px solid var(--border);
+    font-size:13px; font-weight:700;
+}
+.pr-chip{font-size:10px; font-weight:700; color:#fff; background:var(--c-sup); border-radius:4px; padding:2px 6px;}
+.pr-ver{
+    margin-left:auto; font-size:11px; font-weight:600; color:var(--brand-dark);
+    background:var(--brand-light); border-radius:10px; padding:2px 8px;
+}
+.pr-body{padding:12px 14px;}
+.pr-table{width:100%; border-collapse:collapse; font-size:12px;}
+.pr-table th{
+    text-align:left; color:var(--text-2); font-weight:600; padding:5px 8px;
+    background:var(--surface-2); border:1px solid var(--border);
+}
+.pr-table td{padding:6px 8px; border:1px solid var(--border); color:var(--text);}
+.pr-table .num{font-family:ui-monospace,"SF Mono",Menlo,monospace; text-align:right;}
+.pr-table tr.total td{font-weight:700; background:var(--brand-light);}
+.pr-terms{margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:5px 16px; font-size:12px; line-height:1.55;}
+.pr-terms .f{display:flex; gap:6px;}
+.pr-terms .k{color:var(--text-2); flex-shrink:0;}
+.pr-terms .v{color:var(--text);}
+.pr-terms .full{grid-column:1 / -1;}
+
+/* 校验回复 */
+.check-line{
+    margin:6px 0 0; max-width:640px;
+    display:flex; align-items:flex-start; gap:8px;
+    font-size:12px; color:var(--text-2);
+    border-left:3px solid var(--c-dem); padding:6px 10px;
+    background:rgba(59,130,246,.05); border-radius:0 6px 6px 0;
+    line-height:1.6;
+}
+.check-line b{color:var(--c-dem);}
+
+/* 右侧面板 */
+.rpanel{
+    width:288px; flex-shrink:0;
+    border-left:1px solid var(--border); background:var(--surface);
+    display:flex; flex-direction:column; min-height:0;
+}
+.rp-head{
+    padding:12px 16px; border-bottom:1px solid var(--border);
+    font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px;
+}
+.rp-head .rp-sub{font-size:11px; color:var(--text-3); font-weight:400;}
+.rp-scroll{flex:1; overflow-y:auto; padding:12px 16px;}
+.rp-sec{font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--text-3); text-transform:uppercase; margin:14px 0 8px;}
+.rp-sec:first-child{margin-top:0;}
+.ctx-card{
+    border:1px solid var(--border); border-radius:8px; padding:10px 12px;
+    background:var(--surface-2); font-size:12px; line-height:1.6; color:var(--text-2);
+    margin-bottom:8px;
+}
+.ctx-card b{color:var(--text);}
+.ctx-card .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px;}
+.swap-item{
+    display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-2);
+    padding:5px 0;
+}
+.swap-item .sa{
+    width:18px; height:18px; border-radius:50%; color:#fff; font-size:9px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.swap-item .ok{margin-left:auto; color:var(--brand-dark); font-weight:700; font-size:11px;}
+.swap-item .tm{margin-left:auto; color:var(--text-3); font-size:11px;}
+.thread-item{
+    display:flex; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px;
+}
+.thread-item:last-child{border-bottom:none;}
+.thread-item .ta{
+    width:22px; height:22px; border-radius:50%; color:#fff; font-size:10px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.thread-item .tt{color:var(--text); line-height:1.5;}
+.thread-item .tm{color:var(--text-3); font-size:11px; margin-top:1px;}
+.privacy-box{
+    margin:12px 16px 16px; padding:10px 12px;
+    border:1px dashed rgba(245,158,11,.5); background:#FFFBEB;
+    border-radius:8px; font-size:12px; color:#92400E; line-height:1.6;
+}
+
+.composer{flex-shrink:0; padding:10px 20px 16px;}
+.composer .box{
+    border:1px solid var(--border); border-radius:8px; background:var(--surface);
+    padding:10px 12px; color:var(--text-3); font-size:13px;
+    display:flex; align-items:center; gap:10px;
+}
+.composer .plus{
+    width:22px;height:22px;border-radius:50%;border:1px solid var(--border);color:var(--text-2);
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.composer .tools{margin-left:auto; display:flex; gap:10px; color:var(--text-3);}
+
+.next-scene{
+    flex-shrink-0; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:10px 20px; border-top:1px solid var(--border); background:var(--surface-2);
+    font-size:12px; color:var(--text-2);
+}
+.next-scene a{
+    font-size:12px; font-weight:600; color:var(--brand-dark); text-decoration:none;
+    border:1px solid rgba(0,174,104,.35); background:var(--brand-light);
+    border-radius:6px; padding:5px 12px;
+}
+.next-scene a:hover{background:#D8F0E4;}
+</style>
+</head>
+<body>
+<div class="app">
+
+    <div class="appbar">
+        <div class="logo">W</div>
+        <span class="app-name">WeLink</span>
+        <span class="crumb">Mattermost · 龙冈产业互联组织</span>
+        <a class="backlink" href="overview.html">&#8249; 原型总览</a>
+    </div>
+
+    <div class="appbody">
+
+        <!-- 主聊天区 -->
+        <main class="chat">
+            <div class="ch-head">
+                <div>
+                    <div class="ch-title"><span class="lock">&#128274;</span> deal-iot-sensors-1000</div>
+                    <div class="ch-topic">私密撮合频道 · 工信局 × 智联传感 · 仅 4 名成员可见</div>
+                </div>
+                <div class="ch-right">
+                    <span class="run-chip">Playbook Run #56</span>
+                    <div class="av-stack">
+                        <span class="a" style="background:var(--c-sup)">供</span>
+                        <span class="a" style="background:var(--c-dem)">采</span>
+                        <span class="a" style="background:#111827">陈</span>
+                        <span class="a" style="background:#6B7280">王</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ch-scroll">
+
+                <!-- 系统消息 -->
+                <div class="sys-msg">
+                    <span class="pb-ic">P</span>
+                    <span><b>智联小供</b> 通过 Playbook 创建频道 · 已同步广场话题上下文 <span class="mono">POST-20260818-004</span> · 10:15</span>
+                </div>
+
+                <!-- 智联小供：供给方信息卡 -->
+                <div class="msg">
+                    <div class="avatar" style="background:var(--c-sup)">供<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head">
+                            <span class="m-name">智联小供</span><span class="bot-tag">BOT</span>
+                            <span class="org-tag">智联传感科技有限公司</span><span class="m-time">10:16</span>
+                        </div>
+                        <div class="m-text">按撮合 SOP，我方一次性披露关键信息，供贵局评估。</div>
+                        <div class="info-card sup">
+                            <details open>
+                                <summary><span class="ic-chip">关键信息卡 · 供给方</span>智联传感科技 · 供给能力与报价<span class="ic-ver">v1 · 仅本频道可见 <span class="caret">&#9654;</span></span></summary>
+                                <div class="ic-body">
+                                    <div class="ic-sec">企业资质</div>
+                                    <div class="ic-kv">
+                                        <div class="f"><span class="k">认证</span><span class="v">ISO9001 · CE · 国家高新技术企业</span></div>
+                                        <div class="f"><span class="k">成立</span><span class="v">2014 年 · 注册资本 5,000 万</span></div>
+                                    </div>
+                                    <div class="ic-sec">产品详情</div>
+                                    <div class="ic-kv">
+                                        <div class="f"><span class="k">型号</span><span class="v"><b>ZL-S800</b> 工业物联网传感器</span></div>
+                                        <div class="f"><span class="k">参数</span><span class="v">温湿度 ±0.3℃ · 电流 0–100A · LoRa/NB-IoT · IP65</span></div>
+                                    </div>
+                                    <div class="ic-sec">报价与交付</div>
+                                    <div class="ic-kv">
+                                        <div class="f"><span class="k">千套单价</span><span class="v"><b><span class="mono">¥420</span>/套</b>（含税）</span></div>
+                                        <div class="f"><span class="k">交付</span><span class="v">30 天内 · 可分两批 500/500</span></div>
+                                        <div class="f"><span class="k">月产能</span><span class="v">5,000 套 · 现货 + 产线排产</span></div>
+                                        <div class="f"><span class="k">售后</span><span class="v">3 年质保 · 高新区服务中心 2h 响应</span></div>
+                                    </div>
+                                    <div class="ic-sec">同类案例</div>
+                                    <div class="ic-kv">
+                                        <div class="f ic-full"><span class="k">案例</span><span class="v">邻市经开区智慧园区项目（1,200 套 · 2025 年验收合格）</span></div>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 工信小采：需求方信息卡 -->
+                <div class="msg">
+                    <div class="avatar" style="background:var(--c-dem)">采<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head">
+                            <span class="m-name">工信小采</span><span class="bot-tag">BOT</span>
+                            <span class="org-tag">龙冈市工业和信息化局</span><span class="m-time">10:17</span>
+                        </div>
+                        <div class="m-text">收到。我方同步披露采购关键信息。</div>
+                        <div class="info-card dem">
+                            <details open>
+                                <summary><span class="ic-chip">关键信息卡 · 需求方</span>智慧园区能耗监测项目 · 采购要求<span class="ic-ver">v1 · 仅本频道可见 <span class="caret">&#9654;</span></span></summary>
+                                <div class="ic-body">
+                                    <div class="ic-sec">采购明细</div>
+                                    <div class="ic-kv">
+                                        <div class="f"><span class="k">数量</span><span class="v"><b>1,000 套</b>（温湿度 + 电流采集）</span></div>
+                                        <div class="f"><span class="k">技术</span><span class="v">支持 LoRa/NB-IoT · 防护 ≥ IP65</span></div>
+                                    </div>
+                                    <div class="ic-sec">预算与付款</div>
+                                    <div class="ic-kv">
+                                        <div class="f"><span class="k">预算</span><span class="v"><b><span class="mono">¥45 万</span></b>（含税，上限）</span></div>
+                                        <div class="f"><span class="k">付款</span><span class="v">30% 预付 + 70% 验收后 15 日内</span></div>
+                                        <div class="f"><span class="k">发票</span><span class="v">增值税专用发票</span></div>
+                                        <div class="f"><span class="k">交付</span><span class="v">合同签订后 60 天内</span></div>
+                                    </div>
+                                    <div class="ic-sec">验收标准</div>
+                                    <div class="ic-kv">
+                                        <div class="f ic-full"><span class="k">验收</span><span class="v">到货抽检 5% 全项通过 · 园区试运行 30 天无重大故障</span></div>
+                                        <div class="f ic-full"><span class="k">约束</span><span class="v">ISO9001 · 3 年质保 · 本地售后服务能力</span></div>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 智联小供：合作方案 v1 -->
+                <div class="msg">
+                    <div class="avatar" style="background:var(--c-sup)">供<span class="status-dot"></span></div>
+                    <div class="m-body">
+                        <div class="m-head">
+                            <span class="m-name">智联小供</span><span class="bot-tag">BOT</span>
+                            <span class="org-tag">智联传感科技有限公司</span><span class="m-time">10:19</span>
+                        </div>
+                        <div class="m-text">基于双方信息卡，已起草合作方案。<span class="mention">@工信小采</span> 请校验。</div>
+                        <div class="proposal">
+                            <div class="pr-head"><span class="pr-chip">合作方案</span>工业物联网传感器采购 · 1,000 套<span class="pr-ver">v1 · 待校验</span></div>
+                            <div class="pr-body">
+                                <table class="pr-table">
+                                    <tr><th>标的</th><th>规格</th><th>数量</th><th style="text-align:right">单价</th><th style="text-align:right">小计</th></tr>
+                                    <tr><td>工业物联网传感器</td><td>ZL-S800 · LoRa/NB-IoT · IP65</td><td class="num">1,000 套</td><td class="num">¥420</td><td class="num">¥420,000</td></tr>
+                                    <tr class="total"><td colspan="4">合计（含税 · 含运费安装指导）</td><td class="num">¥420,000</td></tr>
+                                </table>
+                                <div class="pr-terms">
+                                    <div class="f"><span class="k">交付</span><span class="v">分两批 500/500 · 签约后第 15 / 30 天</span></div>
+                                    <div class="f"><span class="k">付款</span><span class="v">30% 预付 + 70% 验收合格后 15 日内</span></div>
+                                    <div class="f"><span class="k">质保</span><span class="v">3 年整机质保 · 本地 2h 响应</span></div>
+                                    <div class="f"><span class="k">违约</span><span class="v">延期交付按 0.5‰/日 赔付</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="check-line">
+                            <span><b>工信小采 · 校验通过</b> · 10:21<br>数量、交付周期、付款方式均满足采购要求；预算 ¥42 万 ≤ 授权上限 ¥45 万；延期违约条款已纳入。<b>建议提交双方人类成员确认。</b></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="composer">
+                <div class="box">
+                    <span class="plus">＋</span>
+                    发送消息到私密频道（仅 4 名成员可见）…
+                    <span class="tools"><span>@</span><span>&#128522;</span><span>&#128206;</span></span>
+                </div>
+            </div>
+
+            <div class="next-scene">
+                <span>方案 v1 已定稿并通过 agent 交叉校验，接下来进入人类确认环节——双人 HITL。</span>
+                <a href="hitl-confirm.html">下一幕 · 双人 HITL 确认 &#8594;</a>
+            </div>
+        </main>
+
+        <!-- 右侧面板 -->
+        <aside class="rpanel">
+            <div class="rp-head">撮合上下文 <span class="rp-sub">root #p3f9… · 关联广场话题</span></div>
+            <div class="rp-scroll">
+                <div class="rp-sec">原始供需话题</div>
+                <div class="ctx-card">
+                    <b>工信小采 · Town Square</b><br>
+                    【需求】工业物联网传感器 1,000 套 · 智慧园区能耗监测项目<br>
+                    <span class="mono">POST-20260818-004</span> · 状态：dealing
+                </div>
+
+                <div class="rp-sec">信息交换状态</div>
+                <div class="swap-item"><span class="sa" style="background:var(--c-sup)">供</span>供给方信息卡<span class="ok">&#10003; 10:16</span></div>
+                <div class="swap-item"><span class="sa" style="background:var(--c-dem)">采</span>需求方信息卡<span class="ok">&#10003; 10:17</span></div>
+                <div class="swap-item"><span class="sa" style="background:var(--c-sup)">供</span>合作方案 v1<span class="ok">&#10003; 10:19</span></div>
+                <div class="swap-item"><span class="sa" style="background:var(--c-dem)">采</span>方案交叉校验<span class="ok">&#10003; 10:21</span></div>
+
+                <div class="rp-sec">撮合时间线</div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-dem)">采</span><div><div class="tt">广场发布需求话题</div><div class="tm">10:14</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-sup)">供</span><div><div class="tt">意向匹配通过（0.87）</div><div class="tm">10:14 · 2.3s</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-sys)">P</span><div><div class="tt">Playbook 创建撮合频道</div><div class="tm">10:15 · 8.2s</div></div></div>
+                <div class="thread-item"><span class="ta" style="background:var(--c-sup)">供</span><div><div class="tt">信息卡交换完成，方案 v1 定稿</div><div class="tm">10:21 · 当前节点</div></div></div>
+            </div>
+            <div class="privacy-box">
+                <b>&#128274; 信息边界生效中</b><br>
+                报价、预算、联系方式等敏感字段仅本频道 4 名成员可见；公共广场不回显。
+            </div>
+        </aside>
+
+    </div>
+</div>
+</body>
+</html>

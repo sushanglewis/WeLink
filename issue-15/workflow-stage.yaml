@@ -6,10 +6,10 @@ workflow:
 current_run:
   run_id: 20260818063627-cea89e6a
   branch: issue-15
-  current_stage: ingest
+  current_stage: product-design-docs
   status: in_progress
   started_at: '2026-08-18T06:36:28Z'
-  last_updated_at: '2026-08-18T06:36:28Z'
+  last_updated_at: '2026-08-18T07:19:04Z'
   issue_number: '15'
   variables:
     process_slug: issue-15
@@ -23,23 +23,97 @@ current_run:
   pr_number: ''
   feature_slug: ''
   execution_mode: team
-artifact_guidance: "This issue work package holds all artifacts produced while resolving\
-  \ the issue.\n\nHow to use templates:\n- Document templates live read-only under\
-  \ `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
-  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format\
-  \ reference and author the\n  document directly in the appropriate package directory,\
-  \ replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
-  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n\
-  \  `interviews/` for recorded session outputs, `openspec/` for implementation proposals,\n\
-  \  `docs/` for research and decision records, and `recordings/` for raw input files\
-  \ only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage>\
-  \ --action record-artifacts`\n  to persist produced artifact paths back into this\
-  \ workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
-  \ in the package root. Read that\n  index first to learn which documents exist and\
-  \ their approval status.\n\nApproval convention:\n- Add `<!-- status: approved -->`\
-  \ or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before\
-  \ handoff.\n"
-nodes: []
+  previous_stage: ingest
+artifact_guidance: "This issue work package holds all artifacts produced while resolving the issue.\n\nHow to use templates:\n\
+  - Document templates live read-only under `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
+  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format reference and author the\n  document\
+  \ directly in the appropriate package directory, replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
+  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n  `interviews/` for recorded session outputs,\
+  \ `openspec/` for implementation proposals,\n  `docs/` for research and decision records, and `recordings/` for raw input\
+  \ files only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage> --action record-artifacts`\n  to persist\
+  \ produced artifact paths back into this workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
+  \ in the package root. Read that\n  index first to learn which documents exist and their approval status.\n\nApproval convention:\n\
+  - Add `<!-- status: approved -->` or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before handoff.\n"
+nodes:
+- stage_id: workflow-router
+  node_id: workflow-router-2026-08-18
+  status: completed
+  started_at: '2026-08-18T06:38:57Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts: []
+  handoff_file: null
+- stage_id: ingest
+  node_id: ingest-2026-08-18T06:39:03Z
+  status: in_progress
+  started_at: '2026-08-18T06:39:03Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - issue-15/interviews/2026-08-18-issue-15/metadata.json
+  - issue-15/interviews/2026-08-18-issue-15/raw-insights.md
+  - issue-15/interviews/2026-08-18-issue-15/summary.md
+  - issue-15/interviews/2026-08-18-issue-15/transcript.md
+  handoff_file: null
+- stage_id: ingest
+  node_id: ingest-completed
+  status: completed
+  started_at: '2026-08-18T06:39:08Z'
+  completed_at: '2026-08-18T06:39:08Z'
+  gate_passed: true
+  approved_by: system
+  artifacts:
+  - issue-15/interviews/2026-08-18-issue-15/metadata.json
+  - issue-15/interviews/2026-08-18-issue-15/transcript.md
+  - issue-15/interviews/2026-08-18-issue-15/summary.md
+  - issue-15/interviews/2026-08-18-issue-15/raw-insights.md
+  handoff_file: null
+- stage_id: clarify
+  node_id: clarify-2026-08-18T06:42:44Z
+  status: in_progress
+  started_at: '2026-08-18T06:42:44Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - issue-15/requirements/2026-08-18-issue-15/prd.md
+  - issue-15/requirements/2026-08-18-issue-15/requirements.md
+  - issue-15/requirements/2026-08-18-issue-15/user-stories.md
+  handoff_file: null
+- stage_id: clarify
+  node_id: clarify-questions-2026-08-18
+  status: in_progress
+  started_at: '2026-08-18T06:42:53Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - issue-15/requirements/2026-08-18-issue-15/clarification-questions.md
+  handoff_file: null
+- stage_id: product-design-docs
+  node_id: product-design-docs-prototypes-2026-08-18
+  status: in_progress
+  started_at: '2026-08-18T07:19:04Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - issue-15/designs/issue-15/agent-exchange-plaza-outline.md
+  - issue-15/designs/issue-15/demo-script.md
+  - issue-15/pages/prototypes/overview.html
+  - issue-15/pages/prototypes/town-square.html
+  - issue-15/pages/prototypes/match-intent.html
+  - issue-15/pages/prototypes/group-creation.html
+  - issue-15/pages/prototypes/private-channel.html
+  - issue-15/pages/prototypes/hitl-confirm.html
+  - issue-15/pages/prototypes/order-generated.html
+  - issue-15/index.html
+  - issue-15/assets/js/package-data.js
+  - issue-15/assets/style.css
+  - issue-15/assets/app.js
+  handoff_file: null
 recovery:
   last_validated_checkpoint: ''
   can_resume_from: ingest
