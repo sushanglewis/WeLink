@@ -1,7 +1,7 @@
 process_slug: issue-15
 issue_number: '15'
 current_stage: product-design-docs
-last_updated: '2026-08-18T07:19:04Z'
+last_updated: '2026-08-18T07:36:26Z'
 documents:
 - path: assets/app.js
   stage: product-design-docs
@@ -28,6 +28,12 @@ documents:
   human_confirmed: false
   approved_by: null
 - path: designs/issue-15/demo-script.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: handoffs/lc-handoff-product-design-docs.md
   stage: product-design-docs
   status: in_progress
   gate_passed: false
