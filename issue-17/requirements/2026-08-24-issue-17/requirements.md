@@ -54,22 +54,23 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 ### 话题管理
 
 - 在聊天窗口侧边或顶部提供「话题列表」组件。
-- 每个话题 = 独立的消息窗口 + 独立上下文（可映射到 Mattermost thread 或 WeLink 后端独立表，待确认）。
+- 每个话题 = 一个 Mattermost thread = 独立的消息窗口 + 独立上下文。
 - 人和 agent 均可创建新话题；点击历史话题可继续对话。
 - 话题支持标题、创建时间、最后活跃时间、摘要。
 
 ### Clarify 工具
 
-- 当 agent 识别到需求模糊时，生成澄清问题列表。
-- 每个问题在聊天底部弹出选项卡：3 个推荐选项 + 1 个「自定义」输入框。
-- 用户选择/填写后，以 user message 形式发送给 agent，继续后续处理。
+- 当 agent 识别到需求模糊时，通过定制化开发的 Clarify agent 工具生成澄清问题列表。
+- agent 对该 thread 发起 Clarify 工具调用时，Mattermost 前端在该话题聊天窗口中弹出选项卡。
+- 每个问题提供 3 个推荐选项 + 1 个「自定义」输入框；用户选择/填写后，以 user message 形式发送给 agent。
 - Clarify 可单轮或多轮，直到需求明确。
 
 ### Plan 模式
 
 - 当任务较复杂时，agent 生成 Plan.md（markdown），包含背景、目标、步骤、依赖、验收标准、风险。
-- Plan.md 以消息卡片形式展示，附带「通过」「需要修改」按钮。
-- 用户点击「通过」后，agent 按 Plan 执行；点击「需要修改」或在输入框描述修改意见，agent 更新 Plan.md 并再次展示。
+- 前端以定制 Plan 消息卡片形式展示 Plan.md，附带「通过」「需要修改」按钮。
+- agent 后端将 Plan.md 存储在该 thread 对应的文件中，便于版本管理与审批历史追溯。
+- 用户点击「通过」后，通过 Mattermost 自定义 action / webhook / postMessage 回调 agent，agent 按 Plan 执行；点击「需要修改」或在输入框描述修改意见，agent 更新 Plan.md 文件并重新渲染卡片。
 - Plan 审批通过前，agent 不执行 Plan 中的具体动作（除澄清外）。
 
 ### 胶囊系统（ skills / MCP / 插件 / 多维表格 ）
@@ -80,6 +81,7 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 - **MCP 胶囊**：显示指定 MCP server 名称、可用工具数量、关键工具预览；点击后可将 MCP 工具集接入当前 agent 上下文。
 - **插件胶囊**：显示指定插件名称、版本、功能摘要；点击后激活插件能力。
 - **Teable 胶囊**：显示指定 teable 表格关键信息（base_id、table_id、view_id、表名、权限范围）；点击后 agent 可通过 teable skills 操作数据。
+- 四类胶囊采用统一的自定义 JSON schema，agent 解析后分发到 skill / MCP / 插件 / teable skills 调用。
 - 胶囊统一支持：消息中渲染为可点击/展开的卡片、携带元数据、可被 agent 解析、支持删除/替换。
 
 > 注：Teable 多维表格的集成与表单 iframe 能力已在 issue-6 实现，本次 #17 直接复用，不再重新评估 Teable 本身；重点是扩展胶囊类型到 skills、MCP、插件。
@@ -94,7 +96,8 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 
 - 为每个用户维护一个个人日程看板；看板通过 iframe 嵌入开源日历 UI。
 - Agent 在对话中识别待办事项后，调用日历后端创建事件（时间、标题、描述、参与人）。
-- 事件支持邀请其他成员；受邀人收到通知并可在自己的看板中看到事件。
+- 事件支持邀请其他成员；被邀请的成员均可在自己的日程看板中看到该事件。
+- 用户侧只关注个人日程，无需与 Outlook / Google 日历互通。
 - Agent 通过 token（app password / OAuth token）访问日历后端；操作封装为 CLI / MCP server / skill。
 - 日历后端候选：Nextcloud Calendar（AGPL-3.0，主选）、Stalwart（AGPL-3.0，备选）、Cal.com（需核实 2026 许可证变化）。
 
@@ -105,7 +108,7 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 - Teable 多维表格集成与表单 iframe 已在 issue-6 实现，本次仅扩展胶囊类型，不重新评估 Teable 本身。
 - 不要求日程后端支持移动端原生 SDK（Web/iframe 足够）。
 - 不实现通用 AI 工作台的代码编辑/终端等能力，聚焦对话协作场景。
-- 不替代企业现有 Outlook/Google 日历，但可考虑 CalDAV 互通。
+- 不替代企业现有 Outlook/Google 日历，本次也不与其互通。
 
 ## 验收标准
 
@@ -158,14 +161,14 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 - [ ] 日历后端满足 MIT / Apache-2.0 / AGPL 协议，并提供 CLI/API/MCP 供 agent 调用。
 - [ ] Agent 使用 token 访问日历后端，token 可独立签发和回收。
 
-## 开放问题
+## 已确认决策与待决策问题
 
-1. **话题持久化模型**：话题是映射到 Mattermost thread、Mattermost channel，还是 WeLink 后端独立表？
-2. **Plan.md 存储与审批回调**：Plan.md 存为消息卡片、Teable 记录还是文件？审批通过/修改的按钮如何回调 agent？
-3. **Clarify 宿主**：是否复用 issue-14 的 `clarification.html` 原型？问题选项数据结构如何与 OpenClaw runtime 交互？
-4. **胶囊元数据协议**：skills / MCP / 插件 / 多维表格四类胶囊的统一 schema 如何定义？agent 解析与调用协议如何设计？
-5. **日程范围**：仅个人日历，还是也包含团队共享日历？是否需要与 Outlook/Google 日历互通？
-6. **日程 OSS 最终选择**：主选 Nextcloud Calendar（AGPL-3.0，fit 5/5）还是 Stalwart（AGPL-3.0，JMAP，fit 4/5）？是否接受 AGPL 在 WeLink 私有部署场景下的合规成本？
+1. **话题持久化模型** ✅ 已确认：每个话题映射到一个 **Mattermost thread**。
+2. **Plan.md 存储与审批回调** ✅ 已确认：前端使用定制 Plan 消息卡片展示；agent 后端将 Plan.md 存储在该 thread 对应的文件中；审批按钮通过 Mattermost 自定义 action / webhook / postMessage 回调 agent。
+3. **Clarify 工具宿主** ✅ 已确认：定制化开发一个 Clarify agent 工具；agent 对该 thread 发起 Clarify 工具调用时，Mattermost 前端在该话题聊天窗口中弹出选项卡。
+4. **胶囊元数据协议** ✅ 已确认：采用统一的**自定义 JSON schema**，四类胶囊由 agent 解析后分发调用。
+5. **日程范围** ✅ 已确认：用户侧只关注**个人日程**；事件涉及多人时所有参与人均可见；**不与 Outlook / Google 日历互通**。
+6. **日程 OSS 最终选择** ⏳ 仍待决策：主选 **Nextcloud Calendar**（AGPL-3.0，fit 5/5）还是 **Stalwart**（AGPL-3.0，JMAP，fit 4/5）？是否接受 AGPL 在 WeLink 私有部署场景下的合规成本？
 
 ## 参考
 

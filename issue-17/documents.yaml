@@ -1,7 +1,7 @@
 process_slug: issue-17
 issue_number: '17'
 current_stage: clarify
-last_updated: '2026-08-24T11:45:53Z'
+last_updated: '2026-08-24T12:04:51Z'
 documents:
 - path: interviews/2026-08-24-issue-17/metadata.json
   stage: ingest
