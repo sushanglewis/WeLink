@@ -173,10 +173,10 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 3. **Clarify 工具宿主** ✅ 已确认：定制化开发一个 Clarify agent 工具；agent 对该 thread 发起 Clarify 工具调用时，Mattermost 前端在该话题聊天窗口中弹出选项卡。
 4. **胶囊元数据协议** ✅ 已确认：采用统一的**自定义 JSON schema**，四类胶囊由 agent 解析后分发调用。
 5. **日程范围** ✅ 已确认：用户侧只关注**个人日程**；事件涉及多人时所有参与人均可见；**不与 Outlook / Google 日历互通**。
-6. **日程 OSS 最终选择** ⏳ 仍待决策：日程需要同时具备**前后端**、对人/对 agent 都友好，且支持 **agent 作为组织成员独立管理日程并被事件触发**。在此约束下：
-   - **Nextcloud Calendar（AGPL-3.0，fit 5/5）**：自带完整前后端与成熟日历 UI，CalDAV + 现成 MCP，最贴合「人+agent 共用」场景，**建议作为主选**。
-   - **Stalwart（AGPL-3.0，fit 4/5）**：后端 JMAP 对 agent 最友好，但缺少日历 UI，需自研看板。
-   - 是否接受 AGPL-3.0 在 WeLink 私有部署场景下的合规成本？若不接受，需转向 MIT 自建路径（sabre/dav + 自研 UI）。
+6. **日程 OSS 最终选择** ✅ 已决策：**暂缓最终选择，进入 `product-design-docs` 阶段后通过 PoC 再定**。当前路线：
+   - **主选：Nextcloud Calendar（AGPL-3.0，fit 5/5）**——自带完整前后端与成熟日历 UI，最贴合「人+agent 共用」场景。
+   - **备选：Stalwart（AGPL-3.0，fit 4/5）**——JMAP 对 agent 最友好，但缺少日历 UI，需自研看板。
+   - **Fallback：sabre/dav + 自研 UI（MIT）**——若 AGPL 合规成本不可接受时启用。
 
 ## 参考
 
