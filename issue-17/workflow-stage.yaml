@@ -9,7 +9,7 @@ current_run:
   current_stage: product-design-docs
   status: in_progress
   started_at: '2026-08-24T10:25:36Z'
-  last_updated_at: '2026-08-24T12:34:20Z'
+  last_updated_at: '2026-08-24T12:44:09Z'
   issue_number: '17'
   variables:
     process_slug: issue-17
@@ -84,6 +84,21 @@ nodes:
   - issue-17/requirements/2026-08-24-issue-17/requirements.md
   - issue-17/requirements/2026-08-24-issue-17/user-stories.md
   - issue-17/requirements/2026-08-24-issue-17/prd.md
+  handoff_file: null
+- stage_id: product-design-docs
+  node_id: product-design-docs-2026-08-24T12:44:09Z
+  status: in_progress
+  started_at: '2026-08-24T12:44:09Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - issue-17/designs/issue-17/data-model.md
+  - issue-17/designs/issue-17/design-review.md
+  - issue-17/designs/issue-17/feasibility.md
+  - issue-17/designs/issue-17/feature-catalog.md
+  - issue-17/designs/issue-17/flows.md
+  - issue-17/designs/issue-17/scenarios.md
   handoff_file: null
 recovery:
   last_validated_checkpoint: ''
