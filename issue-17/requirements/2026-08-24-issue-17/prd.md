@@ -8,7 +8,7 @@
 2. 通过 Codex 风格的 Clarify 工具降低需求澄清成本。
 3. 通过 Plan 模式建立复杂任务的人类审批闭环，提升 agent 执行的可控性。
 4. 将 skills、MCP、插件、多维表格以胶囊形式嵌入对话，并复用 issue-6 已实现的 Teable 表单 iframe，让 agent 能够操作企业数据与调用外部能力。
-5. 为每位用户提供个人日程看板，并让 agent 能够从对话中创建日程、邀请成员。
+5. 为每位用户提供个人日程看板；让 agent 能够帮助用户管理日程，同时让 agent 作为组织成员拥有独立日历身份、管理自己的日程，并能够被日程事件触发执行动作。
 
 ## 功能需求
 
@@ -34,11 +34,13 @@
 | 胶囊解析与调用 | Agent 可解析消息中的胶囊并调用对应的 skill / MCP / 插件 / teable skills | P0 |
 | Teable 表单 iframe 嵌入 | 复用 issue-6 已实现的 teable 单条记录表单 iframe 嵌入消息 | P0 |
 | Teable 表单填报提交 | 用户在 iframe 中填写并提交，数据同步回 teable | P0 |
-| 日程看板入口 | 提供个人日程看板入口，通过 iframe 嵌入 | P0 |
-| Agent 创建日程 | Agent 从对话中提取待办并创建事件 | P0 |
+| 日程看板入口 | 提供个人日程看板入口，通过 iframe 嵌入完整开源日历 UI | P0 |
+| Agent 创建日程 | Agent 从对话中提取待办并帮助用户创建事件 | P0 |
 | Agent 邀请成员 | Agent 可将其他成员加入日程并发送邀请 | P0 |
 | 个人日程范围 | 用户只关注个人日程；多人事件所有参与人均可见；不与外部日历互通 | P0 |
 | Agent 日程 Token | 为 agent 签发访问日历后端的 token | P0 |
+| Agent 独立日历身份 | Agent 作为组织成员拥有独立账户/身份，可管理自己的日程 | P0 |
+| 日程事件触发 Agent | 事件到达触发条件时唤醒 agent 执行动作（如推送会议材料） | P0 |
 | 日程看板编辑 | 用户在 iframe 看板中查看/编辑/删除事件 | P1 |
 | 日程通知 | 事件创建/邀请时发送通知 | P1 |
 
@@ -70,7 +72,8 @@
 | 话题持久化模型选择错误导致后期重构 | 高 | 在产品设计阶段与 issue-14 的 Mattermost thread 规则对齐，明确数据模型。 |
 | Plan.md 审批交互与 OpenClaw runtime 集成复杂 | 中 | 复用/扩展 issue-14 的 clarification.html 原型，定义统一的消息卡片协议。 |
 | Teable 表单 iframe 跨域与权限控制 | 中 | PoC 验证 postMessage 白名单、CSP、token 注入方案；必要时使用一次性 exchange code。 |
-| CalDAV/JMAP MCP server 成熟度不足 | 中 | 对 Nextcloud/Stalwart 进行 PoC，验证 "创建事件 + 邀请成员" 最小闭环。 |
+| CalDAV/JMAP MCP server 成熟度不足 | 中 | 对 Nextcloud/Stalwart 进行 PoC，验证 "创建事件 + 邀请成员 + agent 独立账户 + 事件触发" 最小闭环。 |
+| Agent 独立日历身份与日程事件触发机制 | 中 | 明确 agent 账户模型（per-agent account vs service account）与触发机制（webhook / push / 轮询）。 |
 | 用户不接受 AGPL 方案 | 中 | 准备 MIT 自建路径（sabre/dav + 自研 UI）作为 fallback。 |
 
 ## 参考

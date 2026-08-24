@@ -94,12 +94,14 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 
 ### AI 日程
 
+- 日程需要同时具备**前端 UI**和**后端服务**，且对人、对 agent 都友好。
 - 为每个用户维护一个个人日程看板；看板通过 iframe 嵌入开源日历 UI。
-- Agent 在对话中识别待办事项后，调用日历后端创建事件（时间、标题、描述、参与人）。
+- Agent 在对话中识别待办事项后，调用日历后端**帮助用户**创建、更新、删除事件（时间、标题、描述、参与人）。
 - 事件支持邀请其他成员；被邀请的成员均可在自己的日程看板中看到该事件。
+- **Agent 本身作为组织成员拥有独立日历身份**，可以管理自己的日程，并能在自己的事件触发时被唤醒执行动作。
 - 用户侧只关注个人日程，无需与 Outlook / Google 日历互通。
 - Agent 通过 token（app password / OAuth token）访问日历后端；操作封装为 CLI / MCP server / skill。
-- 日历后端候选：Nextcloud Calendar（AGPL-3.0，主选）、Stalwart（AGPL-3.0，备选）、Cal.com（需核实 2026 许可证变化）。
+- 日历后端候选：Nextcloud Calendar（AGPL-3.0，主选，具备完整前后端）、Stalwart（AGPL-3.0，备选，后端强但需自研 UI）、Cal.com（需核实 2026 许可证变化）。
 
 ## 非目标
 
@@ -154,10 +156,13 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 
 ### AI 日程
 
+- [ ] 日程后端具备完整前端 UI 与后端服务，对人、对 agent 都友好。
 - [ ] 每人有一个日程看板入口，可通过 iframe 查看。
-- [ ] Agent 可从对话中提取待办并创建日程事件（时间、标题、参与人）。
+- [ ] Agent 可从对话中提取待办并**帮助用户**创建日程事件（时间、标题、参与人）。
 - [ ] Agent 可将其他成员加入事件并发送邀请通知。
 - [ ] 用户可在看板中查看、编辑、删除事件。
+- [ ] **Agent 作为组织成员拥有独立日历身份，可管理自己的日程。**
+- [ ] **Agent 可被自己的日程事件触发并执行对应动作（如会议前推送准备材料）。**
 - [ ] 日历后端满足 MIT / Apache-2.0 / AGPL 协议，并提供 CLI/API/MCP 供 agent 调用。
 - [ ] Agent 使用 token 访问日历后端，token 可独立签发和回收。
 
@@ -168,7 +173,10 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 3. **Clarify 工具宿主** ✅ 已确认：定制化开发一个 Clarify agent 工具；agent 对该 thread 发起 Clarify 工具调用时，Mattermost 前端在该话题聊天窗口中弹出选项卡。
 4. **胶囊元数据协议** ✅ 已确认：采用统一的**自定义 JSON schema**，四类胶囊由 agent 解析后分发调用。
 5. **日程范围** ✅ 已确认：用户侧只关注**个人日程**；事件涉及多人时所有参与人均可见；**不与 Outlook / Google 日历互通**。
-6. **日程 OSS 最终选择** ⏳ 仍待决策：主选 **Nextcloud Calendar**（AGPL-3.0，fit 5/5）还是 **Stalwart**（AGPL-3.0，JMAP，fit 4/5）？是否接受 AGPL 在 WeLink 私有部署场景下的合规成本？
+6. **日程 OSS 最终选择** ⏳ 仍待决策：日程需要同时具备**前后端**、对人/对 agent 都友好，且支持 **agent 作为组织成员独立管理日程并被事件触发**。在此约束下：
+   - **Nextcloud Calendar（AGPL-3.0，fit 5/5）**：自带完整前后端与成熟日历 UI，CalDAV + 现成 MCP，最贴合「人+agent 共用」场景，**建议作为主选**。
+   - **Stalwart（AGPL-3.0，fit 4/5）**：后端 JMAP 对 agent 最友好，但缺少日历 UI，需自研看板。
+   - 是否接受 AGPL-3.0 在 WeLink 私有部署场景下的合规成本？若不接受，需转向 MIT 自建路径（sabre/dav + 自研 UI）。
 
 ## 参考
 
