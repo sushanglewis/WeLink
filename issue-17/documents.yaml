@@ -1,5 +1,47 @@
 process_slug: issue-17
 issue_number: '17'
-current_stage: ingest
-last_updated: '2026-08-24T10:25:36Z'
-documents: []
+current_stage: clarify
+last_updated: '2026-08-24T10:29:51Z'
+documents:
+- path: interviews/2026-08-24-issue-17/metadata.json
+  stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: interviews/2026-08-24-issue-17/raw-insights.md
+  stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: interviews/2026-08-24-issue-17/summary.md
+  stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: interviews/2026-08-24-issue-17/transcript.md
+  stage: ingest
+  status: completed
+  gate_passed: true
+  human_confirmed: false
+  approved_by: system
+- path: requirements/2026-08-24-issue-17/prd.md
+  stage: clarify
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: requirements/2026-08-24-issue-17/requirements.md
+  stage: clarify
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: requirements/2026-08-24-issue-17/user-stories.md
+  stage: clarify
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
