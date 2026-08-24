@@ -1,5 +1,7 @@
 # PRD: 2026-08-24-issue-17
 
+<!-- status: approved -->
+
 ## 产品目标
 
 为 WeLink 数字员工对话窗口引入 AI 工作台化能力，并实现 AI 日程功能：
