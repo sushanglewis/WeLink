@@ -7,7 +7,7 @@
 1. 让 IM 对话具备话题级别的上下文管理能力，支撑多任务并行协作。
 2. 通过 Codex 风格的 Clarify 工具降低需求澄清成本。
 3. 通过 Plan 模式建立复杂任务的人类审批闭环，提升 agent 执行的可控性。
-4. 将 Teable 多维表格以胶囊和表单 iframe 形式嵌入对话，让 agent 能够操作企业数据。
+4. 将 skills、MCP、插件、多维表格以胶囊形式嵌入对话，并复用 issue-6 已实现的 Teable 表单 iframe，让 agent 能够操作企业数据与调用外部能力。
 5. 为每位用户提供个人日程看板，并让 agent 能够从对话中创建日程、邀请成员。
 
 ## 功能需求
@@ -26,10 +26,13 @@
 | Plan 通过/修改按钮 | 卡片提供「通过」和「需要修改」按钮 | P0 |
 | Plan 迭代修改 | 用户在输入框描述修改意见，agent 更新 Plan.md | P0 |
 | Plan 执行锁定 | Plan 未通过前不执行关键动作 | P0 |
-| Teable 「+」菜单 | 输入框支持四级菜单选择 teable 表格 | P0 |
-| Teable 胶囊插入 | 选择后以胶囊形式插入消息并展示关键信息 | P0 |
-| Teable 胶囊元信息 | 胶囊携带 base_id / table_id / view_id / 权限范围 | P0 |
-| Teable 表单 iframe 嵌入 | 将 teable 单条记录表单以 iframe 嵌入消息 | P0 |
+| 胶囊「+」菜单 | 输入框「+」菜单支持选择 skills / MCP / 插件 / 多维表格 | P0 |
+| Skills 胶囊插入 | 选择 skill 后以胶囊形式插入消息，展示名称/描述/参数预览 | P0 |
+| MCP 胶囊插入 | 选择 MCP server 后以胶囊形式插入消息，展示名称/可用工具数/关键工具预览 | P0 |
+| 插件胶囊插入 | 选择插件后以胶囊形式插入消息，展示名称/版本/功能摘要 | P0 |
+| 多维表格胶囊插入 | 选择 teable 表格后以胶囊形式插入消息，展示表名及 base_id / table_id / view_id | P0 |
+| 胶囊解析与调用 | Agent 可解析消息中的胶囊并调用对应的 skill / MCP / 插件 / teable skills | P0 |
+| Teable 表单 iframe 嵌入 | 复用 issue-6 已实现的 teable 单条记录表单 iframe 嵌入消息 | P0 |
 | Teable 表单填报提交 | 用户在 iframe 中填写并提交，数据同步回 teable | P0 |
 | 日程看板入口 | 提供个人日程看板入口，通过 iframe 嵌入 | P0 |
 | Agent 创建日程 | Agent 从对话中提取待办并创建事件 | P0 |

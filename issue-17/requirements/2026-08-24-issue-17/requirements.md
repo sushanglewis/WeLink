@@ -46,8 +46,9 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 
 延续 WeLink「薄外壳 + iframe/WebView 嵌入 + token SSO」的集成模式：
 
+- **数字员工 IM 窗口即 AI 工作台**：不再单独建设独立工作台页面，而是将现有 IM 对话窗口直接 AI 工作台化。
 - 数字员工聊天表面复用 issue-14 已建设的 Mattermost/OpenClaw 运行时。
-- 话题、Clarify、Plan、Teable 胶囊/表单在聊天消息层扩展。
+- 话题、Clarify、Plan、各类胶囊（skills / MCP / 插件 / 多维表格）在聊天消息层扩展。
 - 日程看板通过 iframe 嵌入开源日历产品；agent 通过 CalDAV/JMAP MCP server 或官方 CLI 操作日程。
 
 ### 话题管理
@@ -71,16 +72,21 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 - 用户点击「通过」后，agent 按 Plan 执行；点击「需要修改」或在输入框描述修改意见，agent 更新 Plan.md 并再次展示。
 - Plan 审批通过前，agent 不执行 Plan 中的具体动作（除澄清外）。
 
-### Teable 胶囊
+### 胶囊系统（ skills / MCP / 插件 / 多维表格 ）
 
-- 输入框「+」菜单增加「多维表格 → 多维表格控件 → 数据库 → 多维表」四级选择。
-- 用户选择自己有权限的 teable 表格后，以胶囊形式插入消息。
-- 胶囊携带关键技术信息（base_id、table_id、view_id、表名、权限范围等），供 agent 调用 teable skills。
-- 胶囊在消息中可点击展开查看表格概要。
+在输入框或 agent 消息中支持插入多种类型的胶囊，用于显式指定一个 skill、MCP server、插件或 teable 表格：
+
+- **Skills 胶囊**：显示指定 skill 名称、描述、输入参数预览；点击后可将该 skill 及其上下文注入当前对话，agent 可调用。
+- **MCP 胶囊**：显示指定 MCP server 名称、可用工具数量、关键工具预览；点击后可将 MCP 工具集接入当前 agent 上下文。
+- **插件胶囊**：显示指定插件名称、版本、功能摘要；点击后激活插件能力。
+- **Teable 胶囊**：显示指定 teable 表格关键信息（base_id、table_id、view_id、表名、权限范围）；点击后 agent 可通过 teable skills 操作数据。
+- 胶囊统一支持：消息中渲染为可点击/展开的卡片、携带元数据、可被 agent 解析、支持删除/替换。
+
+> 注：Teable 多维表格的集成与表单 iframe 能力已在 issue-6 实现，本次 #17 直接复用，不再重新评估 Teable 本身；重点是扩展胶囊类型到 skills、MCP、插件。
 
 ### Teable 表单 iframe
 
-- Agent 或用户可基于 teable 单条记录生成表单视图。
+- 直接复用 issue-6 已实现的 teable 表单视图 iframe 嵌入能力。
 - 表单以 iframe 形式嵌入消息，保持 teable 原样式。
 - 用户在 iframe 中填写/修改字段并提交；提交结果通过 postMessage 回传聊天窗口，并同步到 teable。
 
@@ -95,7 +101,8 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 ## 非目标
 
 - 本次不替换 Mattermost 作为 IM 底层。
-- 不重新实现完整的 teable 多维表格产品，仅做集成与嵌入。
+- 不单独建设独立 AI 工作台页面；数字员工 IM 窗口即工作台。
+- Teable 多维表格集成与表单 iframe 已在 issue-6 实现，本次仅扩展胶囊类型，不重新评估 Teable 本身。
 - 不要求日程后端支持移动端原生 SDK（Web/iframe 足够）。
 - 不实现通用 AI 工作台的代码编辑/终端等能力，聚焦对话协作场景。
 - 不替代企业现有 Outlook/Google 日历，但可考虑 CalDAV 互通。
@@ -126,16 +133,18 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 - [ ] Plan 未通过前，agent 不执行 Plan 中的关键动作。
 - [ ] Plan 通过后，agent 按 Plan 执行并反馈进度。
 
-### Teable 胶囊
+### 胶囊系统
 
-- [ ] 输入框「+」菜单可四级选择 teable 表格。
-- [ ] 选择后以胶囊形式插入消息，展示表名等关键信息。
-- [ ] 胶囊携带 base_id / table_id / view_id 等技术信息。
-- [ ] Agent 可读取胶囊信息并调用 teable skills 操作数据。
+- [ ] 输入框「+」菜单支持选择 skills / MCP / 插件 / 多维表格并插入对应胶囊。
+- [ ] Skills 胶囊展示 skill 名称、描述、输入参数预览；点击后可注入当前对话供 agent 调用。
+- [ ] MCP 胶囊展示 MCP server 名称、可用工具数量、关键工具预览；点击后接入 agent 上下文。
+- [ ] 插件胶囊展示插件名称、版本、功能摘要；点击后激活插件能力。
+- [ ] Teable 胶囊展示表名、base_id / table_id / view_id 等关键信息；agent 可读取并调用 teable skills。
+- [ ] 胶囊在消息中统一渲染为可点击/展开的卡片，支持删除/替换。
 
 ### Teable 表单 iframe
 
-- [ ] 可将 teable 单条记录的表单视图以 iframe 嵌入消息。
+- [ ] 复用 issue-6 已实现的 teable 表单视图 iframe 嵌入。
 - [ ] iframe 保持 teable 表单样式。
 - [ ] 用户可在 iframe 中填写并提交。
 - [ ] 提交后数据同步回 teable，并在聊天中反馈提交结果。
@@ -152,12 +161,11 @@ WeLink（龙智协同）正在建设「数字员工」能力：在 Mattermost IM
 ## 开放问题
 
 1. **话题持久化模型**：话题是映射到 Mattermost thread、Mattermost channel，还是 WeLink 后端独立表？
-2. **聊天宿主**：#17 的「人-数字员工对话窗口」是基于 issue-14 的 Mattermost/OpenClaw 数字员工聊天表面，还是 issue-3 的 AI 工作台落地页（LibreChat/WeKnora）？
-3. **Plan.md 存储与审批回调**：Plan.md 存为消息卡片、Teable 记录还是文件？审批通过/修改的按钮如何回调 agent？
-4. **Clarify 宿主**：是否复用 issue-14 的 `clarification.html` 原型？问题选项数据结构如何与 OpenClaw runtime 交互？
-5. **Teable 胶囊字段**：胶囊中需携带 base_id / table_id / view_id / permission scope 中的哪些？使用 per-user token 还是共享 bot token？
-6. **日程范围**：仅个人日历，还是也包含团队共享日历？是否需要与 Outlook/Google 日历互通？
-7. **日程 OSS 最终选择**：主选 Nextcloud Calendar（AGPL-3.0，fit 5/5）还是 Stalwart（AGPL-3.0，JMAP，fit 4/5）？是否接受 AGPL 在 WeLink 私有部署场景下的合规成本？
+2. **Plan.md 存储与审批回调**：Plan.md 存为消息卡片、Teable 记录还是文件？审批通过/修改的按钮如何回调 agent？
+3. **Clarify 宿主**：是否复用 issue-14 的 `clarification.html` 原型？问题选项数据结构如何与 OpenClaw runtime 交互？
+4. **胶囊元数据协议**：skills / MCP / 插件 / 多维表格四类胶囊的统一 schema 如何定义？agent 解析与调用协议如何设计？
+5. **日程范围**：仅个人日历，还是也包含团队共享日历？是否需要与 Outlook/Google 日历互通？
+6. **日程 OSS 最终选择**：主选 Nextcloud Calendar（AGPL-3.0，fit 5/5）还是 Stalwart（AGPL-3.0，JMAP，fit 4/5）？是否接受 AGPL 在 WeLink 私有部署场景下的合规成本？
 
 ## 参考
 
