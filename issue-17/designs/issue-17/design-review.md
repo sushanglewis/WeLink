@@ -1,6 +1,6 @@
 # Design Review: issue-17
 
-<!-- status: draft -->
+<!-- status: approved -->
 
 ## 背景
 
