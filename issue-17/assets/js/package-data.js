@@ -189,41 +189,6 @@ window.LINC_PACKAGE = {
           "human_confirmed": false
         }
       ]
-    },
-    {
-      "group": "HTML 原型",
-      "items": [
-        {
-          "path": "prototype/chat.html",
-          "label": "IM 工作台",
-          "title": "IM 工作台原型",
-          "group": "HTML 原型",
-          "stage": "product-prototype",
-          "version": "v1.0",
-          "status": "draft",
-          "human_confirmed": false
-        },
-        {
-          "path": "prototype/schedule.html",
-          "label": "日程看板",
-          "title": "日程看板原型",
-          "group": "HTML 原型",
-          "stage": "product-prototype",
-          "version": "v1.0",
-          "status": "draft",
-          "human_confirmed": false
-        },
-        {
-          "path": "prototype/token.html",
-          "label": "Token 管理",
-          "title": "Token 管理原型",
-          "group": "HTML 原型",
-          "stage": "product-prototype",
-          "version": "v1.0",
-          "status": "draft",
-          "human_confirmed": false
-        }
-      ]
     }
   ]
 };

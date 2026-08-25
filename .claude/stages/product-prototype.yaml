@@ -28,8 +28,8 @@ artifacts:
   - '{process_slug}/designs/{design_id}/ui-spec.md'
   - '{process_slug}/designs/{design_id}/fields.md'
   - '{process_slug}/index.html'
-  - '{process_slug}/prototype/chat.html'
   optional:
+  - '{process_slug}/prototype/*.html'
   - '{process_slug}/designs/{design_id}/prototype.pen'
 context:
   goal: 将已确认的产品设计文档转化为开发可用的 UI/字段规格文档，以及可在浏览器中直接查看的 HTML 原型（Pencil 原型可选）。

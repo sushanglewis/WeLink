@@ -61,17 +61,18 @@ body {
 
 /* ---------- Portal layout ---------- */
 .portal-wrap {
-    display: flex; height: 100vh; background: #1A1D21;
+    display: flex; height: 100vh; background: var(--background);
     color: var(--foreground);
 }
 .pnav {
     width: var(--pnav-width); flex-shrink: 0;
-    background: #111316; color: #E5E7EB;
+    background: #FFFFFF; color: var(--foreground);
     overflow: auto; padding: 16px 0;
+    border-right: 1px solid var(--border);
 }
 .pnav-header {
     display: flex; align-items: center; gap: 10px;
-    padding: 0 16px 16px; border-bottom: 1px solid #1F2328;
+    padding: 0 16px 16px; border-bottom: 1px solid var(--border);
     margin-bottom: 8px;
 }
 .pnav-logo {
@@ -80,22 +81,22 @@ body {
     font-size: 12px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
 }
-.pnav-title { font-size: 14px; font-weight: 600; color: #FFFFFF; }
-.pnav-subtitle { font-size: 11px; color: var(--text-subtle); }
-.pnav-group { font-size: 11px; font-weight: 700; color: var(--text-subtle); text-transform: uppercase; margin: 20px 16px 6px; }
+.pnav-title { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.pnav-subtitle { font-size: 11px; color: var(--text-muted); }
+.pnav-group { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 20px 16px 6px; }
 .pnav-link {
     display: block; padding: 8px 16px;
-    font-size: 13px; color: #D1D5DB; text-decoration: none;
+    font-size: 13px; color: var(--text-muted); text-decoration: none;
     cursor: pointer;
 }
-.pnav-link:hover { background: #1F2328; color: #FFFFFF; }
+.pnav-link:hover { background: var(--muted); color: var(--foreground); }
 .pnav-link.active { background: var(--primary); color: #FFFFFF; }
 .pnav-status {
     margin: 16px; padding: 10px 12px;
-    background: #1F2328; border-radius: var(--radius);
-    font-size: 12px; color: var(--text-subtle);
+    background: var(--muted); border-radius: var(--radius);
+    font-size: 12px; color: var(--text-muted);
 }
-.pnav-status .stage { color: #FFFFFF; font-weight: 600; }
+.pnav-status .stage { color: var(--foreground); font-weight: 600; }
 
 .pstage {
     flex: 1; display: flex; flex-direction: column;
@@ -137,7 +138,7 @@ body {
     margin-top: 36px; margin-bottom: 12px;
     background: #FFFFFF;
     border-radius: 10px;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
     overflow: hidden;
     display: flex; flex-direction: column;
 }
