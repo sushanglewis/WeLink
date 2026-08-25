@@ -1,7 +1,7 @@
 process_slug: issue-17
 issue_number: '17'
 current_stage: product-prototype
-last_updated: '2026-08-25T02:23:30Z'
+last_updated: '2026-08-25T02:36:49Z'
 documents:
 - path: designs/issue-17/data-model.md
   stage: product-design-docs

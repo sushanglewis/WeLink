@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="场景分析">
+<meta name="nav-group" content="产品设计">
+<meta name="doc-version" content="v1.0">
+<meta name="doc-uid" content="scenarios">
+<title>场景分析</title>
+<!-- Asset paths assume this page lives at pages/docs/*.html (depth 2). Adjust if placed elsewhere. -->
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="scenarios">
+
+<header class="doc-header">
+    <h1 data-uid="scenarios-h1">场景分析</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v1.0</span>
+        <span class="doc-stage">阶段: product-design-docs</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+<!-- version: v1.0 -->
+
+# 场景分析: issue-17
+
+## 用户画像
+
+- **普通员工（人类用户）**：通过数字员工完成日常任务；需要清晰的话题管理、低成本的需求澄清、可审阅的计划审批、个人日程看板。
+- **数字员工（agent）**：需要结构化上下文（thread）、Clarify 工具、Plan 审批协议、胶囊解析与技能分发、代管用户日程的能力；同时自身是组织成员，拥有独立日历身份并可被日程事件触发。
+- **团队协作者（受邀成员）**：被 agent 邀请加入日程事件的其他成员，在自己的日程看板中可见相关事件并接收通知。
+- **管理员**：为 agent 签发/回收日程访问 token，关注权限最小化与审计。
+
+## 核心场景
+
+### 场景一：创建话题开始新任务（对应用户故事一）
+
+- 触发条件：员工准备与数字员工讨论一个与当前话题无关的新任务。
+- 用户行为：在聊天窗口话题列表点击「新建话题」，输入标题（可空，由 agent 后续补摘要）。
+- 预期结果：创建新 Mattermost thread 并进入该话题窗口；历史消息为空或仅系统提示；话题出现在列表中（标题 + 创建时间）。
+
+### 场景二：切换并继续历史话题（对应用户故事二）
+
+- 触发条件：员工需要回到之前未完成的任务讨论。
+- 用户行为：在话题列表中点击某历史话题。
+- 预期结果：聊天窗口加载该 thread 全部历史消息；继续发送的消息归属该 thread，其他话题不受影响；列表展示最后活跃时间。
+
+### 场景三：Agent 建议创建话题（对应用户故事三）
+
+- 触发条件：agent 识别到用户新输入与当前话题明显不同。
+- 用户行为：agent 在当前话题中提示「是否创建新话题讨论 X」；用户确认。
+- 预期结果：创建新话题并切换；新话题可携带上下文摘要；在规则允许时 agent 也可自动创建。
+
+### 场景四：Clarify 澄清模糊需求（对应用户故事四）
+
+- 触发条件：agent 判断用户需求模糊（如「帮我整理一下数据」缺对象/范围/格式）。
+- 用户行为：agent 对该 thread 调用 Clarify 工具；前端在话题窗口底部弹出选项卡；用户对每个问题选择 1 个推荐选项或填写自定义输入后提交。
+- 预期结果：用户选择以 user message 形式发回 agent；agent 继续澄清（多轮）或进入 Plan/执行。
+
+### 场景五：审阅并批准 Plan（对应用户故事五）
+
+- 触发条件：任务复杂（多步骤、有副作用或跨系统）。
+- 用户行为：agent 生成 Plan.md 并以消息卡片展示；用户阅读后点击「通过」，或点击「需要修改」并在输入框描述意见。
+- 预期结果：点击「通过」→ 回调 agent，agent 解锁执行并反馈进度；点击「需要修改」→ agent 更新 Plan.md 文件并重新渲染卡片，版本可追溯；未通过前关键动作保持锁定。
+
+### 场景六：插入并使用胶囊（对应用户故事六、十二、十三、十四）
+
+- 触发条件：员工希望显式指定 agent 使用某个 skill / MCP server / 插件 / teable 表格。
+- 用户行为：在输入框点击「+」，浏览并选择目标对象（仅展示有权限的），胶囊插入消息并发送。
+- 预期结果：消息中渲染对应胶囊卡片（skill：名称/描述/参数预览；MCP：名称/工具数/关键工具预览；插件：名称/版本/功能摘要；teable：表名/base_id/table_id/view_id）；agent 解析胶囊并调用对应能力；胶囊可删除/替换。
+
+### 场景七：聊天内填写 Teable 表单（对应用户故事七）
+
+- 触发条件：agent 在对话中发送 teable 表单视图。
+- 用户行为：员工在消息内 iframe 中填写字段并提交。
+- 预期结果：iframe 保持 teable 原样式；提交结果经 postMessage 回传聊天窗口并同步 teable；权限受控（白名单域名）。
+
+### 场景八：Agent 从对话创建日程（对应用户故事八、十五）
+
+- 触发条件：对话中出现明确待办（时间、事项、可选参与人）。
+- 用户行为：agent 识别待办要素，经日程后端 token 调用创建事件，并在话题中返回确认消息（时间/标题/参与人）。
+- 预期结果：事件出现在用户的个人日程看板；用户后续可在看板中编辑/删除。
+
+### 场景九：邀请成员加入日程（对应用户故事九）
+
+- 触发条件：待办涉及其他同事。
+- 用户行为：agent 创建事件时按用户名/邮箱添加参与人。
+- 预期结果：受邀成员收到通知（IM 消息或邮件，视后端能力）；事件在其日程看板可见（共享/受邀视图）。
+
+### 场景十：查看个人日程看板（对应用户故事十）
+
+- 触发条件：员工需要总览或管理自己的日程。
+- 用户行为：通过侧边栏或聊天内入口打开日程看板。
+- 预期结果：iframe 嵌入开源日历 UI，支持月/周/日视图；可查看、编辑、删除事件。
+
+### 场景十一：为 Agent 签发日程 Token（对应用户故事十一）
+
+- 触发条件：首次启用 agent 代管日程或轮换凭证。
+- 用户行为：员工/管理员在 token 签发界面确认权限范围（读写日程、邀请成员）并生成 token。
+- 预期结果：token 可独立生成、查看、撤销；agent 持 token 调用日历后端 API/CLI/MCP。
+
+### 场景十二：Agent 管理自己的日程（对应用户故事十六）
+
+- 触发条件：agent 作为组织成员需要安排自身任务时间或被邀请参会。
+- 用户行为：agent 以自己的日历身份创建/查看/更新/删除事件；其他成员可将 agent 添加为参与人。
+- 预期结果：agent 拥有独立账户/身份；其事件对参与人可见。
+
+### 场景十三：日程事件触发 Agent（对应用户故事十七）
+
+- 触发条件：agent 自身日程事件到达触发条件（如会议开始前 5 分钟）。
+- 用户行为：无需用户操作；触发机制（webhook / push / 定时轮询）唤醒 agent。
+- 预期结果：agent 收到通知并执行预设动作（发送提醒、推送会议材料、调用 skill）；触发动作可配置。
+
+## 边界场景
+
+- **空话题**：新建话题无消息时，话题列表仍展示（标题 + 创建时间），窗口显示系统提示。
+- **话题无标题**：允许创建时标题为空，由 agent 根据首轮对话生成标题/摘要并回填。
+- **Clarify 仅单题**：选项卡支持单问题提交，不强制多题。
+- **Clarify 自定义为空**：用户既未选推荐项也未填自定义时，提交按钮置灰并提示。
+- **Plan 多轮修改**：每次修改生成新 PlanRevision，卡片展示最新版本，可查看历史版本。
+- **Plan 通过后的再修改**：已通过的 Plan 如需变更，agent 生成新 revision 并重新走审批。
+- **胶囊权限不足**：「+」菜单仅列出用户有权限的对象；无权限对象不出现在候选中。
+- **多胶囊同消息**：一条消息可携带多个胶囊，agent 按顺序解析分发。
+- **日程跨时区**：事件存储带时区；看板按用户本地时区渲染。
+- **多人事件部分成员无日历账户**：仅对已有日历身份的参与人生成事件与通知，其余参与人在确认消息中标注。
+- **Agent 自身事件与代办事件同名**：通过 organizer/日历账户区分归属。
+
+## 异常场景
+
+- **Mattermost thread 创建失败**：话题创建回滚，提示用户重试；不产生孤儿话题项。
+- **Clarify 回调丢失/超时**：选项卡保留用户已选内容；超时后允许用户重新提交，agent 端幂等去重。
+- **Plan 审批回调失败**：按钮进入重试态；回调接口幂等（同一 revision 重复通过仅生效一次）。
+- **Plan.md 文件写入失败**：agent 暂停该任务执行，向话题发送错误提示并保留当前版本。
+- **胶囊 schema 非法或版本不兼容**：消息内胶囊卡片显示「无法解析」，agent 忽略该胶囊并在回复中说明。
+- **Teable iframe 加载失败 / postMessage 来源非法**：聊天中显示加载失败提示；postMessage 白名单校验失败则丢弃消息并记录日志。
+- **日程后端不可用**：agent 回复创建失败与原因，待办要素保留在对话中，用户可要求重试。
+- **邀请成员失败（地址不存在/通知通道失败）**：事件本体创建成功，失败参与人逐项标注并提示补救方式。
+- **token 过期/被撤销**：agent 收到 401 后在话题中提示重新签发；不再尝试旧 token。
+- **触发机制漏报（webhook 丢失）**：以定时轮询兜底对账，保证 agent 自身事件最终可触发。
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

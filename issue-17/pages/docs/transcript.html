@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="访谈转写">
+<meta name="nav-group" content="访谈记录">
+<meta name="doc-version" content="v1.0">
+<meta name="doc-uid" content="transcript">
+<title>访谈转写</title>
+<!-- Asset paths assume this page lives at pages/docs/*.html (depth 2). Adjust if placed elsewhere. -->
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="transcript">
+
+<header class="doc-header">
+    <h1 data-uid="transcript-h1">访谈转写</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v1.0</span>
+        <span class="doc-stage">阶段: ingest</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+<!-- version: v1.0 -->
+
+# 访谈转写: 2026-08-24-issue-17
+
+- 录音文件: `issue-17/recordings/github-issue-17.md`
+- 时长: N/A（文本型原始需求）
+- 参与人: 产品负责人
+
+## 转写内容
+
+```
+00:00:00 产品负责人: 本次需求为「新版本需求」，包含两大方向。
+
+00:00:05 产品负责人: 第一，数字员工聊天窗口 AI workbench 化。
+00:00:10 产品负责人: 人与数字员工在 IM 中会有一个对话窗口，现在在 IM 前端缺乏一个主动管理上下文的机制，就像现在的 AI 工作台，人与 coding agent 有多个对话，来推进不同的任务。
+00:00:25 产品负责人: 因此，我们需要在人-数字员工对话的窗口中，增加类似的显示管理上下文的机制，我们将此定义为「话题」。
+00:00:35 产品负责人: 人-数字员工的对话，要有一个话题列表，人、agent 都可以通过创建一个新的话题，来重新开始讨论一个事情。也可以基于一个话题的历史对话继续讨论。每个话题都有一个窗口。
+
+00:00:55 产品负责人: 第二，增加 plan 模式以及 clarify 工具，就像 codex 那样。
+00:01:00 产品负责人: agent 处理人类需求的时候，如果有模糊不清的需求，agent 可以提出多个问题，每个问题都有 3 个推荐选项和一个用户自定义选项。
+00:01:15 产品负责人: 这些问题通过对话底部弹窗的方式呈现给用户，用户在上面作出选择，或填入自己的要求，提交后以 user message 发出去。
+00:01:30 产品负责人: 当 agent 执行复杂任务时，需要一个 Plan.md 来说明该事情的前因后果以及后续计划，并以 markdown 方式展示给人类。
+00:01:45 产品负责人: 在对话窗口下弹出按钮，让人类选择是否通过；人类也可以在对话输入框中描述问题，来让 agent 修改 Plan，直到人类审批通过，agent 开始依据最终定版的 Plan 执行。
+
+00:02:05 产品负责人: 第三，在对话输入窗口中，允许人选择一个多维表格。
+00:02:10 产品负责人: 人类点击「+」，展开菜单，选择多维表格 > 多维表格控件 > 数据库 > 多维表，从而让人类选择自己具备权限的确定的一张 teable 表格。
+00:02:25 产品负责人: 以胶囊的方式拼接到消息中，胶囊中包含该表格在 teable 中的关键技术信息，从而让数字员工可以通过 teable skills 来获取、操作这个多维表格中的数据。
+
+00:02:45 产品负责人: 第四，实现将多维表格的表单视图作为 iframe 嵌入到消息。
+00:02:50 产品负责人: 使用多维表格的一条数据做成的视图表单，在对话消息中保持表单样式发送给人类，并允许人类在表单中填报数据并提交。
+
+00:03:05 产品负责人: 第二大方向是 AI 日程功能。
+00:03:10 产品负责人: 增加同多维表格一样的日程管理功能，每个人都有一个自己的日程看板，日程需要对 agent 友好，如有官方 cli、agent skills，并允许提供 token 令牌给 agent。
+00:03:25 产品负责人: Agent 与人交流过程中，如果产生了待办事项，则基于日程，来为人类创建一个日程（在什么时间、做什么事情、和谁），并可以将其他成员加入到日程中。
+00:03:40 产品负责人: 日程功能需要具备传统日程产品的特性，并对 agent 友好。需要找开源项目，MIT 协议或者 APL、AGPL。
+```
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

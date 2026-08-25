@@ -1,147 +1,89 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Issue #17 — 数字员工 AI 工作台 &amp; AI 日程</title>
-  <style>
-    :root {
-      --bg: #f5f6f8;
-      --card: #ffffff;
-      --text: #1f2328;
-      --muted: #656d76;
-      --border: #d1d5da;
-      --accent: #0969da;
-      --accent-bg: #ddf4ff;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0d1117;
-        --card: #161b22;
-        --text: #c9d1d9;
-        --muted: #8b949e;
-        --border: #30363d;
-        --accent: #58a6ff;
-        --accent-bg: #121d2f;
-      }
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 24px;
-      line-height: 1.6;
-    }
-    .container { max-width: 960px; margin: 0 auto; }
-    header { margin-bottom: 24px; }
-    h1 { font-size: 24px; margin: 0 0 8px; }
-    .subtitle { color: var(--muted); font-size: 14px; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    .card h2 { font-size: 18px; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
-    .badge {
-      display: inline-block;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 12px;
-      background: var(--accent-bg);
-      color: var(--accent);
-    }
-    ul { margin: 0; padding-left: 20px; }
-    li { margin: 6px 0; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-    .status { color: var(--muted); font-size: 12px; }
-    .prototype { border: 2px dashed var(--accent); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lincoln Issue Package · 门户</title>
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Issue #17 — 数字员工 AI 工作台 &amp; AI 日程</h1>
-      <div class="subtitle">Lincoln issue-package 门户 · 当前阶段：product-prototype</div>
-    </header>
+<div class="portal-wrap">
+    <nav class="pnav" id="pnav">
+        <div class="pnav-header">
+            <div class="pnav-logo">L</div>
+            <div>
+                <div class="pnav-title">Issue Package</div>
+                <div class="pnav-subtitle">Issue #17 · 数字员工 AI 工作台 & AI 日程</div>
+            </div>
+        </div>
+        <div class="pnav-status">阶段: <span class="stage">not_started</span></div>
 
-    <div class="card prototype">
-      <h2>🎨 HTML 原型 <span class="badge">Review</span></h2>
-      <p>点击下方链接查看关键页面的简洁 HTML 原型（仅体现核心交互）。</p>
-      <ul>
-        <li><a href="prototype/chat.html">IM 工作台主界面（话题 / Clarify / Plan / 胶囊 / Teable 表单）</a></li>
-        <li><a href="prototype/schedule.html">AI 日程看板（iframe 占位）</a></li>
-        <li><a href="prototype/token.html">Agent 日程 Token 管理</a></li>
-      </ul>
-    </div>
+        <div class="pnav-checklist" id="artifactChecklist">
+            <h4>必要产物清单</h4>
+            <ul>
+                <li data-key="prd">PRD</li>
+                <li data-key="ui-spec">UI 规范</li>
+                <li data-key="fields">字段说明</li>
+                <li data-key="decisions">决策记录</li>
+                <li data-key="research">调研笔记</li>
+                <li data-key="prototype-web">原型 · Web 端</li>
+                <li data-key="prototype-mobile">原型 · 手机端</li>
+                <li data-key="prototype-app">原型 · 应用端</li>
+                <li data-key="handoff">Handoff 交接</li>
+                <li data-key="openspec">OpenSpec 提案</li>
+            </ul>
+        </div>
+    </nav>
 
-    <div class="grid">
-      <div class="card">
-        <h2>📁 访谈记录</h2>
-        <ul>
-          <li><a href="interviews/2026-08-24-issue-17/metadata.json">metadata.json</a> <span class="status">system</span></li>
-          <li><a href="interviews/2026-08-24-issue-17/transcript.md">transcript.md</a></li>
-          <li><a href="interviews/2026-08-24-issue-17/summary.md">summary.md</a></li>
-          <li><a href="interviews/2026-08-24-issue-17/raw-insights.md">raw-insights.md</a></li>
-        </ul>
-      </div>
+    <main class="pstage" id="pstage">
+        <div class="mac-menubar">
+            <div class="mac-menu-left">
+                <span class="mac-apple">&#63743;</span>
+                <span class="mac-app">Lincoln</span>
+                <span>文件</span>
+                <span>编辑</span>
+                <span>视图</span>
+                <span>窗口</span>
+                <span>帮助</span>
+            </div>
+            <div class="mac-menu-right">
+                <button class="theme-toggle" id="themeToggle" title="切换主题" aria-label="切换主题">☀</button>
+                <span class="mac-tray" id="macTray">L</span>
+                <span class="mac-date" id="macDate"></span>
+            </div>
+        </div>
 
-      <div class="card">
-        <h2>📋 需求文档 <span class="badge">PM approved</span></h2>
-        <ul>
-          <li><a href="requirements/2026-08-24-issue-17/requirements.md">requirements.md</a></li>
-          <li><a href="requirements/2026-08-24-issue-17/user-stories.md">user-stories.md</a></li>
-          <li><a href="requirements/2026-08-24-issue-17/prd.md">prd.md</a></li>
-        </ul>
-      </div>
+        <div class="mac-window" id="macWindow">
+            <div class="mac-titlebar">
+                <div class="mac-traffic">
+                    <span class="mac-close"></span>
+                    <span class="mac-min"></span>
+                    <span class="mac-max"></span>
+                </div>
+                <div class="mac-win-title" id="winTitle">Lincoln Issue Package</div>
+            </div>
+            <iframe id="frame" title="page"></iframe>
+        </div>
+    </main>
 
-      <div class="card">
-        <h2>🎨 产品设计文档 <span class="badge">PM approved</span></h2>
-        <ul>
-          <li><a href="designs/issue-17/design-review.md">design-review.md</a></li>
-          <li><a href="designs/issue-17/scenarios.md">scenarios.md</a></li>
-          <li><a href="designs/issue-17/feature-catalog.md">feature-catalog.md</a></li>
-          <li><a href="designs/issue-17/data-model.md">data-model.md</a></li>
-          <li><a href="designs/issue-17/flows.md">flows.md</a></li>
-          <li><a href="designs/issue-17/feasibility.md">feasibility.md</a></li>
-        </ul>
-      </div>
+    <aside class="pann" id="pann">
+        <button class="pann-toggle" id="pannToggle">&#10094;</button>
+        <div class="pann-inner" id="pannInner">
+            <p>点击左侧页面索引加载文档或原型。</p>
+        </div>
+    </aside>
+</div>
 
-      <div class="card">
-        <h2>🔧 原型阶段产物</h2>
-        <ul>
-          <li><a href="designs/issue-17/ui-spec.md">ui-spec.md</a></li>
-          <li><a href="designs/issue-17/fields.md">fields.md</a></li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h2>📚 研究文档</h2>
-        <ul>
-          <li><a href="docs/research/schedule-oss-options.md">schedule-oss-options.md</a></li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h2>🔖 原始输入</h2>
-        <ul>
-          <li><a href="recordings/github-issue-17.md">github-issue-17.md</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>🔗 外部参考</h2>
-      <ul>
-        <li><a href="https://github.com/sushanglewis/WeLink/issues/17" target="_blank">GitHub Issue #17</a></li>
-      </ul>
-    </div>
-  </div>
+<script src="assets/js/package-data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function(){
+    var dateEl = document.getElementById('macDate');
+    if (dateEl) {
+        var now = new Date();
+        dateEl.textContent = now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate();
+    }
+})();
+</script>
 </body>
 </html>
