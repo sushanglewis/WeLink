@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 日程看板原型</title>
+  <style>
+    :root { --bg:#f5f6f8; --panel:#fff; --border:#d1d5da; --accent:#0969da; --text:#1f2328; --muted:#656d76; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif; background: var(--bg); color: var(--text); height:100vh; display:flex; flex-direction:column; }
+    .header { padding:12px 20px; background:var(--panel); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .header h2 { margin:0; font-size:16px; }
+    .content { flex:1; padding:20px; display:flex; gap:16px; }
+    .board { flex:1; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px; }
+    .toolbar { display:flex; gap:10px; margin-bottom:14px; }
+    .btn { padding:6px 12px; border:1px solid var(--border); border-radius:6px; background:#fff; cursor:pointer; font-size:13px; }
+    .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .iframe-placeholder { height:calc(100% - 50px); border:1px dashed var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--muted); background:#fafafa; }
+    .side { width:260px; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px; }
+    .side h3 { margin:0 0 12px; font-size:14px; }
+    .event { padding:10px; border:1px solid var(--border); border-radius:6px; margin-bottom:10px; }
+    .event-time { font-size:12px; color:var(--muted); }
+    .event-title { font-weight:600; margin:4px 0; }
+    .event-meta { font-size:12px; color:var(--muted); }
+    .back { color:var(--accent); text-decoration:none; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div><a class="back" href="../index.html">← 返回门户</a> · <b>AI 日程看板</b></div>
+    <div>我的日历 · 个人视图 · 不与外部日历互通</div>
+  </div>
+
+  <div class="content">
+    <div class="board">
+      <div class="toolbar">
+        <button class="btn">月</button>
+        <button class="btn">周</button>
+        <button class="btn primary">日</button>
+        <button class="btn primary">+ 新建事件</button>
+      </div>
+      <div class="iframe-placeholder">
+        [iframe：嵌入开源日历 UI（Nextcloud Calendar / Stalwart / 自研 UI）]
+      </div>
+    </div>
+
+    <div class="side">
+      <h3>即将到来的事件</h3>
+      <div class="event">
+        <div class="event-time">今天 14:00 - 15:00</div>
+        <div class="event-title">Q3 销售评审会</div>
+        <div class="event-meta">参与者：你、张三、小智（Agent）</div>
+      </div>
+      <div class="event">
+        <div class="event-time">明天 10:00 - 10:30</div>
+        <div class="event-title">小智 · 周报提醒</div>
+        <div class="event-meta">触发：Agent 自身日程</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

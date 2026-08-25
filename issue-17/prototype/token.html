@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent 日程 Token 管理原型</title>
+  <style>
+    :root { --bg:#f5f6f8; --panel:#fff; --border:#d1d5da; --accent:#0969da; --text:#1f2328; --muted:#656d76; --danger:#cf222e; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif; background: var(--bg); color: var(--text); padding:24px; }
+    .container { max-width:720px; margin:0 auto; }
+    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    h2 { margin:0; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:16px; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th, td { text-align:left; padding:10px; border-bottom:1px solid var(--border); }
+    th { color:var(--muted); font-weight:600; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:12px; background:var(--bg); font-size:12px; }
+    .btn { padding:6px 12px; border:1px solid var(--border); border-radius:6px; background:#fff; cursor:pointer; font-size:13px; }
+    .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .btn.danger { color:var(--danger); border-color:var(--danger); }
+    .form-row { display:flex; gap:12px; margin-bottom:12px; align-items:center; }
+    .form-row label { width:80px; font-size:14px; }
+    .form-row select, .form-row input { flex:1; padding:8px; border:1px solid var(--border); border-radius:6px; }
+    .back { color:var(--accent); text-decoration:none; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div><a class="back" href="../index.html">← 返回门户</a> · <b>Agent 日程 Token 管理</b></div>
+      <button class="btn primary" onclick="alert('生成新 token：选择权限范围后签发')">+ 签发新 Token</button>
+    </div>
+
+    <div class="card">
+      <h3>为 Agent 签发 Token</h3>
+      <div class="form-row">
+        <label>授权对象</label>
+        <select>
+          <option>小智（Agent）</option>
+          <option>我的个人日历</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>权限范围</label>
+        <select>
+          <option>read_events + write_events + invite_members</option>
+          <option>read_events only</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>后端类型</label>
+        <select>
+          <option>Nextcloud app_password</option>
+          <option>Stalwart OAuth token</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>已签发 Token</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Token ID</th>
+            <th>授权对象</th>
+            <th>权限</th>
+            <th>签发时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>tok_abc123</td>
+            <td>小智（Agent）</td>
+            <td><span class="badge">read + write + invite</span></td>
+            <td>2026-08-20</td>
+            <td><button class="btn danger">撤销</button></td>
+          </tr>
+          <tr>
+            <td>tok_xyz789</td>
+            <td>我的个人日历</td>
+            <td><span class="badge">read + write</span></td>
+            <td>2026-08-22</td>
+            <td><button class="btn danger">撤销</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
