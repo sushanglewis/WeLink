@@ -7,9 +7,9 @@ current_run:
   run_id: 20260824102535-2bd7b26a
   branch: issue-17
   current_stage: product-prototype
-  status: in_progress
+  status: validation_failed
   started_at: '2026-08-24T10:25:36Z'
-  last_updated_at: '2026-08-25T01:55:55Z'
+  last_updated_at: '2026-08-25T02:23:30Z'
   issue_number: '17'
   variables:
     process_slug: issue-17
@@ -114,6 +114,19 @@ nodes:
   - issue-17/designs/issue-17/data-model.md
   - issue-17/designs/issue-17/flows.md
   - issue-17/designs/issue-17/feasibility.md
+  handoff_file: null
+- stage_id: product-prototype
+  node_id: product-prototype-2026-08-25T02:12:05Z
+  status: in_progress
+  started_at: '2026-08-25T02:12:05Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - issue-17/designs/issue-17/fields.md
+  - issue-17/designs/issue-17/ui-spec.md
+  - issue-17/index.html
+  - issue-17/prototype/chat.html
   handoff_file: null
 recovery:
   last_validated_checkpoint: ''

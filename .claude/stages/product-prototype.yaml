@@ -1,7 +1,7 @@
 schema_version: 2.0.0
 id: product-prototype
 name: Product Prototype
-description: Generates UI specs, field specs, and Pencil prototypes.
+description: Generates UI specs, field specs, and HTML or Pencil prototypes.
 templates:
 - interview-to-knowledge
 - existing-project-iteration
@@ -27,9 +27,12 @@ artifacts:
   required:
   - '{process_slug}/designs/{design_id}/ui-spec.md'
   - '{process_slug}/designs/{design_id}/fields.md'
+  - '{process_slug}/index.html'
+  - '{process_slug}/prototype/chat.html'
+  optional:
   - '{process_slug}/designs/{design_id}/prototype.pen'
 context:
-  goal: 将已确认的产品设计文档转化为可交互的 Pencil 原型和开发可用的 UI/字段规格文档。
+  goal: 将已确认的产品设计文档转化为开发可用的 UI/字段规格文档，以及可在浏览器中直接查看的 HTML 原型（Pencil 原型可选）。
   constraints: '- 仅通过 scripts/stage_loader.py 更新 {process_slug}/workflow-stage.yaml。
 
     - 禁止修改 {process_slug}/recordings/ 中的原始文件。
