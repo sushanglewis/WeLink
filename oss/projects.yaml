@@ -101,3 +101,33 @@ projects:
     notes: |
       AWS-centric full-stack reference app. Heavier operational footprint and
       copyleft concerns.
+
+  - name: OpenHands/OpenHands
+    url: https://github.com/OpenHands/OpenHands
+    license: MIT
+    fit_score: 8.1
+    status: reference_only
+    domain: coding-agent-framework
+    decided_at: "2026-08-28"
+    notes: |
+      Large open-source autonomous coding-agent control center (~85k stars).
+      Borrowable patterns for Lincoln: event-sourced EventLog, typed
+      Action-Observation loop, SecurityAnalyzer + ConfirmationPolicy,
+      Condenser for context pressure, workspace factory, skill/plugin
+      marketplace, and sub-agent delegation. Reference only; not embedded as a
+      dependency.
+
+  - name: Tencent/teamai-cli
+    url: https://github.com/Tencent/teamai-cli
+    license: MIT
+    fit_score: 7.7
+    status: reference_only
+    domain: coding-agent-framework
+    decided_at: "2026-08-28"
+    notes: |
+      Tencent open-source TypeScript multi-agent harness for Claude Code / Codex
+      / Cursor / CodeBuddy / OpenCode (~678 stars). Borrowable patterns for
+      Lincoln: git-native skill/rule/hook/MCP distribution, friction-based
+      learning capture, recall subagent with precheck, dual-track AST+heuristic
+      code graph, session analytics, MR-knowledge mining, and team hooks/MCP
+      declarative config. Reference only; not embedded as a dependency.

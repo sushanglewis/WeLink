@@ -1,0 +1,47 @@
+process_slug: issue-70
+issue_number: '70'
+current_stage: explore-opensource
+last_updated: '2026-08-28T16:03:08Z'
+documents:
+- path: docs/decision-001-lew70-research-scope.md
+  stage: explore-opensource
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
+- path: docs/research/openhands-teamai-research-oss-options.md
+  stage: explore-opensource
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
+- path: oss/projects.yaml
+  stage: explore-opensource
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
+- path: requirements/2026-08-28-issue-70/prd.md
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
+- path: requirements/2026-08-28-issue-70/requirements.md
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
+- path: requirements/2026-08-28-issue-70/user-stories.md
+  stage: clarify
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
+- path: workflow-stage.yaml
+  stage: workflow-router
+  status: completed
+  gate_passed: true
+  human_confirmed: true
+  approved_by: human-pm
