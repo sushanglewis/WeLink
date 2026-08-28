@@ -135,10 +135,10 @@ policies:
 | Harness | 落地方式 | 说明 |
 |---------|---------|------|
 | Claude Code | `.claude/hooks/pre-tool-use.sh` | 原生支持 pre-tool-use hook，可直接拦截。 |
-| Codex | 生成 `AGENTS.md` 安全约束章节 + `.codex-plugin/plugin.json` 声明 `hooks: {}` 并可选启用 `security-hook` | Codex CLI 的 hook 支持不稳定，采用“prompt 约束 + 可选 hook”双保险。 |
-| OpenCode | `.opencode/agent/*.md` 系统提示 + 可选 `.opencode/hooks/` | 同 Codex，以 prompt 约束为主。 |
+| Codex | `.codex/hooks/pre-tool-use.sh` + `AGENTS.md` 安全约束 | 启用 pre-tool-use hook，调用同一 `security_analyzer.py`；`AGENTS.md` 作为补充约束。 |
+| OpenCode | `.opencode/hooks/pre-tool-use.sh` + agent 系统提示 | 启用 pre-tool-use hook，调用同一 `security_analyzer.py`；agent 系统提示作为补充约束。 |
 
-> 注：若 Codex/OpenCode 后续原生支持 pre-tool-use hook，可复用同一 `security_analyzer.py`，只需调整调用入口。
+> 三 harness 共用 `scripts/security_analyzer.py` 与 `.claude/security/risk-policy.yaml` 作为单一事实源。Codex/OpenCode 的 hook 脚本为生成产物，由 `scripts/lincoln_harness_adapter.py` 从 `.claude/hooks/pre-tool-use.sh` 派生，并在目标 harness 中替换状态文件解析路径。
 
 #### 4.1.6 human_gate 暂停与恢复
 
@@ -146,6 +146,10 @@ policies:
   ```
   BLOCKED: 文件/目录删除操作不可逆，需人工确认。
   Run: python3 scripts/stage_loader.py --stage <current_stage> --action approve-gate --approved-by human-pm
+  ```
+- 同时向 `issue-<N>/logs/security.log` 写入 JSON 日志：
+  ```json
+  {"timestamp": "2026-08-29T12:00:00Z", "stage": "...", "tool": "Bash", "level": "high", "policy": "file-deletion", "action": "blocked", "command": "rm -rf foo"}
   ```
 - Agent 进入 `waiting_for_human` 状态，只允许 Read/Grep/Glob。
 - PM 确认后运行 approve-gate，恢复 side-effect 工具执行。
@@ -255,6 +259,10 @@ servers:
         enabled: false   # codex 暂不需要 Pencil
 ```
 
+- 环境变量支持从 `.env` 文件读取（通过 `python-dotenv` 在项目根加载），也允许用户显式导出。
+- 敏感变量不会硬编码在 `mcp.yaml` 中；分发到各 harness 时保留 `${VAR}` 占位符，由运行时环境解析。
+- `.env` 加入 `.gitignore`，并提供 `.env.example` 模板。
+
 #### 4.3.4 与现有 `dependencies.yaml` 的关系
 
 - `dependencies.yaml` 继续负责外部 skills/CLIs/plugins 的依赖声明与 pin 校验。
@@ -360,12 +368,20 @@ Lincoln **不自建** risk LLM、hook 引擎或 MCP server；只提供规则配�
   - 若 `security_analyzer.py` 导致误拦截，可删除 `.claude/security/risk-policy.yaml` 或设置 `LINCOLN_SECURITY_MODE=permissive` 环境变量跳过分析。
   - harness 产物为生成文件，可随时删除并重新生成。
 
-## 11. 关键待澄清问题
+## 11. 关键待澄清问题（PM 已答复）
 
-1. **Codex/OpenCode 的 hook 支持**：是否需要投入启用 codex/opencode 的 pre-tool-use hook，还是先用 prompt 约束覆盖 P0？
+1. **Codex/OpenCode 的 hook 支持**：是否投入启用 codex/opencode 的 pre-tool-use hook，还是先用 prompt 约束覆盖 P0？
+   - **PM 决策**：投入启用 Codex / OpenCode 的 pre-tool-use hook。
+   - **落地**：由 `scripts/lincoln_harness_adapter.py` 生成 `.codex/hooks/pre-tool-use.sh` 与 `.opencode/hooks/pre-tool-use.sh`，调用同一 `security_analyzer.py`。
+
 2. **日志记录位置**：风险操作日志写入 `issue-<N>/logs/security.log` 还是统一写入 `.claude/logs/`？
+   - **PM 决策**：写入 `issue-<N>/logs/security.log`。
+   - **落地**：`security_analyzer.py` 根据 `workflow-stage.yaml` 中的 `process_slug` 确定日志路径；目录不存在时自动创建。
+
 3. **MCP 环境变量**：`.claude/mcp/mcp.yaml` 中的敏感变量是否允许从 `.env` 读取，还是必须显式导出？
+   - **PM 决策**：允许从 `.env` 读取。
+   - **落地**：`scripts/lincoln-setup.py` 与 harness adapter 使用 `python-dotenv` 加载 `.env`；`mcp.yaml` 保留 `${VAR}` 占位符，不存储明文密钥。
 
 ---
 
-*PM 确认后，本设计进入 TDD 实现阶段。*
+`<!-- status: approved -->`
