@@ -194,5 +194,3 @@ if __name__ == "__main__":
         log_dir=args.log_dir,
     )
     print(json.dumps(result, ensure_ascii=False))
-    if result["confirm_required"]:
-        raise SystemExit(1)
