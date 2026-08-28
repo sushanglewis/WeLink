@@ -1,8 +1,14 @@
 process_slug: issue-70
 issue_number: '70'
-current_stage: explore-opensource
-last_updated: '2026-08-28T16:03:08Z'
+current_stage: phase-1-p0-design
+last_updated: '2026-08-28T17:05:26Z'
 documents:
+- path: designs/phase-1-p0-harness-security-design.md
+  stage: phase-1-p0-design
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
 - path: docs/decision-001-lew70-research-scope.md
   stage: explore-opensource
   status: completed
