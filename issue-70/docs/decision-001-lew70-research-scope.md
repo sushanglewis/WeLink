@@ -49,6 +49,22 @@ Issue #70 / Linear LEW-70 要求调研 OpenHands（`All-Hands-AI/OpenHands`）�
 | 是否采用摩擦驱动知识捕获？ | **同意**。摩擦信号触发后自动提示贡献者沉淀经验。 | `on-stop.sh` 接入 friction scoring，新增 `lc-share-learnings` 提示模板。 |
 | 是否需要跨仓库代码图？ | **需要**，但 Lincoln 做轻做薄，仅声明外部工具依赖。 | 不自建图引擎，依赖 tree-sitter / lsif / scip 等外部工具；Lincoln 只负责 stage/docs 中的依赖说明与输出消费。 |
 
+## 6. 研究基线合并与后续 Phase 拆分（2026-08-29）
+
+- **PM 决策**：
+  - 同意将研究基线合并到仓库，但不合并到 `main`。
+  - 创建独立分支 `lew-70-research-baseline` 存放研究基线。
+  - P0 / P1 / P2 各创建独立 GitHub Issue，分别进行方案设计，经 PM 批准后进入实现与独立 PR。
+
+- **已执行**：
+  - PR #18 已合并到分支 `lew-70-research-baseline`。
+  - 已创建后续设计 Issue：
+    - #19 — Phase 1 / P0：安全门控 + 三 harness 分发 + hook/MCP 规范
+    - #20 — Phase 2 / P1：摩擦学习、recall precheck、EventLog/Condenser、skill 市场、sub-agent 委托、MR 知识挖掘
+    - #21 — Phase 3 / P2：轻量跨仓库代码图 + session analytics
+
+- **原则**：每个 Phase 独立设计、独立评审、独立实现、独立 PR；真正有效优化 Lincoln 后再提交 PR。
+
 ## 状态
 
 `<!-- status: approved -->`
