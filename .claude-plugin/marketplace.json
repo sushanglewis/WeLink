@@ -1,0 +1,32 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "lincoln",
+  "description": "AI-Native product R&D collaboration system that connects product, design, engineering, and agents into a repeatable workflow.",
+  "owner": {
+    "name": "Lincoln contributors"
+  },
+  "plugins": [
+    {
+      "name": "lincoln",
+      "description": "AI-Native product R&D collaboration system for Conductor + Claude Code. Orchestrates stages, gates, artifacts, skills, and roles across product, design, and engineering into a repeatable workflow from recordings to GitHub Issues to Obsidian knowledge base.",
+      "version": "1.2.0",
+      "author": {
+        "name": "Lincoln contributors"
+      },
+      "source": "./",
+      "category": "productivity",
+      "homepage": "https://github.com/sushanglewis/Lincoln",
+      "tags": [
+        "ai-native",
+        "product-rnd",
+        "collaboration",
+        "interview-to-knowledge",
+        "openspec",
+        "obsidian",
+        "stages",
+        "gates"
+      ]
+    }
+  ],
+  "version": "1.2.0"
+}
