@@ -16,10 +16,10 @@ current_run:
     session_id: 2026-08-28-issue-70
     design_id: issue-70
     issue_number: '70'
-    change_name: ''
+    change_name: openhands-teamai-research
     pr_number: ''
     feature_slug: ''
-  change_name: ''
+  change_name: openhands-teamai-research
   pr_number: ''
   feature_slug: ''
   execution_mode: team
