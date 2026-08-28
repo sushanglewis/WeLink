@@ -1,8 +1,44 @@
 process_slug: issue-70
 issue_number: '70'
 current_stage: phase-1-p0-implement
-last_updated: '2026-08-28T17:14:12Z'
+last_updated: '2026-08-28T17:55:50Z'
 documents:
+- path: .claude/harnesses/codex.yaml
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: .claude/harnesses/opencode.yaml
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: .claude/hooks/hooks.yaml
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: .claude/hooks/pre-tool-use.sh
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: .claude/mcp/mcp.yaml
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: .claude/security/risk-policy.yaml
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
 - path: designs/phase-1-p0-harness-security-design.md
   stage: phase-1-p0-design
   status: completed
@@ -45,6 +81,54 @@ documents:
   gate_passed: true
   human_confirmed: true
   approved_by: human-pm
+- path: scripts/check-harness-drift.sh
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: scripts/lincoln-setup.py
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: scripts/lincoln_harness_adapter.py
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: scripts/security_analyzer.py
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: tests/test_harness_adapter_extended.py
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: tests/test_harness_default_off.py
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: tests/test_hooks.py
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: tests/test_security_analyzer.py
+  stage: phase-1-p0-implement
+  status: completed
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
 - path: workflow-stage.yaml
   stage: workflow-router
   status: completed
