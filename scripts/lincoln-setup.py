@@ -467,6 +467,20 @@ def _add_common_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--offline-cache", default=None, help="Directory with cached skill clones")
 
 
+def _load_dotenv(root: Path) -> None:
+    """Load environment variables from project root .env if python-dotenv is available."""
+    env_file = root / ".env"
+    if not env_file.exists():
+        return
+    try:
+        from dotenv import load_dotenv
+
+        load_dotenv(dotenv_path=env_file, override=False, verbose=False)
+    except ImportError:
+        # python-dotenv is optional; callers can export vars manually.
+        pass
+
+
 def main(args: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="lc-setup",
@@ -515,6 +529,9 @@ def main(args: list[str] | None = None) -> int:
     _add_harness_args(harness_p)
 
     parsed = parser.parse_args(args)
+
+    # Make .env variables available to install commands and harness adapters.
+    _load_dotenv(Path(parsed.root).resolve())
 
     handlers = {
         "check": run_check,

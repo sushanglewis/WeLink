@@ -31,6 +31,25 @@ workflow:
       exit_checks:
         - check: oss_research_complete
 
+    - id: phase-1-p0-design
+      name: Phase 1 P0 设计
+      description: 对 P0 优先级可借鉴模式进行方案设计并获得 PM 批准
+      human_gate: true
+      action: draft-phase-design
+      artifacts:
+        - "{process_slug}/designs/phase-1-p0-harness-security-design.md"
+      exit_checks:
+        - check: design_docs_complete
+        - check: human_approved
+
+    - id: phase-1-p0-implement
+      name: Phase 1 P0 实现
+      description: 按已批准设计实现 P0 功能并通过测试与静态检查
+      action: implement-phase-plan
+      exit_checks:
+        - check: tests_pass
+        - check: static_checks_pass
+
     - id: product-design-docs
       name: 产品设计文档
       description: 产出设计文档（场景、功能目录、数据模型、流程、可行性）
