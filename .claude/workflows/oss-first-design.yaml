@@ -50,6 +50,25 @@ workflow:
         - check: tests_pass
         - check: static_checks_pass
 
+    - id: phase-2-p1-design
+      name: Phase 2 P1 设计
+      description: 对 P1 优先级可借鉴模式进行方案设计并获得 PM 批准
+      human_gate: true
+      action: draft-phase-design
+      artifacts:
+        - "{process_slug}/designs/phase-2-p1-learning-eventlog-subagents-design.md"
+      exit_checks:
+        - check: design_docs_complete
+        - check: human_approved
+
+    - id: phase-2-p1-implement
+      name: Phase 2 P1 实现
+      description: 按已批准设计实现 P1 功能并通过测试与静态检查
+      action: implement-phase-plan
+      exit_checks:
+        - check: tests_pass
+        - check: static_checks_pass
+
     - id: product-design-docs
       name: 产品设计文档
       description: 产出设计文档（场景、功能目录、数据模型、流程、可行性）
