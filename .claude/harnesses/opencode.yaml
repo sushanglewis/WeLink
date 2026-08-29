@@ -1,0 +1,62 @@
+# opencode harness manifest
+# 生成:.opencode/agent/*.md(角色)
+#       .opencode/command/lc-*.md(命令)
+#       .opencode/skills/<skill>/SKILL.md(项目级技能)
+#       .opencode/rules/**/*.md(项目级规则)
+#       .opencode/hooks/*.sh(项目级 hook)
+#       .opencode/mcp.json(项目级 MCP 配置)
+# spike 结论(Context7 /anomalyco/opencode):
+#   agent frontmatter 字段:description/mode/model/temperature/tools/permission
+#   command 文件:frontmatter(description/agent/model)+ 正文模板($ARGUMENTS)
+
+name: opencode
+
+capabilities:
+  # 缺省即关闭(#64):任何未显式声明的能力都可能被 harness 按默认值激活
+  # (superpowers codex hooks 陷阱 obra/superpowers@7d8d3d4)。新增能力必须显式写出;
+  # 空能力显式置 false,不得省略字段。验收测试:tests/test_harness_default_off.py
+  hooks: true
+  skills: true
+  agents: true
+  commands: true
+
+command_map_source: command-map.yaml
+
+targets:
+  - kind: agent
+    source: .claude/agents/*.md
+    output: "{project}/.opencode/agent/{name}.md"
+    scope: project
+    transform: frontmatter
+    fields: [description, mode, model, permission, tools]
+
+  - kind: command
+    source: command_map
+    output: "{project}/.opencode/command/{name}.md"
+    scope: project
+    transform: command-template
+
+  - kind: skill
+    source: .claude/skills/*/SKILL.md
+    output: "{project}/.opencode/skills/{parent}/{name}.md"
+    scope: project
+    transform: copy
+
+  - kind: rule
+    source: .claude/rules/**/*.md
+    output: "{project}/.opencode/rules/{relative_path}.md"
+    scope: project
+    transform: copy
+    optional: true
+
+  - kind: hook
+    source: .claude/hooks/*.sh
+    output: "{project}/.opencode/hooks/{name}.sh"
+    scope: project
+    transform: copy
+
+  - kind: mcp
+    source: .claude/mcp/mcp.yaml
+    output: "{project}/.opencode/mcp.json"
+    scope: project
+    transform: mcp-config
