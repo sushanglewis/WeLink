@@ -16,6 +16,11 @@ agent:
   - lc-engineer
   - lc-researcher
   handoff_to: lc-pm
+  parallel_specialists:
+  - lc-architect
+  - lc-security-reviewer
+  merge_strategy: priority
+  output_schema: .claude/schemas/design-review-feedback.json
 skills:
   required: []
   optional: []

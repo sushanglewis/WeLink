@@ -67,4 +67,26 @@ if [[ -n "$CURRENT_STAGE" && ( "$STAGE_STATUS" == "waiting_for_human" || "$STAGE
         >/dev/null 2>&1 || true
 fi
 
+# Record session stop lifecycle event (best-effort).
+"$PYTHON" - "$STATE_FILE" "$ROOT" <<'PY' >/dev/null 2>&1 || true
+import sys
+sys.path.insert(0, sys.argv[2])
+from pathlib import Path
+from scripts import lincoln_trace
+lincoln_trace.append_event_entry(
+    Path(sys.argv[1]),
+    "session",
+    {"event_type": "session_ended"},
+)
+PY
+
+# Score session friction asynchronously; failures must not block hook exit.
+(
+    "$PYTHON" "$ROOT/scripts/lincoln_friction.py" \
+        --root "$ROOT" \
+        --state-file "$STATE_FILE" \
+        --tail-lines 500 \
+        >/dev/null 2>&1 || true
+) &
+
 exit 0

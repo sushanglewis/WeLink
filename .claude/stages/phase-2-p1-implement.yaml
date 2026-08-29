@@ -17,7 +17,16 @@ skills:
   required: []
   optional: []
 artifacts:
-  required: []
+  required:
+  - scripts/lincoln_friction.py
+  - scripts/lincoln_recall.py
+  - scripts/lincoln_condenser.py
+  - scripts/lincoln_mr_mine.py
+  - scripts/security_analyzer.py
+  - .claude/policies/friction.yaml
+  - .claude/policies/security.yaml
+  - .claude/schemas/design-review-feedback.json
+  optional: []
 context:
   goal: |
     Implement the approved P1 design and verify with tests and static checks.

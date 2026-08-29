@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Risk analyzer for Lincoln pre-tool-use security gate.
 
-Loads `.claude/security/risk-policy.yaml` and evaluates a tool call against the
+Loads `.claude/policies/security.yaml` and evaluates a tool call against the
 configured policies. Designed to be invoked from `.claude/hooks/pre-tool-use.sh`
 and from generated harness-specific hook scripts.
 """
@@ -11,13 +11,14 @@ from __future__ import annotations
 import json
 import os
 import re
+import shlex
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-DEFAULT_POLICY_PATH = ".claude/security/risk-policy.yaml"
+DEFAULT_POLICY_PATH = ".claude/policies/security.yaml"
 
 
 def load_policy(root: Path) -> dict[str, Any]:
@@ -33,54 +34,112 @@ def _normalize_command(command: str) -> str:
     return re.sub(r"\s+", " ", command.strip())
 
 
+def _split_command_segments(command: str) -> list[str]:
+    """Split a shell command on chain operators so each segment is matched.
+
+    Handles `&&`, `||`, `;`, and `|`.
+    """
+    # Split while preserving the operator is not required; we just need segments.
+    segments = re.split(r"\s*(&&|\|\||;|\|)\s*", command)
+    return [_normalize_command(seg) for seg in segments if seg and not re.match(r"^(&&|\|\||;|\|)$", seg.strip())]
+
+
+def _strip_command_prefix(segment: str) -> str:
+    """Remove common leading prefixes that should not hide the real command.
+
+    Examples: `sudo rm foo`, `env VAR=1 rm foo`, `cd /tmp && rm foo`.
+    """
+    segment = _normalize_command(segment)
+    # Strip leading environment assignments.
+    while re.match(r"^[A-Za-z_][A-Za-z0-9_]*=\S+\s+", segment):
+        segment = _normalize_command(re.sub(r"^[A-Za-z_][A-Za-z0-9_]*=\S+\s+", "", segment))
+    # Strip leading sudo/doas.
+    if re.match(r"^(sudo|doas)\s+", segment):
+        segment = _normalize_command(re.sub(r"^(sudo|doas)\s+", "", segment))
+    # Strip leading cd ... && / ;
+    if re.match(r"^cd\s+\S+\s*(&&|;|\|)", segment):
+        segment = _normalize_command(re.sub(r"^cd\s+\S+\s*(&&|;|\|)", "", segment))
+    return segment
+
+
 def _command_matches(condition: str, command: str) -> bool:
     """Evaluate a human-readable condition against a bash command.
 
     Supports a small set of explicitly declared patterns so the policy file
     remains readable. Unknown conditions are treated as non-matching.
+    Segments split on shell chain operators and common prefixes are checked.
     """
-    cmd = _normalize_command(command)
     lowered = condition.lower()
+    segments = _split_command_segments(command)
+
+    def _any_segment(pattern: str) -> bool:
+        return any(re.search(pattern, _strip_command_prefix(seg)) for seg in segments)
 
     if "rm -rf" in lowered or 'command matches "rm -rf"' in lowered:
-        if re.search(r"\brm\s+-rf\b", cmd):
+        if _any_segment(r"\brm\s+-rf\b"):
             return True
 
     if 'command matches "rm -r" or "rm -rf"' in lowered:
-        if re.search(r"\brm\s+-r(?:f)?\b", cmd):
+        if _any_segment(r"\brm\s+-r(?:f)?\b"):
             return True
 
     if 'command matches any of ["rm", "rmdir"]' in lowered:
-        if re.match(r"(?:rm\b|rmdir\b)", cmd):
+        if _any_segment(r"(?:^|\s)(?:rm\b|rmdir\b)"):
             return True
 
     if 'command matches "git push"' in lowered:
-        if re.match(r"git\s+push\b", cmd):
+        if _any_segment(r"\bgit\s+push\b"):
             return True
 
     if "external http client" in lowered or "curl, wget" in lowered:
-        if re.match(r"(?:curl|wget|httpie)\b", cmd):
+        if _any_segment(r"\b(?:curl|wget|httpie)\b"):
             return True
 
     if 'command matches "rm"' in lowered and "rmdir" not in lowered:
-        if re.match(r"rm\b", cmd):
+        if _any_segment(r"\brm\b"):
             return True
 
     return False
 
 
-def _target_matches(condition: str, target: str, process_slug: str) -> bool:
-    """Evaluate a file-target condition."""
+def _resolve_target_path(target: str, root: Path) -> Path:
+    """Resolve a Write/Edit target to an absolute, canonical path."""
+    path = Path(target)
+    if not path.is_absolute():
+        path = root / path
+    try:
+        return path.resolve()
+    except (OSError, ValueError):
+        return path.absolute()
+
+
+def _target_matches(condition: str, target: str, process_slug: str, root: Path) -> bool:
+    """Evaluate a file-target condition using canonical absolute paths."""
     lowered = condition.lower()
-    normalized = target.lstrip("/")
+    resolved = _resolve_target_path(target, root)
+    try:
+        package_root = (root / process_slug).resolve()
+    except (OSError, ValueError):
+        package_root = (root / process_slug).absolute()
+
     if "outside current process_slug" in lowered:
-        return not normalized.startswith(f"{process_slug}/")
+        try:
+            resolved.relative_to(package_root)
+            return False
+        except ValueError:
+            return True
+
     if "inside current process_slug" in lowered:
-        return normalized.startswith(f"{process_slug}/")
+        try:
+            resolved.relative_to(package_root)
+            return True
+        except ValueError:
+            return False
+
     return False
 
 
-def _evaluate_policy(policy: dict[str, Any], tool_name: str, tool_args: dict[str, Any], process_slug: str) -> bool:
+def _evaluate_policy(policy: dict[str, Any], tool_name: str, tool_args: dict[str, Any], process_slug: str, root: Path) -> bool:
     """Return True if the policy applies to this tool call."""
     tools = [t.strip() for t in policy.get("tool", "").split("|")]
     if tool_name not in tools:
@@ -93,7 +152,7 @@ def _evaluate_policy(policy: dict[str, Any], tool_name: str, tool_args: dict[str
 
     if tool_name in ("Write", "Edit"):
         target = tool_args.get("file_path") or tool_args.get("path") or ""
-        return _target_matches(condition, target, process_slug)
+        return _target_matches(condition, target, process_slug, root)
 
     return False
 
@@ -149,7 +208,7 @@ def analyze(
 
     # Evaluate in order; the first matching policy wins.
     for policy in policies:
-        if not _evaluate_policy(policy, tool_name, tool_args, process_slug):
+        if not _evaluate_policy(policy, tool_name, tool_args, process_slug, root):
             continue
 
         result = {

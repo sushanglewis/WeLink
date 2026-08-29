@@ -129,8 +129,8 @@ def _setup_repo(root: Path) -> None:
         ),
         encoding="utf-8",
     )
-    (root / ".claude" / "security").mkdir(parents=True, exist_ok=True)
-    (root / ".claude" / "security" / "risk-policy.yaml").write_text(
+    (root / ".claude" / "policies").mkdir(parents=True, exist_ok=True)
+    (root / ".claude" / "policies" / "security.yaml").write_text(
         yaml.safe_dump({"schema_version": "1.0.0", "policies": []}),
         encoding="utf-8",
     )
@@ -346,11 +346,11 @@ def test_claude_code_check_reports_missing_mcp_config(fake_repo, tmp_path):
 
 
 def test_claude_code_check_reports_missing_risk_policy(fake_repo, tmp_path):
-    (fake_repo / ".claude" / "security" / "risk-policy.yaml").unlink()
+    (fake_repo / ".claude" / "policies" / "security.yaml").unlink()
     project = tmp_path / "project"
     home = tmp_path / "home"
     diffs = check_drift(fake_repo, "claude-code", project_dir=project, home_dir=home)
-    assert any("risk-policy.yaml" in d for d in diffs)
+    assert any("security.yaml" in d for d in diffs)
 
 
 def test_claude_code_generate_is_no_op(fake_repo, tmp_path):

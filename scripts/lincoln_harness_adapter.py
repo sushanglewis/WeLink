@@ -402,7 +402,7 @@ def _check_claude_code_sources(root: Path) -> list[str]:
     if not mcp_yaml.exists():
         diffs.append(f"missing: {mcp_yaml}")
 
-    risk_policy = root / ".claude" / "security" / "risk-policy.yaml"
+    risk_policy = root / ".claude" / "policies" / "security.yaml"
     if not risk_policy.exists():
         diffs.append(f"missing: {risk_policy}")
 

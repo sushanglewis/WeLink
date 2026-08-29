@@ -10,9 +10,9 @@ from scripts.security_analyzer import analyze, load_policy
 
 
 def _write_policy(root: Path, policies: list | None = None) -> Path:
-    policy_dir = root / ".claude" / "security"
+    policy_dir = root / ".claude" / "policies"
     policy_dir.mkdir(parents=True, exist_ok=True)
-    path = policy_dir / "risk-policy.yaml"
+    path = policy_dir / "security.yaml"
     data = {
         "schema_version": "1.0.0",
         "policies": policies
@@ -184,3 +184,46 @@ def test_analyze_respects_permissive_mode(fake_repo):
         assert result["confirm_required"] is False
     finally:
         del os.environ["LINCOLN_SECURITY_MODE"]
+
+
+def test_analyze_rm_with_sudo_prefix_is_blocked(fake_repo):
+    result = analyze(fake_repo, "Bash", {"command": "sudo rm foo.txt"}, process_slug="issue-1")
+    assert result["level"] == "high"
+    assert result["confirm_required"] is True
+
+
+def test_analyze_rm_after_cd_and_chain_is_blocked(fake_repo):
+    result = analyze(fake_repo, "Bash", {"command": "cd /tmp && rm foo.txt"}, process_slug="issue-1")
+    assert result["level"] == "high"
+    assert result["confirm_required"] is True
+
+
+def test_analyze_git_push_with_sudo_prefix_is_logged(fake_repo):
+    result = analyze(fake_repo, "Bash", {"command": "sudo git push origin main"}, process_slug="issue-1")
+    assert result["level"] == "medium"
+    assert result["confirm_required"] is False
+    assert result["log"] is True
+
+
+def test_analyze_absolute_path_inside_package_is_allowed(fake_repo):
+    target = str(fake_repo / "issue-1" / "docs" / "research" / "note.md")
+    result = analyze(
+        fake_repo,
+        "Write",
+        {"file_path": target},
+        process_slug="issue-1",
+    )
+    assert result["level"] == "medium"
+    assert result["confirm_required"] is False
+
+
+def test_analyze_path_traversal_outside_package_is_blocked(fake_repo):
+    target = str(fake_repo / "issue-1" / ".." / ".." / "etc" / "evil.md")
+    result = analyze(
+        fake_repo,
+        "Write",
+        {"file_path": target},
+        process_slug="issue-1",
+    )
+    assert result["level"] == "high"
+    assert result["confirm_required"] is True
