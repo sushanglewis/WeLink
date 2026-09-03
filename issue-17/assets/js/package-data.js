@@ -141,6 +141,21 @@ window.LINC_PACKAGE = {
       ]
     },
     {
+      "group": "产品原型",
+      "items": [
+        {
+          "path": "prototype/workbench.html",
+          "label": "工作台首页原型 (1.3.1 MVP)",
+          "title": "工作台首页原型 (1.3.1 MVP)",
+          "group": "产品原型",
+          "stage": "product-prototype",
+          "version": "v0.1",
+          "status": "draft",
+          "human_confirmed": false
+        }
+      ]
+    },
+    {
       "group": "访谈记录",
       "items": [
         {

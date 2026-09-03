@@ -1,5 +1,7 @@
 # 可行性分析: issue-17
 
+<!-- status: approved -->
+
 ## 业务可行性
 
 - **需求真实且高频**：访谈确认数字员工对话窗口在多任务并行、需求澄清、计划审批、数据操作、日程管理五个维度存在明确痛点；本设计直接对应验收标准逐项可验。
@@ -16,6 +18,47 @@
 - **Teable 表单 iframe**：issue-6 已实现并验收（iframe 嵌入、postMessage 回执、白名单控制），本期直接复用，风险低。
 - **AI 日程**：为本期最大技术不确定性来源，核心未知项（日历后端选型、agent 独立身份、事件触发机制）已通过「PoC 后定案」策略管理，详见下节评估。
 - **性能**：话题切换、Clarify 弹窗、Plan 卡片均为本地渲染与单次 API 调用，< 500ms 目标可达；日程看板为 iframe 加载，依赖后端部署质量，< 3s 目标在自托管条件下可达。
+
+## Mattermost 官方方案与 OpenClaw 能力评估
+
+### Mattermost 官方 BOT 对话窗口方案（截至 2026-08）
+
+Mattermost 核心本身没有「session」概念，但官方 Agents 插件 v2.x（原 Copilot）已提供可直接满足多会话/多话题的方案：
+
+- 右侧栏独立 AI 聊天面板，会话作为一等公民实体（`LLM_Conversations` / `LLM_Turns`）。
+- 频道中 @mention agent 时，thread 即上下文边界；v11.10 的 "Top-level posts only" auto-reply 使每个顶层消息自动开启 thread，即官方版「按话题拆分上下文」。
+- 支持多 agent 自助创建，每个 agent 拥有独立 bot 账号、指令、工具集。
+- Mattermost MCP Server（v11.3+）允许外部 AI 客户端把 Mattermost 当工具使用。
+
+**结论**：官方方案已具备多会话/多话题能力，但 WeLink 已投入 OpenClaw + Mattermost 运行时（issue-14），切换成本极高。本期继续基于 OpenClaw + Mattermost thread 自研话题管理，官方 Agents 插件作为 UX 参考和备选。
+
+### OpenClaw sub-agent 与多 agent 协作
+
+当前 WeLink 数字员工底座为 **OpenClaw**（非 AgentScope）：
+
+- **Sub-agent 扇出/扇入**：`sessions_spawn` 异步创建隔离子 session；子 agent 完成后通过 announce chain 自动汇总回父 session。
+- **多 agent 协作**：Multi-agent routing 支持多角色隔离；Agent-to-Agent 对等通信可通过 `sessions_send` 实现（默认关闭，需配置白名单）。
+- **状态共享**：workspace 可选共享；Teable 作为结构化状态唯一事实源。
+- **Mattermost 集成**：`@openclaw/mattermost` 插件支持 thread-scoped session、mention 门控、Bot Token + WebSocket。
+
+**结论**：OpenClaw 已原生支持 sub-agent 扇出/扇入与多 agent 协作，issue-17 及龙小督督办场景无需框架层改造。
+
+### DeepSeek Harness vs 开源 Codex Harness
+
+| 维度 | DeepSeek Harness | Codex Harness | OpenClaw（当前） |
+|------|-----------------|---------------|-----------------|
+| 定位 | 插件化 agent runtime | 生产级 coding agent 执行层 | 自托管 AI agent 网关 |
+| Sub-agent | 支持，插件化 dispatch | 原生 `spawn_agent` / `wait` | 原生 `sessions_spawn` |
+| 多 agent 协作 | 通过插件包装异构 agent | 多线程并行 thread | 原生 multi-agent routing + A2A |
+| 模型中立 | 高 | 中（偏 OpenAI） | 高 |
+| 生产就绪 | 低（developer preview） | 高 | 高 |
+| 与现有 Mattermost/Teable 集成 | 需重新适配 | 需重新适配 | 已集成 |
+
+**结论**：
+
+- DeepSeek Harness 处于早期 preview，不建议现在替换。
+- Codex Harness 生产级但偏 OpenAI 生态，替换成本高。
+- **保留 OpenClaw**；未来如需增强 coding agent 执行能力，可将 Codex app-server 作为工具接入 OpenClaw，而非整体替换。
 
 ## 开源项目 / 框架参考
 
@@ -92,6 +135,28 @@
 
 ## 建议方案
 
-1. **按 D-1 ~ D-9 关键决策实施**：IM 窗口即工作台；topic = thread；Plan.md 文件化 + 卡片审批；Clarify 定制工具；胶囊统一 JSON schema；复用 issue-6 Teable 成果。
-2. **日程能力按 PoC 驱动落地**：在设计阶段完成 Nextcloud Calendar 主选 PoC（六项用例），合规与体验双通过后定案；agent 侧自始封装统一 skill / MCP / CLI 适配层，隔离后端差异。
-3. **实施顺序建议**：话题管理 → 胶囊系统（含 Teable 复用）→ Clarify → Plan 模式 → AI 日程（依赖 PoC 结论），前四项不阻塞日程 PoC 并行推进。
+1. **按 D-1 ~ D-11 关键决策实施**：IM 窗口即工作台；topic = thread；Plan.md 文件化 + 卡片审批；Clarify 定制工具；胶囊统一 JSON schema；复用 issue-6 Teable 成果；保留 OpenClaw；Mattermost 方案参考官方 Agents 插件但继续自研。
+2. **版本实施顺序**：
+   - **1.3.0**：话题管理 → Clarify → Teable 表单 iframe → 龙小督督办场景。
+   - **1.4.0**：胶囊系统 → Plan 模式 → AI 日程（依赖 PoC 结论）。
+3. **日程能力按 PoC 驱动落地**：在设计阶段完成 Nextcloud Calendar 主选 PoC（六项用例），合规与体验双通过后定案；agent 侧自始封装统一 skill / MCP / CLI 适配层，隔离后端差异。
+
+## 2026-09-02 会议纪要后的可行性增量（2026-09-03 补充）
+
+按 2026-09-02 领导会议纪要，实施顺序调整为「每月两版、1 月底前 8 个版本」（详见 PRD 版本规划），新增能力的可行性初判：
+
+| 新增能力 | 可行性初判 | 关键依赖/风险 |
+|----------|-----------|---------------|
+| 督办自动催办闭环（1.3.1） | 高：OpenClaw 定时任务 + Mattermost thread 回复监听即可支撑；行文润色复用现有 Skill | 回复自动解析准确率需 PoC 验证；确认环节不可省略（Skill 铁则） |
+| 工作台首页（1.3.1/1.4.0） | 高：BFF 聚合审批/督办/通知/知识四类数据源；前端独立页面 | 审批与通知的数据源接入依赖 OA 与管理端（跨团队，九月计划背景条目） |
+| 组织化数字员工管理（1.4.0） | 中：审批流与台账为常规业务系统能力；通讯录联动依赖组织主数据 | 权限分散落地需各业务系统配合改造，接入规范需先行 |
+| 网易/163 邮箱接入（1.4.1/1.5.1） | 中：成熟企业邮箱服务接入；迁移工具链需 PoC | 历史邮件迁移完整性与双轨期不丢信是最大风险 |
+| 企微替换三件套（1.6.0） | 中：审批/考勤/工资条均为成熟业务形态，新系统有 Teable+BFF 底座 | 1 月底倒排时间紧；考勤移动端界面依赖伊莎条目；数据迁移对账复杂 |
+| EIC 专属版本（1.5.1/1.7.x） | 中：多租户/独立环境部署 | 启创本地流程适配需业务侧配合 |
+
+## 修订记录
+
+| 日期 | 修订内容 | 修订人 |
+|------|----------|--------|
+| 2026-08-28 | 新增「Mattermost 官方方案与 OpenClaw 能力评估」章节；新增 DeepSeek Harness / Codex Harness 对比；建议方案中增加版本实施顺序 1.3.0/1.4.0；标记 status: approved | agent |
+| 2026-09-03 | 新增「2026-09-02 会议纪要后的可行性增量」章节：督办闭环/工作台首页/组织化管理/邮箱/企微替换/EIC 六项可行性初判；版本节奏调整为每月两版 | agent |
