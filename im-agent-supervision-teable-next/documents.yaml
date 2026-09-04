@@ -1,0 +1,17 @@
+process_slug: im-agent-supervision-teable-next
+issue_number: ''
+current_stage: clarify
+last_updated: '2026-09-04T07:52:44Z'
+documents:
+- path: docs/research/input-sources.md
+  stage: clarify
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: requirements/2026-09-03-next-steps/next-steps.md
+  stage: clarify
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
