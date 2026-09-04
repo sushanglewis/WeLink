@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="子需求 · 邮箱接入">
+<meta name="nav-group" content="上游需求基线 (issue-17)">
+<meta name="doc-version" content="v0.9-draft">
+<meta name="doc-uid" content="email-p0">
+<title>子需求 · 邮箱接入</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="email-p0">
+
+<header class="doc-header">
+    <h1 data-uid="email-p0-h1">子需求 · 邮箱接入</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.9-draft</span>
+        <span class="doc-stage">阶段: product-prototype</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+> 📄 本文档镜像自 `issue-17/requirements/2026-08-24-issue-17/email-p0.md`（快照 2026-09-04，以源文件为准）。
+# 子需求：企业邮箱接入（P1 / 1.4.1 & 1.5.1）
+
+<!-- status: draft -->
+
+## 背景与来源
+
+本文件从 issue-17 综合需求中拆分而出，聚焦两个相互独立的企业邮箱接入需求（2026-09-03 PM 决策：两个独立需求都进 issue-17）。
+
+- **来源 Issue**: [WeLink #17](https://github.com/sushanglewis/WeLink/issues/17)
+- **来源会议纪要**: `issue-17/interviews/2026-09-02-roadmap-meeting/summary.md`（2026-09-02，网易邮件）
+- **来源九月计划**: `issue-17/recordings/2026-09-September-plan.png`（163 邮箱接入，管理端场景）
+- **PM 决策（2026-09-03）**: 两个独立需求，均纳入 issue-17
+- **上游 PRD**: `issue-17/requirements/2026-08-24-issue-17/prd.md`
+- **上游需求文档**: `issue-17/requirements/2026-08-24-issue-17/requirements.md`
+- **目标版本**: E-1 网易邮件 1.4.1（10 月下）；E-2 163 邮箱 1.5.1（11 月下）
+
+纪要原始论述：
+
+> 「优先保障 IM 基础功能可用，后续逐步接入网易邮件服务，完成从腾讯邮件的迁移。」
+
+九月计划原始条目：
+
+> 「v1.3.0 平台管理端/企业管理端 立即启动：1、163邮箱接入方案（立即启动）」
+
+## 目标
+
+1. **E-1 网易邮件接入（用户邮件）**：接入网易邮件服务，完成企业用户邮件从腾讯邮件的迁移，支撑 MVP 之后的日常邮件收发。
+2. **E-2 163 邮箱接入（管理端场景）**：完成 163 邮箱接入方案并落地管理端邮件场景。
+3. **迁移安全**：邮件迁移过程数据完整可校验、双轨并行不丢信、异常可回滚。
+
+## 范围（In Scope）
+
+### E-1 网易邮件接入（用户邮件，1.4.1）
+
+- 接入网易企业邮箱服务（API/IMAP/SMTP），作为用户日常邮件收发后端。
+- **迁移方案**：
+  - 腾讯邮件 → 网易邮件的全量历史邮件迁移（含文件夹结构、已读状态、附件）。
+  - 双轨并行期：迁移期间新邮件双端可达，避免丢信。
+  - 迁移完成后的 DNS/MX 切换与旧端只读保留期。
+- **功能范围**：收发邮件、文件夹管理、附件、企业通讯录联动（收件人联想）、邮件搜索。
+- **与平台集成**：
+  - 工作台首页知识模块的邮件来源（见 `workbench-home-p0.md` W-3）。
+  - 龙小督督办场景的催办邮件渠道（见 `supervision-p0.md` S-5）。
+  - 新用户默认开通邮箱账号（与组织化数字员工管理的账号体系对齐）。
+
+### E-2 163 邮箱接入（管理端场景，1.5.1）
+
+- 163 邮箱接入方案（九月计划标注「立即启动」，目标 1.5.1 落地）。
+- **管理端场景范围**：管理端业务流程中的邮件收发（具体场景在方案评审时与管理端负责人对齐，可能含审批通知邮件、报表投递等）。
+- 与 E-1 的关系：独立账号体系与接入通道，不共用用户邮件迁移链路；统一管理后台可并存展示两个邮箱渠道状态。
+
+### E-3 迁移治理（公共）
+
+- 迁移前：数据盘点（账号数、邮件量、附件规模）、迁移窗口与双轨期计划、回滚预案。
+- 迁移中：进度监控、失败重试、差异对账（源/目标邮件计数与抽样校验）。
+- 迁移后：旧端只读保留期（建议 ≥ 3 个月）、用户告知与使用引导。
+
+## 非目标
+
+- 不自建邮件服务器；以接入成熟企业邮箱服务为主。
+- 不做个人邮箱（QQ/163 个人版等）的接入。
+- 不替代 OA 内部消息/通知系统（属工作台通知模块，见 `workbench-home-p0.md`）。
+- 管理端整体建设属九月计划背景条目，本文件仅覆盖其中的邮箱接入场景。
+
+## 用户故事
+
+### 故事一：我的邮件迁到了新系统（E-1）
+
+- **作为**：企业内部员工
+- **我希望**：我的历史邮件和文件夹完整迁到新邮箱，迁移期间不丢信，切换后正常工作
+- **以便**：无感完成邮箱切换
+- **验收标准**：
+  - 历史邮件、文件夹、已读状态、附件完整迁移。
+  - 双轨期新邮件不丢。
+  - 切换后收发、搜索、通讯录联动正常。
+
+### 故事二：在工作台看到与我相关的邮件（E-1 集成）
+
+- **作为**：企业内部员工
+- **我希望**：工作台首页知识模块聚合与我工作相关的邮件
+- **以便**：邮件成为个人工作知识的一部分
+- **验收标准**：
+  - 知识模块可检索/展示我的邮件（范围与隐私策略在评审时定义）。
+
+### 故事三：督办催办邮件到达责任人（E-1 集成）
+
+- **作为**：督办管理员
+- **我希望**：龙小督的催办邮件能发送到责任人邮箱
+- **以便**：未登录 IM 的责任人也能收到催办
+- **验收标准**：
+  - 督办催办可按规则走邮件渠道（见 `supervision-p0.md` S-5）。
+
+### 故事四：管理端场景使用 163 邮箱（E-2）
+
+- **作为**：管理端业务负责人
+- **我希望**：管理端业务流程的邮件通过 163 邮箱渠道收发
+- **以便**：管理端邮件能力与用户邮件（网易）解耦，独立运营
+- **验收标准**：
+  - 163 邮箱接入方案通过评审并完成落地。
+  - 管理端指定场景的邮件收发可用。
+
+## 功能需求表
+
+| 功能 | 描述 | 优先级 | 目标版本 |
+|------|------|--------|----------|
+| 网易邮件接入 | 接入网易企业邮箱（API/IMAP/SMTP） | P1 | 1.4.1 |
+| 腾讯→网易历史迁移 | 全量迁移邮件/文件夹/状态/附件 | P1 | 1.4.1 |
+| 双轨并行与切换 | 双轨期不丢信，MX 切换与旧端只读保留 | P1 | 1.4.1 |
+| 邮件基础功能 | 收发/文件夹/附件/通讯录联动/搜索 | P1 | 1.4.1 |
+| 工作台邮件集成 | 知识模块聚合邮件 | P1 | 1.4.1 |
+| 催办邮件渠道 | 督办催办走邮件渠道 | P1 | 1.4.1 |
+| 163 邮箱接入方案 | 方案评审与落地（管理端场景） | P1 | 1.5.1 |
+| 迁移对账与回滚 | 源/目标对账校验、失败重试、回滚预案 | P1 | 1.4.1 |
+
+## 验收标准
+
+### 网易邮件（E-1）
+
+- [ ] 网易企业邮箱接入完成，收发/文件夹/附件/搜索可用。
+- [ ] 历史邮件迁移完整率 100%（计数对账 + 抽样内容校验）。
+- [ ] 双轨并行期无丢信；MX 切换后旧端进入只读保留期（≥ 3 个月）。
+- [ ] 工作台知识模块可聚合展示邮件。
+- [ ] 督办催办可按规则发送邮件。
+- [ ] 回滚预案通过评审且演练可用。
+
+### 163 邮箱（E-2）
+
+- [ ] 163 邮箱接入方案完成评审。
+- [ ] 管理端指定场景邮件收发可用。
+- [ ] 与网易邮件渠道在管理后台并存展示状态。
+
+## 数据模型
+
+邮箱接入本身不引入核心业务数据模型；需记录的配置与审计数据（详细字段在设计阶段定稿）：
+
+| 概念 | 说明 |
+|------|------|
+| MailboxAccount | 邮箱账号映射：user_id → 网易/163 账号、开通状态、开通时间 |
+| MigrationJob | 迁移任务：批次、范围（账号/时间段）、状态、对账结果、回滚标记 |
+| MailChannelConfig | 渠道配置：渠道类型（netease/163）、API 凭证引用（走密钥管理，不硬编码）、启用状态 |
+| MailAuditLog | 审计：迁移操作、切换操作、对账差异处理记录 |
+
+## 界面/交互说明
+
+- 邮箱前端形态（独立邮件客户端界面 vs 嵌入工作台）在 ui-spec 阶段与整体信息架构一并设计；当前版本可先以「工作台知识模块聚合 + 标准 Web 邮件入口」满足。
+- 管理后台提供双渠道（网易/163）状态页：账号开通数、迁移进度、异常告警。
+
+## 依赖
+
+- **组织账号体系**：`org-agent-management-p0.md`（新用户默认开通邮箱）
+- **工作台集成**：`workbench-home-p0.md` W-3 知识模块
+- **督办集成**：`supervision-p0.md` S-5 催办邮件渠道
+- **管理端**：九月计划「v1.3.0 平台管理端/企业管理端」（背景依赖，跨团队）
+
+## 关联产物
+
+- 上游 PRD：`issue-17/requirements/2026-08-24-issue-17/prd.md`
+- 会议纪要摘要：`issue-17/interviews/2026-09-02-roadmap-meeting/summary.md`
+- 九月计划图：`issue-17/recordings/2026-09-September-plan.png`
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

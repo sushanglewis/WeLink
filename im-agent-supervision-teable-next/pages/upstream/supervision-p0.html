@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="子需求 · 督办场景">
+<meta name="nav-group" content="上游需求基线 (issue-17)">
+<meta name="doc-version" content="v0.9-draft">
+<meta name="doc-uid" content="supervision-p0">
+<title>子需求 · 督办场景</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="supervision-p0">
+
+<header class="doc-header">
+    <h1 data-uid="supervision-p0-h1">子需求 · 督办场景</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.9-draft</span>
+        <span class="doc-stage">阶段: product-prototype</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+> 📄 本文档镜像自 `issue-17/requirements/2026-08-24-issue-17/supervision-p0.md`（快照 2026-09-04，以源文件为准）。
+# 子需求：龙小督督办场景（P0 / 1.3.1）
+
+<!-- status: draft -->
+
+> 2026-09-03 按 2026-09-02 领导会议纪要扩展：新增 **S-5 自动催办闭环**（自动催办、责任人回复自动入库、每日汇总报告），本文件对应 9/9 需定稿的「督办事项 V1 方案」。
+
+## 背景与来源
+
+本文件从 issue-17 综合需求中拆分而出，聚焦「龙小督」数字员工在督办业务场景下的高优先级能力。龙小督通过 Mattermost IM 窗口与用户协作，完成督办事项的收集、润色、填报、查询、主动通知与自动催办闭环。
+
+- **来源 Issue**: [WeLink #17](https://github.com/sushanglewis/WeLink/issues/17)
+- **来源会议纪要**: `issue-17/interviews/2026-09-02-roadmap-meeting/summary.md`（2026-09-02，督办场景闭环要求）
+- **关联技能文档**: `issue-17/recordings/督办事项行文风格Skill.docx`
+- **上游 PRD**: `issue-17/requirements/2026-08-24-issue-17/prd.md`
+- **上游需求文档**: `issue-17/requirements/2026-08-24-issue-17/requirements.md`
+- **话题管理子需求**: `issue-17/requirements/2026-08-24-issue-17/topic-windows-p0.md`
+- **目标版本**: 1.3.1（9 月下）；**9/9 完成督办 V1 方案定稿评审**
+
+## 目标
+
+1. **持续澄清 + 行文润色 + 表单填报**：龙小督通过 Clarify 工具持续收集督办事项要素，使用「督办事项行文风格 Skill」对原始文本润色，用户确认后填报到 Teable 表单。
+2. **表格数据筛选与问答**：龙小督基于 Teable 数据直接回答用户关于督办事项的查询。
+3. **Teable 独立账号与 Token 机制**：龙小督拥有独立 Teable 账号；代用户操作时使用用户 Token，留下真实操作痕迹。
+4. **主动通知与话题控制**：龙小督主动通知用户时，按「批次-事项」一对多关系智能创建新话题或延续已有话题。
+5. **自动催办闭环（9/2 会议新增，S-5）**：按规则自动催办责任人，责任人 IM 回复自动同步督办台账，每日向管理员推送汇总报告，实现「录入→催办→更新→汇总」全流程自动化。
+
+## 范围（In Scope）
+
+### S-1 持续澄清与行文润色
+
+- 用户向龙小督提供督办相关原始文本（落实情况、口头记录、会议纪要片段、聊天摘抄）。
+- 龙小督识别督办事项所需关键要素（总体情况、具体进展、存在困难/待协调问题、下一步计划）。
+- 若关键要素缺失，龙小督通过 Clarify 工具主动提问，要求用户补充澄清，直到要素完整。
+- 要素完整后，龙小督调用「督办事项行文风格 Skill」将原始文本改写为标准公文格式。
+- 润色后的文本必须经用户确认，确认无误后方可视为完成，不能直接输出「已完成」。
+- 用户确认后，龙小督将文本填报到 Teable 督办台账对应表单。
+
+### S-2 表格数据筛选与问答
+
+- 用户通过自然语言向龙小督查询督办数据，如：
+  - "这条督办具体信息是什么？"
+  - "编号 xxxx 的督办上一次的反馈结果是什么？"
+- 龙小督将自然语言转化为 Teable 筛选条件或查询请求。
+- 龙小督基于查询结果直接回答用户问题，必要时引用表格中的具体字段值。
+
+### S-3 Teable 独立账号与 Token
+
+- 为龙小督在 Teable 中创建独立账号（`agent@longxiaodu` 或类似）。
+- 为龙小督签发独立 Teable Token，用于系统级只读/管理操作。
+- 为每个用户默认初始化一个 Teable Token，龙小督代用户填写、修改或操作任何 Teable 数据时，使用用户本人的 Token。
+- Token 管理界面支持查看、轮换、撤销。
+
+### S-4 主动通知与话题控制
+
+- 督办业务按「批次-事项」一对多关系组织。
+- 当龙小督需要主动通知用户时：
+  - 若该「批次-事项」已存在对应话题，则在该话题中发送通知消息。
+  - 若不存在对应话题，则主动创建新话题，并将通知消息发送到新话题。
+- 话题创建/选择规则可配置，支持按批次聚合或按事项拆分。
+
+### S-5 自动催办闭环（9/2 会议新增）
+
+- **催办规则配置**：
+  - 管理员可配置催办规则：事项截止时间、逾期天数阈值、催办频率（每日/每周）、催办渠道（IM / 邮件 / 两者）。
+  - 规则可按批次或按事项粒度覆盖默认配置。
+- **自动催办执行**：
+  - 龙小督按规则扫描督办台账，对临近截止或已逾期的事项自动生成催办任务。
+  - 通过「批次-事项」话题映射找到责任人对应话题，向其发送催办消息（IM）；规则要求时同时发送催办邮件。
+  - 每次催办记录催办历史（时间、渠道、内容、责任人）。
+- **责任人回复自动入库**：
+  - 责任人在对应话题中回复后，龙小督自动识别回复内容中的进展信息。
+  - 调用「督办事项行文风格 Skill」将回复润色为标准格式（遵循不脑补、不篡改、保留负面事实的铁则）。
+  - 润色结果在话题中经责任人或管理员确认后，自动更新 Teable 督办台账对应记录，无需人工二次录入。
+- **每日汇总报告**：
+  - 每日固定时间向管理员（于福帅）推送汇总报告，覆盖当日全部督办事项（约 15 个）。
+  - 报告内容：当日新增进展、已催办事项及反馈情况、逾期未反馈事项、明日临近截止事项。
+  - 汇总报告以卡片形式推送，支持点击进入对应「批次-事项」话题查看详情。
+
+## 非目标
+
+- 不替换 Mattermost 作为 IM 底层。
+- 不单独建设独立督办工作台页面；所有交互在数字员工 IM 窗口内完成。
+- 不重新评估 Teable 本身；直接复用 issue-6 已实现的 Teable 集成。
+- 不实现通用 NLP 到 SQL 的任意转换；仅覆盖督办场景常用查询意图。
+
+## 用户故事
+
+### 故事一：龙小督帮我整理并填报督办事项
+
+- **作为**：企业内部员工
+- **我希望**：把一段口语化的督办进展发给龙小督，由其整理成标准格式并填报
+- **以便**：减少公文改写和手动录入工作量
+- **验收标准**：
+  - 龙小督识别缺失要素并主动提问澄清。
+  - 要素完整后按「督办事项行文风格 Skill」润色。
+  - 润色后的文本经我确认后才填报。
+  - 填报使用我的 Teable Token，留下我的操作痕迹。
+
+### 故事二：向龙小督查询督办信息
+
+- **作为**：企业内部员工
+- **我希望**：用自然语言询问龙小督某条督办的具体信息或历史反馈
+- **以便**：快速获取督办数据，无需手动打开表格筛选
+- **验收标准**：
+  - 龙小督能理解常见查询意图。
+  - 基于 Teable 数据给出准确回答。
+  - 回答中引用关键字段（编号、状态、上次反馈结果等）。
+
+### 故事三：龙小督主动通知我督办动态
+
+- **作为**：企业内部员工
+- **我希望**：当督办状态变化或需要我处理时，龙小督主动发消息通知我
+- **以便**：及时处理督办事项，避免遗漏
+- **验收标准**：
+  - 龙小督能根据「批次-事项」关系找到或创建对应话题。
+  - 通知消息发送到正确的话题中。
+  - 同一「批次-事项」的多次通知集中在同一话题。
+
+### 故事四：龙小督自动催办并同步回复（9/2 会议新增）
+
+- **作为**：督办管理员（于福帅）
+- **我希望**：龙小督按规则自动催办责任人，责任人在 IM 回复后自动更新台账，我每天只看汇总报告
+- **以便**：摆脱手工维护 Excel 台账与逐人催办，降低督办运营成本
+- **验收标准**：
+  - 催办规则可配置（截止时间、逾期天数、频率、IM/邮件渠道）。
+  - 龙小督按规则自动向责任人发送催办消息并保留催办历史。
+  - 责任人回复后自动润色、确认并更新 Teable 台账，无需人工二次录入。
+  - 每日收到汇总报告，覆盖约 15 个督办事项的更新、逾期与待办情况。
+
+## 功能需求表
+
+| 功能 | 描述 | 优先级 | 目标版本 |
+|------|------|--------|----------|
+| 督办要素识别 | 从用户输入中提取督办事项关键要素 | P0 | 1.3.0 |
+| 持续澄清提问 | 缺失关键要素时，通过 Clarify 工具主动提问 | P0 | 1.3.0 |
+| 行文风格润色 | 调用「督办事项行文风格 Skill」将原始文本改写为标准公文 | P0 | 1.3.0 |
+| 用户确认环节 | 润色后的文本必须经用户确认后方可填报 | P0 | 1.3.0 |
+| Teable 表单填报 | 用户确认后，使用用户 Token 将数据填报到 Teable | P0 | 1.3.0 |
+| 督办数据查询 | 理解自然语言查询意图，从 Teable 筛选数据并回答 | P0 | 1.3.0 |
+| 龙小督独立 Teable 账号 | 为龙小督创建独立账号和 Token | P0 | 1.3.0 |
+| 用户 Teable Token 初始化 | 为每个用户默认初始化 Teable Token | P0 | 1.3.0 |
+| 代操作使用用户 Token | 龙小督代用户操作 Teable 时使用用户 Token | P0 | 1.3.0 |
+| 主动通知话题创建 | 无对应话题时，龙小督主动创建新话题发送通知 | P0 | 1.3.0 |
+| 主动通知话题延续 | 有对应话题时，龙小督在该话题中发送通知 | P0 | 1.3.0 |
+| 批次-事项话题映射 | 按「批次-事项」一对多关系维护话题映射规则 | P1 | 1.3.0 |
+| 催办规则配置 | 配置截止时间、逾期阈值、催办频率与渠道（IM/邮件） | P0 | 1.3.1 |
+| 自动催办执行 | 按规则扫描台账，主动向责任人发送催办消息并记录历史 | P0 | 1.3.1 |
+| 责任人回复自动入库 | 回复自动识别、润色、确认后更新 Teable 台账 | P0 | 1.3.1 |
+| 每日汇总报告 | 每日向管理员推送全量督办事项更新/逾期/待办汇总卡片 | P0 | 1.3.1 |
+
+## 验收标准
+
+### 持续澄清与行文润色
+
+- [ ] 龙小督能从用户输入中识别督办事项关键要素。
+- [ ] 关键要素缺失时，龙小督主动发起 Clarify 提问。
+- [ ] 用户补充后，龙小督继续识别，直到要素完整。
+- [ ] 要素完整后，龙小督调用「督办事项行文风格 Skill」输出标准格式文本。
+- [ ] 润色后的文本需经用户确认，不能直接标记为「已完成」。
+- [ ] 用户确认后，龙小督使用用户 Token 将数据填报到 Teable。
+- [ ] 填报完成后在对话中反馈结果。
+
+### 表格数据查询
+
+- [ ] 龙小督能理解至少 5 类常见查询意图（按编号查、按名称查、查最新状态、查历史反馈、查批次列表）。
+- [ ] 查询结果直接以自然语言回答用户。
+- [ ] 回答中引用关键字段，避免编造不存在的数据。
+
+### Token 与账号
+
+- [ ] 龙小督拥有独立 Teable 账号和 Token。
+- [ ] 每个用户在启用龙小督时默认初始化 Teable Token。
+- [ ] 龙小督代用户操作时使用用户 Token，而非自身 Token。
+- [ ] Token 管理界面支持查看、轮换、撤销。
+
+### 主动通知与话题控制
+
+- [ ] 龙小督主动通知时，优先查找该「批次-事项」的已有话题。
+- [ ] 无已有话题时，主动创建新话题并发送通知。
+- [ ] 同一「批次-事项」的后续通知发送到同一话题。
+- [ ] 话题映射规则可配置（按批次聚合 / 按事项拆分）。
+
+### 自动催办闭环（S-5，9/2 会议新增）
+
+- [ ] 管理员可配置催办规则：截止时间、逾期天数阈值、催办频率、催办渠道（IM/邮件/两者）。
+- [ ] 规则支持按批次或按事项粒度覆盖默认配置。
+- [ ] 龙小督按规则扫描台账，对临近截止或已逾期事项自动生成催办任务。
+- [ ] 催办消息发送到责任人对应话题；规则要求时同步发送催办邮件。
+- [ ] 每次催办记录历史（时间、渠道、内容、责任人）。
+- [ ] 责任人在话题中回复后，龙小督自动识别进展信息并按行文风格 Skill 润色。
+- [ ] 润色结果经确认后自动更新 Teable 台账，无需人工二次录入。
+- [ ] 每日固定时间向管理员推送汇总报告（当日进展、已催办及反馈、逾期未反馈、明日临近截止）。
+- [ ] 汇总报告以卡片形式推送，可点击进入对应话题查看详情。
+
+## 数据模型
+
+复用 `issue-17/designs/issue-17/fields.md` 中定义的 `Topic`、`ClarifySession`、`Capsule`、`ScheduleToken` 等模型，并新增/扩展以下概念：
+
+| 概念 | 说明 |
+|------|------|
+| SupervisionBatch | 督办批次，一个批次包含多个督办事项 |
+| SupervisionItem | 督办事项，属于某个批次，可能对应一个或多个话题 |
+| Topic.batch_id / Topic.item_id | 话题与督办批次/事项的关联字段（可选扩展） |
+| TeableToken | 复用 ScheduleToken 结构，token_type 扩展为 teable_token |
+| ReminderRule | 催办规则（9/2 新增）：截止时间、逾期阈值、频率、渠道、适用批次/事项 |
+| ReminderLog | 催办历史（9/2 新增）：催办时间、渠道、内容、责任人、关联事项 |
+| DailyDigest | 每日汇总报告（9/2 新增）：日期、事项更新集合、逾期集合、明日临近截止集合 |
+
+## 界面/交互说明
+
+- 复用 issue-17 话题管理、Clarify 选项卡、Teable 表单 iframe 的交互形态。
+- 龙小督在督办场景下以独立 agent 身份出现，拥有独立头像/名称。
+- 行文润色结果以 Plan 卡片形式展示，底部附「确认填报」「需要修改」按钮。
+- 数据查询结果以普通消息气泡或卡片形式回复。
+- 催办消息（9/2 新增）：以带事项摘要与「反馈进展」按钮的卡片形式发送至责任人话题；催办邮件使用同一文案模板。
+- 每日汇总报告（9/2 新增）：以卡片形式推送至管理员，按「当日进展 / 已催办及反馈 / 逾期未反馈 / 明日临近截止」分区，每条附跳转对应话题链接。
+
+## 依赖
+
+- **Mattermost/OpenClaw 运行时**：`issue-14` 已建设
+- **话题管理**：`topic-windows-p0.md`
+- **Clarify 工具**：`issue-17/designs/issue-17/flows.md` F-C01~F-C03
+- **Teable 集成**：`issue-6` 已实现
+- **行文风格 Skill**：`issue-17/recordings/督办事项行文风格Skill.docx`（稳定副本，原附件 `.context/attachments/wQ2Qxc/`）
+
+## 关联产物
+
+- 上游 PRD：`issue-17/requirements/2026-08-24-issue-17/prd.md`
+- 上游需求文档：`issue-17/requirements/2026-08-24-issue-17/requirements.md`
+- 话题管理子需求：`issue-17/requirements/2026-08-24-issue-17/topic-windows-p0.md`
+- 功能目录：`issue-17/designs/issue-17/feature-catalog.md`
+- 流程图：`issue-17/designs/issue-17/flows.md`
+- 数据模型：`issue-17/designs/issue-17/fields.md`
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

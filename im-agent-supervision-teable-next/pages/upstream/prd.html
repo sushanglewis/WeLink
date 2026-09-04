@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="PRD">
+<meta name="nav-group" content="上游需求基线 (issue-17)">
+<meta name="doc-version" content="v1.0">
+<meta name="doc-uid" content="prd">
+<title>PRD</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="prd">
+
+<header class="doc-header">
+    <h1 data-uid="prd-h1">PRD</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v1.0</span>
+        <span class="doc-stage">阶段: clarify</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+> 📄 本文档镜像自 `issue-17/requirements/2026-08-24-issue-17/prd.md`（快照 2026-09-04，以源文件为准）。
+# PRD: 2026-08-24-issue-17
+
+<!-- status: draft -->
+
+> 2026-09-03 整合 2026-09-02 领导会议纪要后大范围修订，状态回退为 draft，待 PM 重新确认后标记 approved。
+
+## 产品目标
+
+为 WeLink 数字员工产品引入 AI 工作台化能力，并按 2026-09-02 领导会议纪要（见 [`issue-17/interviews/2026-09-02-roadmap-meeting/summary.md`](../../interviews/2026-09-02-roadmap-meeting/summary.md)）确定的产品路线推进企业协同系统建设：
+
+1. 让 IM 对话具备话题级别的上下文管理能力，支撑多任务并行协作。
+2. 通过 Codex 风格的 Clarify 工具降低需求澄清成本。
+3. 通过 Plan 模式建立复杂任务的人类审批闭环，提升 agent 执行的可控性。
+4. 将 skills、MCP、插件、多维表格以胶囊形式嵌入对话，并复用 issue-6 已实现的 Teable 表单 iframe，让 agent 能够操作企业数据与调用外部能力。
+5. 为每位用户提供个人日程看板；让 agent 能够帮助用户管理日程，同时让 agent 作为组织成员拥有独立日历身份、管理自己的日程，并能够被日程事件触发执行动作。
+6. **（9/2 会议新增）独立工作台首页**：以待办（流程审批 + 艾特督办）、通知、知识三模块呈现员工日常工作的第一界面，作为系统默认落地页；数字员工 IM 为对外协同交流入口。
+7. **（9/2 会议新增）龙小督督办全闭环**：在收集、润色、填报、查询基础上，扩展自动催办、责任人 IM 回复自动同步数据表、每日汇总报告；9/9 完成督办 V1 方案定稿。
+8. **（9/2 会议新增）组织化数字员工管理**：建立「业务部门提需求 → 人力资源部基础配置 → 纳入企业通讯录 → 数字赋能部配置账号/权限/岗位职责」的创建审批流；数字员工定位企业内初级岗位（登记、分发、归集）；权限分散到各业务系统内部管理，平台侧只管系统级访问，仅人事岗位开放技能配置权限。
+9. **（9/2 会议新增）企业邮箱接入**：163 邮箱接入（管理端场景，源自九月计划）与网易邮件接入替换腾讯邮件（用户邮件）两个独立需求。
+10. **（9/2 会议新增）企微替换**：重建审批、考勤、工资条能力，11 月在启创内部全员试用，1 月底完全替换现有 SaaS 版企微，并同步部署启创专属 EIC 版本。
+
+## 版本规划
+
+按 2026-09-02 会议纪要确定的路线重排：自 2026 年 9 月起**每月发布两个版本，1 月底前共 8 个版本**（1.3.0 ~ 1.6.1），关键锚点：**11 月启创全员试用**、**1 月底完全替换 SaaS 企微**。
+
+| 版本 | 时间 | 上线能力 | 锚点/说明 |
+|------|------|----------|-----------|
+| 1.3.0 | 9 月上 | 话题多窗口、Clarify 工具、Teable 表单 iframe 嵌入（原 1.3.0 主体） | 9/9 督办 V1 方案定稿评审 |
+| 1.3.1 | 9 月下 | 龙小督督办全闭环 V1（自动催办、责任人回复自动入库、每日汇总报告）；工作台首页 MVP（待办 + 督办数据源） | 督办 V1 开发落地 |
+| 1.4.0 | 10 月上 | 工作台首页完整版（待办/通知/知识三模块）；组织化数字员工管理（创建审批流、通讯录纳入、防冗余创建） | |
+| 1.4.1 | 10 月下 | 网易邮件接入（替换腾讯邮件）；权限分散配置体系 | |
+| 1.5.0 | 11 月上 | **启创全员试用版**：IM 基础功能打磨 + 工作台首页 + 督办闭环 + 邮件 | 11 月试用锚点 |
+| 1.5.1 | 11 月下 | 试用反馈快速迭代；163 邮箱接入（管理端场景）；EIC 专属版本部署启动 | |
+| 1.6.0 | 12 月上 | 企微替换三件套重建：审批、考勤、工资条；话题摘要 P1 | |
+| 1.6.1 | 12 月下 | 企微替换切换预演；主数据系统对接；Plan 模式 | |
+| 1.7.x | 次年 1 月 | **1 月底完全替换 SaaS 企微**；EIC 版本全量适配；胶囊系统、AI 日程 | 1 月底替换锚点；胶囊/日程顺序待排 |
+
+原 1.4.0 中的 Plan 模式、胶囊系统、AI 日程因企微替换倒排计划提前而移至 1.6.1 / 1.7.x；AI 日程在九月计划中标注「日程 - ?」，具体排期待 PM 确认。
+
+> ⚠️ 上表 R1–R8 映射为 agent 按「每月两版、会议纪要范围」拟定的初稿，**待 PM 确认**后固化为需求基线。
+
+Agent 框架与 Mattermost BOT 对话窗口调研结论：当前底座 **OpenClaw 已原生支持 sub-agent 扇出/扇入与多 agent 协作**，Mattermost thread 已能满足话题隔离需求，因此**保留 OpenClaw、不替换为 DeepSeek Harness / Codex Harness**，详情见 [`issue-17/docs/research/agent-framework-decision.md`](../../docs/research/agent-framework-decision.md)。
+
+GUI 路线调研结论：保留 Teable 作为数据底座，在其上建设**轻量 BFF 应用层**而非让每个 GUI 直接耦合 Teable API，亦不做独立前后台系统；详情见 [`issue-17/docs/research/issue-17-gui-vs-custom-system.md`](../../docs/research/issue-17-gui-vs-custom-system.md)。该结论与会议纪要「TF 仅作为底层数据库、交互界面产品化封装」「不再做工具拼装」一致。
+
+## 功能需求
+
+| 功能 | 描述 | 优先级 | 目标版本 |
+|------|------|--------|----------|
+| 话题列表展示 | 在聊天窗口中展示当前对话的所有话题（标题/最后活跃时间）；详细规格见 `topic-windows-p0.md` | P0 | 1.3.0 |
+| 创建新话题 | 人类用户可创建新话题并进入独立窗口（= 新 Mattermost thread）；详细规格见 `topic-windows-p0.md` | P0 | 1.3.0 |
+| Agent 建议/创建话题 | 当用户输入与当前话题明显不同时，agent 可建议或直接创建新话题；详细规格见 `topic-windows-p0.md` | P0 | 1.3.0 |
+| 切换/继续话题 | 点击历史话题加载其消息并继续讨论；详细规格见 `topic-windows-p0.md` | P0 | 1.3.0 |
+| 话题摘要与元信息 | 话题显示标题、创建时间、最后活跃时间、可选摘要；空标题时 agent 可生成摘要回填 | P1 | 1.6.0 |
+| Clarify 底部弹窗 | 需求模糊时 agent 对 thread 调用 Clarify 工具，前端在话题窗口底部弹出选项卡 | P0 | 1.3.0 |
+| Clarify 自定义输入 | 每个问题提供 3 个推荐选项 + 1 个自定义输入；支持单选/多选 | P0 | 1.3.0 |
+| Clarify 多轮支持 | 支持连续多轮澄清直到需求明确 | P1 | 1.3.0 |
+| Teable 表单 iframe 嵌入 | 复用 issue-6 已实现的 teable 表单视图 iframe 嵌入消息；仅允许白名单域名 | P0 | 1.3.0 |
+| Teable 表单填报提交 | 用户在 iframe 中填写并提交，数据同步回 teable，并通过 postMessage 回传成功/失败提示 | P0 | 1.3.0 |
+| 工作台首页三模块 | 独立工作台首页作为默认落地页，聚合待办（流程审批+艾特督办）、通知、知识三模块；详见 `workbench-home-p0.md` | P0 | 1.3.1/1.4.0 |
+| 督办自动催办闭环 | 催办规则配置、主动向责任人 IM/邮件催办、责任人 IM 回复自动解析入库、每日汇总报告推送；详见 `supervision-p0.md` S-5 | P0 | 1.3.1 |
+| 组织化数字员工管理 | 创建审批流、纳入企业通讯录、初级岗位定位、防冗余创建、权限分散到业务系统、仅人事技能配置；详见 `org-agent-management-p0.md` | P0 | 1.4.0 |
+| 网易邮件接入 | 接入网易邮件服务，完成从腾讯邮件的迁移（用户邮件）；详见 `email-p0.md` | P1 | 1.4.1 |
+| 163 邮箱接入 | 163 邮箱接入方案（管理端场景，源自九月计划）；详见 `email-p0.md` | P1 | 1.5.1 |
+| 企微替换三件套 | 审批、考勤、工资条能力重建，替换现有 SaaS 版企微；详见 `wework-replacement-p0.md` | P0 | 1.6.0 |
+| EIC 专属版本 | 启创专属 EIC 版本部署，配置适配启创业务的流程；详见 `wework-replacement-p0.md` | P0 | 1.5.1/1.7.x |
+| Plan.md 生成 | 复杂任务触发 Plan 模式，agent 生成 markdown 计划（背景/目标/步骤/依赖/验收标准/风险） | P0 | 1.6.1 |
+| Plan.md 展示 | 以定制消息卡片形式渲染 Plan.md，展示当前版本号 | P0 | 1.6.1 |
+| Plan 通过/修改按钮 | 卡片提供「通过」和「需要修改」按钮，回调 agent | P0 | 1.6.1 |
+| Plan 迭代修改 | 用户在输入框描述修改意见，agent 更新 Plan.md 并重渲染；每次修改生成新 PlanRevision，历史可查 | P0 | 1.6.1 |
+| Plan 执行锁定 | Plan 未通过前 agent 不执行 Plan 中的关键动作 | P0 | 1.6.1 |
+| Plan 执行与进度反馈 | Plan 通过后 agent 按计划执行并在话题中反馈进度 | P0 | 1.6.1 |
+| 胶囊「+」菜单 | 输入框「+」菜单支持选择 skills / MCP / 插件 / 多维表格；仅展示有权限对象 | P0 | 1.7.x |
+| Skills 胶囊插入 | 选择 skill 后以胶囊形式插入消息，展示名称/描述/参数预览；点击后 skill 及上下文注入当前对话 | P0 | 1.7.x |
+| MCP 胶囊插入 | 选择 MCP server 后以胶囊形式插入消息，展示名称/可用工具数/关键工具预览；点击后对应 MCP 工具集接入 agent 上下文 | P0 | 1.7.x |
+| 插件胶囊插入 | 选择插件后以胶囊形式插入消息，展示名称/版本/功能摘要；点击后插件能力在当前对话激活 | P0 | 1.7.x |
+| 多维表格胶囊插入 | 选择 teable 表格后以胶囊形式插入消息，展示表名及 base_id / table_id / view_id；仅列出有权限表格 | P0 | 1.7.x |
+| 胶囊解析与调用 | 四类胶囊采用统一自定义 JSON schema，agent 解析后按 capsule_type 分发调用 skill / MCP / 插件 / teable skills | P0 | 1.7.x |
+| 胶囊卡片渲染与管理 | 消息内统一渲染为可点击/展开卡片，支持删除/替换；非法 schema 显示「无法解析」 | P0 | 1.7.x |
+| 日程看板入口 | 提供个人日程看板入口（侧边栏或聊天内），通过 iframe 嵌入开源日历 UI（月/周/日视图） | P0 | 1.7.x |
+| Agent 创建日程 | Agent 从对话中识别待办（时间/事项/参与人）并帮助用户创建事件；创建成功后在话题返回确认 | P0 | 1.7.x |
+| Agent 邀请成员 | Agent 可将其他成员加入日程并发送邀请；受邀人收到通知并在其看板可见 | P0 | 1.7.x |
+| 个人日程范围 | 用户只关注个人日程；多人事件所有参与人均可见；不与外部日历互通 | P0 | 1.7.x |
+| Agent 日程 Token | 为 agent 签发/查看/撤销访问日历后端的 token；token 可独立生成、轮换、撤销 | P0 | 1.7.x |
+| Agent 独立日历身份 | Agent 作为组织成员拥有独立账户/身份，可管理自己的日程；可被其他成员添加为参与人 | P0 | 1.7.x |
+| 日程事件触发 Agent | agent 自身事件到达触发条件时唤醒 agent 执行配置动作；触发机制支持 webhook/push/轮询兜底，动作可配置 | P0 | 1.7.x |
+| 日程看板编辑 | 用户在 iframe 看板中查看/编辑/删除事件 | P1 | 1.7.x |
+| 日程通知 | 事件创建/邀请时向参与人发送通知 | P1 | 1.7.x |
+
+## 非功能需求
+
+| 类别 | 需求 |
+|------|------|
+| License | 日程后端必须采用 MIT / Apache-2.0 / AGPL；GPL 家族排除。 |
+| Agent 友好 | 日历后端需提供 CLI、REST API、MCP server 或 JMAP 中至少一种可编程接口。 |
+| 国产化 | 优先选择国内可部署或有商业买断路径的开源方案；遵循 issue-3/6/11/14 的国产化约束。 |
+| 安全 | iframe 嵌入启用 HTTPS、CSP、postMessage 白名单；token 不硬编码、可轮换；权限最小化；数字员工权限分散到业务系统，平台侧不集中管理数据权限。 |
+| 性能 | 话题切换、Clarify 弹窗、Plan 卡片渲染响应时间 < 500ms（前端）；工作台首页首屏加载 < 2s。 |
+| 可用性 | 工作台首页、话题、Clarify、Plan、Teable 胶囊/表单、日程看板在桌面端（Tauri/WebView）与 B/S 端一致可用。 |
+| 可维护性 | Agent 操作日历的接口封装为 skill / MCP server / CLI，便于替换后端；业务 GUI 通过 BFF 应用层访问 Teable，不直接耦合 Teable API。 |
+| 数据 | 所有业务数据最终统一对接企业主数据系统，避免数据孤岛（会议纪要原则，1.6.1 起落地）。 |
+
+## 发布标准
+
+1. 各版本范围内功能通过验收；11 月试用版（1.5.0）通过启创内部试用评审。
+2. 日程开源方案完成 License 与 国产化 合规评审。
+3. PM 确认需求文档（requirements.md / user-stories.md / prd.md 及各子需求文档）并标记 `<!-- status: approved -->`。
+4. 产品设计文档通过 human_gate 审批。
+5. 安全团队确认 iframe token 传递、postMessage、CSP 方案。
+6. 1 月底企微替换完成前，审批/考勤/工资条三件套通过业务验收并完成数据迁移校验。
+
+## 风险
+
+| 风险 | 影响 | 缓解措施 |
+|------|------|----------|
+| 工作台首页入口形态与会议发言存在张力 | 中 | 纪要中「工作台入口不得比数字员工更明显」「IM 窗口内做工作台改造」与 PM 决策的独立工作台首页存在张力；评审时与领导再对齐，首页内突出数字员工协同入口。 |
+| 督办 V1 9/9 定稿时间紧 | 高 | 本工作包优先交付 `supervision-p0.md` S-5 自动催办闭环扩展与评审材料。 |
+| 企微替换倒排（1 月底）挤压 Plan/胶囊/日程排期 | 中 | Plan 提前至 1.6.1；胶囊与 AI 日程放入 1.7.x 并留排期缓冲。 |
+| 权限分散落地依赖各业务系统改造 | 中 | 平台侧先落地「系统级访问清单」，与各业务系统约定接入规范与排期。 |
+| 邮件迁移数据完整性与双轨运行 | 中 | 迁移方案评审时定义数据校验、双轨并行期与回滚策略。 |
+| AGPL 日程后端的商业分发合规成本 | 高 | 确认 WeLink 私有部署模式下 AGPL 网络触发条件；评估商业许可买断。 |
+| 话题持久化模型选择错误导致后期重构 | 高 | 在产品设计阶段与 issue-14 的 Mattermost thread 规则对齐，明确数据模型。 |
+| Plan.md 审批交互与 OpenClaw runtime 集成复杂 | 中 | 复用/扩展 issue-14 的 clarification.html 原型，定义统一的消息卡片协议。 |
+| Teable 表单 iframe 跨域与权限控制 | 中 | PoC 验证 postMessage 白名单、CSP、token 注入方案；必要时使用一次性 exchange code。 |
+| CalDAV/JMAP MCP server 成熟度不足 | 中 | 对 Nextcloud/Stalwart 进行 PoC，验证 "创建事件 + 邀请成员 + agent 独立账户 + 事件触发" 最小闭环。 |
+| Agent 独立日历身份与日程事件触发机制 | 中 | 明确 agent 账户模型（per-agent account vs service account）与触发机制（webhook / push / 轮询）。 |
+| 用户不接受 AGPL 方案 | 中 | 准备 MIT 自建路径（sabre/dav + 自研 UI）作为 fallback。 |
+
+## 参考
+
+- GitHub Issue #17：https://github.com/sushanglewis/WeLink/issues/17
+- 2026-09-02 领导会议纪要摘要：`issue-17/interviews/2026-09-02-roadmap-meeting/summary.md`
+- 需求文档：`issue-17/requirements/2026-08-24-issue-17/requirements.md`
+- 用户故事：`issue-17/requirements/2026-08-24-issue-17/user-stories.md`
+- 子需求：`topic-windows-p0.md` / `supervision-p0.md` / `workbench-home-p0.md` / `org-agent-management-p0.md` / `email-p0.md` / `wework-replacement-p0.md`
+- 日程开源调研：`issue-17/docs/research/schedule-oss-options.md`
+- GUI 路线调研：`issue-17/docs/research/issue-17-gui-vs-custom-system.md`
+- 相关 issue：issue-3（AI 工作台）、issue-6（Teable）、issue-11（Tauri 桌面端）、issue-14（数字员工平台）、issue-15（Agent 交流广场）
+
+## 修订记录
+
+| 日期 | 修订内容 | 修订人 |
+|------|----------|--------|
+| 2026-08-27 | 与 `feature-catalog.md` 对齐：补全 Agent 建议/创建话题、Plan 执行与进度反馈、胶囊卡片渲染与管理；统一话题管理、Clarify、Plan、胶囊、Teable 表单、AI 日程描述细节 | human-pm |
+| 2026-08-28 | 新增版本规划（1.3.0 / 1.4.0）；功能需求表增加「目标版本」列；新增龙小督督办场景引用与 Agent 框架/Mattermost 决策引用 | agent |
+| 2026-09-03 | 整合 2026-09-02 领导会议纪要：产品目标扩至 10 项；版本规划按「每月两版、1 月前 8 版」重排为 1.3.0~1.6.1（锚点：11 月启创试用、1 月底替换企微）；新增工作台首页、督办自动催办闭环、组织化数字员工管理、双邮箱需求、企微替换三件套/EIC 版本；新增 GUI 路线（Teable+BFF）引用；风险表新增 5 项；状态回退 draft 待 PM 确认。依据 `interviews/2026-09-02-roadmap-meeting/summary.md` 与 PM 8 项决策 | agent |
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>
