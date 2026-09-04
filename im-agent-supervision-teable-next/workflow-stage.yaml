@@ -44,6 +44,10 @@ nodes:
   artifacts:
   - im-agent-supervision-teable-next/docs/research/input-sources.md
   - im-agent-supervision-teable-next/requirements/2026-09-03-next-steps/next-steps.md
+  - im-agent-supervision-teable-next/index.html
+  - im-agent-supervision-teable-next/assets/js/package-data.js
+  - im-agent-supervision-teable-next/pages/docs/next-steps.html
+  - im-agent-supervision-teable-next/pages/docs/input-sources.html
   handoff_file: null
 recovery:
   last_validated_checkpoint: ''
