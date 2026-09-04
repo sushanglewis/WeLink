@@ -49,6 +49,7 @@ nodes:
   - im-agent-supervision-teable-next/pages/docs/next-steps.html
   - im-agent-supervision-teable-next/pages/docs/input-sources.html
   - im-agent-supervision-teable-next/pages/upstream/
+  - im-agent-supervision-teable-next/docs/research/gui-route-teable-bff.md
   handoff_file: null
 recovery:
   last_validated_checkpoint: ''

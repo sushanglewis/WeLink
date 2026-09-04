@@ -1,9 +1,15 @@
 process_slug: im-agent-supervision-teable-next
 issue_number: ''
 current_stage: clarify
-last_updated: '2026-09-04T08:12:54Z'
+last_updated: '2026-09-04T08:46:26Z'
 documents:
 - path: assets/js/package-data.js
+  stage: clarify
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: docs/research/gui-route-teable-bff.md
   stage: clarify
   status: in_progress
   gate_passed: false
