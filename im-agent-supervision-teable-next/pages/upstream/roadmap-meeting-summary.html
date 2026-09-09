@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="9/2 会议纪要摘要">
+<meta name="nav-group" content="研究调研 (issue-17)">
+<meta name="doc-version" content="v0.9-draft">
+<meta name="doc-uid" content="roadmap-meeting-summary">
+<title>9/2 会议纪要摘要</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="roadmap-meeting-summary">
+
+<header class="doc-header">
+    <h1 data-uid="roadmap-meeting-summary-h1">9/2 会议纪要摘要</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.9-draft</span>
+        <span class="doc-stage">阶段: product-prototype</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+> 📄 本文档镜像自 `issue-17/interviews/2026-09-02-roadmap-meeting/summary.md`（快照 2026-09-04，以源文件为准）。
+# 访谈摘要：数字员工产品路线与企业协同系统需求讨论（2026-09-02）
+
+- **会议时间**：2026-09-02 10:15 ~ 10:42（约 26 分钟，3 人）
+- **原始材料**：`issue-17/recordings/数字员工产品路线与企业协同系统需求讨论-2026年09月02日.pdf`（录音转写 + 智能总结）
+- **补充材料**：`issue-17/recordings/2026-09-September-plan.png`（九月份计划）、`issue-17/recordings/督办事项行文风格Skill.docx`
+- **录入日期**：2026-09-03
+- **状态**：已纳入 issue-17 需求基线（见 PRD 修订记录 2026-09-03）
+
+## 关键结论（按主题）
+
+1. **产品路线**：坚持数字员工为核心路线；反对工作台入口比数字员工更明显（以飞书「艾丽 + 豆包工作台」双入口混乱为反面案例）；工作台相关能力需要改造，但入口形态经 PM 决策为独立工作台首页（见下方 PM 决策 ⑥）。
+2. **权限体系**：权限分散到各业务系统内部自管，数字员工平台只管「能访问哪些系统」，不在平台侧做统一数据权限（避免复杂度飙升）；参考飞书 Agent 打包预设权限降低配置门槛；仅对人事岗位开放技能配置权限，业务侧可灵活配置数字员工可访问的业务范围。
+3. **组织化数字员工**：创建流程 = 业务部门提需求 → 人力资源部基础配置 → 纳入企业通讯录 → 数字赋能部配置账号/权限/岗位职责；数字员工定位为企业内初级岗位员工，优先处理登记、分发、归集等基础事务；禁止单个用户随意创建（防止短期生成 50+ 冗余 Agent）。
+4. **企业日常工作三核心模块**：待办（流程审批、他人艾特的督办任务）、通知（组织发布的公告/活动/规则）、知识（邮件/文档/文章等工作相关知识）。过往知识库设计偏组织层面，未落地到个人工作支撑。
+5. **轻量化小系统**：AI 普及后大型系统拆解为单一事务的轻量小模块（参考黑虎公司小工单：岗位工作 → 工单/表格/列表，流程引擎驱动岗位间数据流转）；依托 Table 能力快速搭建。
+6. **工作台 vs 数字员工边界**：工作台 = 员工自主完成工作的界面（任务进度、待处理事项、关联知识，无需对话交互）；数字员工 = 对外协同交流的界面（分配任务、跨角色协作）。
+7. **MVP 与企微替换**：优先保障 IM 基础功能可用 → 接入网易邮件服务完成腾讯邮件迁移 → 11 月在启创内部全员试用 → 按倒排计划 1 月底完全替换现有 SaaS 版企微（现存核心功能：审批、考勤、工资条，聊天频率极低具备替换条件）；同步部署启创专属 EIC 版本适配本地业务流程。
+8. **督办场景闭环**：将于福帅手工维护 Excel 的督办工作迁移到系统，数字员工自动完成录入、催办、状态更新；自动向责任人发消息/邮件催办，责任人在 IM 回复后系统自动同步数据表；于福帅每日仅查看汇总报告即可掌握 15 个督办事项动态。
+9. **前端产品化**：TF（Teable）仅作为底层数据库，不面向普通用户开放复杂操作，面向用户的交互界面单独做产品化封装；接入 Tigo 官方 Coding 能力支持专业人员搭建小应用并发布到 AI 门户；所有业务数据统一对接企业主数据系统，避免数据孤岛。
+10. **九月计划（背景引用）**：v1.3.0 平台管理端/企业管理端立即启动（163 邮箱接入、在线文档）；P0 9/9 重构督办事项产品方案、AI 表格下沉为底层能力、督办事项 V1 方案定稿；EAIC 首页工作台能力迁移（待办数据源+督办）；核心原则「不再做工具拼装」。计划中的移动端（打卡、IM，伊莎）、音视频会议等条目按 PM 决策仅作背景，不进 issue-17 范围。
+
+## PM 决策（2026-09-03 澄清确认，8 项）
+
+1. 9/2 会议范围**全面扩入 issue-17**，以会议纪要为准重构；9 月计划独有的管理端/移动端/音视频会议等仅作背景引用。
+2. **督办 V1 全闭环**纳入 9/9 定稿：现有收集/润色/填报/查询 + 自动催办 + 责任人回复自动入库 + 每日汇总报告。
+3. issue-70 旧方案包**仅保留 IM/督办相关内容**（GUI 策略研究 + gui-strategy 设计原型），opencode/TeamAI/harness 相关全部丢弃。
+4. 需求修订**直接在未提交状态上进行**，完成后一次性提交。
+5. 版本按「每月两个版本、1 月底前共 8 个版本」重排（R1–R8，具体映射见 PRD 版本规划，待 PM 确认）。
+6. 工作台形态为**独立工作台首页**（待办/通知/知识，默认落地页），数字员工 IM 为协同入口。（注：与纪要中「工作台入口不得比数字员工更明显」「IM 窗口内做工作台改造」的发言存在张力，按 PM 决策执行并在 PRD 风险节记录。）
+7. **邮箱两个独立需求都进 issue-17**：163 邮箱接入（管理端场景，源自九月计划）+ 网易邮件接入替换腾讯邮件（用户邮件，源自纪要 MVP 计划）。
+8. 组织化数字员工管理、企微替换（审批/考勤/工资条 + EIC 版本）纳入 issue-17 范围。
+
+## 待办（纪要原文）
+
+- 产品团队：按 11 月启创全员试用目标推进，1 月底完成 SaaS 企微完全替换
+- 技术团队：部署启创专属 EIC 版本；接入网易邮件完成腾讯邮件迁移
+- 产品团队：梳理督办场景落地细节并迁移现有督办流程（9/9 V1 定稿）
+- 技术团队：接入 Tigo Coding 支持专业人员自主搭建小应用
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

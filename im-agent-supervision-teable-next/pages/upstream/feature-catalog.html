@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="功能目录">
+<meta name="nav-group" content="上游设计文档 (issue-17)">
+<meta name="doc-version" content="v1.0">
+<meta name="doc-uid" content="feature-catalog">
+<title>功能目录</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="feature-catalog">
+
+<header class="doc-header">
+    <h1 data-uid="feature-catalog-h1">功能目录</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v1.0</span>
+        <span class="doc-stage">阶段: product-design-docs</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+> 📄 本文档镜像自 `issue-17/designs/issue-17/feature-catalog.md`（快照 2026-09-04，以源文件为准）。
+# 功能目录: issue-17
+
+> 2026-09-03 按 2026-09-02 领导会议纪要重排版本并新增模块（工作台首页 / 督办闭环 / 组织化管理 / 邮箱 / 企微替换），设计文档变更待 PM 重新确认。
+
+## 功能清单
+
+| 功能编号 | 功能名称 | 优先级 | 目标版本 | 验收标准 |
+|----------|----------|--------|----------|----------|
+| F-T01 | 话题列表展示：聊天窗口内展示当前对话全部话题（标题/最后活跃时间）。详见 `requirements/2026-08-24-issue-17/topic-windows-p0.md` | 高 | 1.3.0 | 话题列表在聊天窗口可见，展示标题与最后活跃时间 |
+| F-T02 | 创建新话题：人类用户创建话题并进入独立窗口（= 新 Mattermost thread）；agent 侧创建能力见 F-T05。详见 `requirements/2026-08-24-issue-17/topic-windows-p0.md` | 高 | 1.3.0 | 创建后自动进入新话题窗口；话题出现在列表中 |
+| F-T03 | 切换/继续话题：点击历史话题加载其消息并继续讨论。详见 `requirements/2026-08-24-issue-17/topic-windows-p0.md` | 高 | 1.3.0 | 加载该 thread 全部历史消息；新消息归属该话题；话题间消息隔离 |
+| F-T04 | 话题元信息与摘要：标题、创建时间、最后活跃时间、可选摘要（agent 可回填）。详见 `requirements/2026-08-24-issue-17/topic-windows-p0.md` | 中 | 1.6.0 | 列表与窗口头部展示元信息；空标题话题可由 agent 生成摘要回填 |
+| F-T05 | Agent 建议/创建话题：识别新任务时建议或直接创建话题。详见 `requirements/2026-08-24-issue-17/topic-windows-p0.md` | 高 | 1.3.0 | agent 可提示「是否创建新话题讨论 X」；确认后创建并迁移；规则允许时可自动创建 |
+| F-C01 | Clarify 选项卡：agent 对 thread 调用 Clarify 工具，前端在话题窗口底部弹出选项卡 | 高 | 1.3.0 | 需求模糊时选项卡在该话题窗口底部弹出 |
+| F-C02 | Clarify 选项结构：每题 3 个推荐选项 + 1 个自定义输入；支持单选/多选 | 高 | 1.3.0 | 每题至少 3 推荐 + 1 自定义；选择/填写后以 user message 发送给 agent |
+| F-C03 | 多轮 Clarify：支持连续多轮澄清直至需求明确 | 中 | 1.3.0 | agent 可基于上轮答案再次发起 Clarify；答案按轮次归属 ClarifySession |
+| F-F01 | Teable 表单 iframe 嵌入：复用 issue-6 表单视图 iframe 嵌入消息 | 高 | 1.3.0 | iframe 保持 teable 原样式；仅允许白名单域名 |
+| F-F02 | Teable 表单填报提交：iframe 内填写提交，结果同步 teable 并回执聊天 | 高 | 1.3.0 | 提交后数据同步 teable；postMessage 回传成功/失败提示 |
+| F-P01 | Plan.md 生成：复杂任务触发 Plan 模式，agent 生成 markdown 计划（背景/目标/步骤/依赖/验收标准/风险） | 高 | 1.6.1 | Plan.md 内容包含六个约定章节 |
+| F-P02 | Plan 卡片渲染：以定制消息卡片展示 Plan.md | 高 | 1.6.1 | 卡片完整渲染 markdown；展示当前版本号 |
+| F-P03 | Plan 审批按钮：卡片提供「通过」「需要修改」按钮，回调 agent | 高 | 1.6.1 | 按钮经 Mattermost 自定义 action / webhook / postMessage 回调 agent；接口幂等 |
+| F-P04 | Plan 迭代修改：用户在输入框描述修改意见，agent 更新 Plan.md 并重渲染 | 高 | 1.6.1 | 每次修改生成新 PlanRevision；卡片展示最新版本，历史可查 |
+| F-P05 | Plan 执行锁定：审批通过前 agent 不执行 Plan 中的关键动作 | 高 | 1.6.1 | 未通过状态下关键动作被拦截；仅允许澄清类交互 |
+| F-P06 | Plan 执行与进度反馈：通过后 agent 按计划执行并在话题中反馈进度 | 高 | 1.6.1 | 通过后开始执行；关键节点在话题中反馈进度 |
+| F-X01 | 胶囊「+」菜单：输入框「+」支持选择 skills / MCP / 插件 / 多维表格 | 高 | 1.7.x | 四类对象均可从「+」菜单浏览并插入；仅展示有权限对象 |
+| F-X02 | Skills 胶囊：插入并展示 skill 名称/描述/输入参数预览 | 高 | 1.7.x | 胶囊展示约定信息；点击后 skill 及上下文注入当前对话，agent 可调用 |
+| F-X03 | MCP 胶囊：插入并展示 MCP server 名称/可用工具数/关键工具预览 | 高 | 1.7.x | 胶囊展示约定信息；点击后对应 MCP 工具集接入 agent 上下文 |
+| F-X04 | 插件胶囊：插入并展示插件名称/版本/功能摘要 | 高 | 1.7.x | 胶囊展示约定信息；点击后插件能力在当前对话激活 |
+| F-X05 | Teable 胶囊：插入并展示表名及 base_id/table_id/view_id（复用 issue-6 集成） | 高 | 1.7.x | 仅列出有权限表格；agent 可解析胶囊并调用 teable skills |
+| F-X06 | 胶囊统一 schema 与解析分发：四类胶囊采用统一自定义 JSON schema，agent 解析后按 capsule_type 分发调用 | 高 | 1.7.x | schema 校验通过方可渲染；agent 按 capsule_type 分发到 skill/MCP/插件/teable skills |
+| F-X07 | 胶囊卡片渲染与管理：消息内统一渲染为可点击/展开卡片，支持删除/替换 | 高 | 1.7.x | 卡片可展开查看元数据；支持删除/替换；非法 schema 显示「无法解析」 |
+| F-S01 | 日程看板入口：个人日程看板入口，iframe 嵌入开源日历 UI（月/周/日视图） | 高 | 1.7.x | 侧边栏或聊天内入口可达；看板正常渲染三种视图 |
+| F-S02 | Agent 代创建日程：从对话识别待办（时间/事项/参与人）并帮助用户创建事件 | 高 | 1.7.x | agent 调用日历后端创建成功并在话题返回确认；事件出现在用户看板 |
+| F-S03 | Agent 邀请成员：创建事件时添加参与人并发送邀请 | 高 | 1.7.x | 受邀人收到通知（IM 或邮件）；事件在其看板可见 |
+| F-S04 | 日程看板编辑：用户在看板中查看/编辑/删除事件 | 中 | 1.7.x | 三种操作在看板内可用并即时生效 |
+| F-S05 | 日程通知：事件创建/邀请时向参与人发送通知 | 中 | 1.7.x | 创建与邀请动作触发通知投递 |
+| F-S06 | Agent 日程 Token：为 agent 签发/查看/撤销日历后端 token | 高 | 1.7.x | 签发界面说明权限范围；token 可独立生成、轮换、撤销 |
+| F-S07 | Agent 独立日历身份：agent 作为组织成员拥有独立账户/日历，可管理自身日程 | 高 | 1.7.x | agent 可创建/查看/更新/删除自己的事件；可被其他成员添加为参与人 |
+| F-S08 | 日程事件触发 Agent：agent 自身事件到达触发条件时唤醒 agent 执行配置动作 | 高 | 1.7.x | 触发机制（webhook/push/轮询兜底）可用；动作可配置（提醒/推送材料/调用 skill） |
+| F-L01 | 龙小督督办要素识别：从用户输入中提取督办事项关键要素 | 高 | 1.3.0 | 覆盖总体情况、具体进展、困难/待协调问题、下一步计划四类要素 |
+| F-L02 | 龙小督持续澄清：缺失关键要素时通过 Clarify 工具主动提问 | 高 | 1.3.0 | 在该话题窗口底部弹出 Clarify 选项卡；支持多轮直至要素完整 |
+| F-L03 | 龙小督行文润色：调用「督办事项行文风格 Skill」将原始文本改写为标准公文 | 高 | 1.3.0 | 润色后文本符合督办事项行文规范；以 Plan 卡片形式展示供用户确认 |
+| F-L04 | 龙小督用户确认填报：润色结果经用户确认后使用用户 Token 填报到 Teable | 高 | 1.3.0 | 未确认前不执行填报；填报后反馈结果；使用用户 Token 留下操作痕迹 |
+| F-L05 | 龙小督表格问答：理解自然语言查询意图，基于 Teable 数据直接回答 | 高 | 1.3.0 | 覆盖至少 5 类常用查询意图；回答引用关键字段，不编造数据 |
+| F-L06 | 龙小督独立 Teable 身份：为龙小督创建独立 Teable 账号与 Token | 高 | 1.3.0 | 独立账号可执行系统级只读/管理操作；不影响用户数据归属 |
+| F-L07 | 用户 Teable Token 初始化：为每个用户默认初始化 Teable Token | 高 | 1.3.0 | Token 可查看、轮换、撤销；龙小督代操作时使用用户 Token |
+| F-L08 | 龙小督主动通知话题控制：按「批次-事项」一对多关系找到或创建对应话题发送通知 | 高 | 1.3.0 | 同一「批次-事项」的多次通知集中在同一话题；规则可配置 |
+| F-L09 | 催办规则配置：截止时间、逾期阈值、催办频率与渠道（IM/邮件） | 高 | 1.3.1 | 规则可按批次/事项覆盖默认配置 |
+| F-L10 | 自动催办执行：按规则扫描台账，向责任人话题发送催办（可同步邮件） | 高 | 1.3.1 | 催办消息到达责任人对应话题；每次催办记录 ReminderLog |
+| F-L11 | 责任人回复自动入库：回复自动识别、润色、确认后更新 Teable 台账 | 高 | 1.3.1 | 无需人工二次录入；润色遵循行文风格 Skill 铁则 |
+| F-L12 | 每日汇总报告：向管理员推送全量督办事项更新/逾期/待办卡片 | 高 | 1.3.1 | 每日定时推送；分区展示；可跳转对应话题 |
+| F-W01 | 工作台首页框架：系统默认落地页，三模块布局与导航（含数字员工入口） | 高 | 1.3.1 | 打开系统默认进入工作台首页 |
+| F-W02 | 待办-流程审批聚合：OA 待审批事项聚合，筛选/排序/跳转处理 | 高 | 1.3.1 | 审批待办展示完整字段；可跳转审批详情并回跳 |
+| F-W03 | 待办-督办任务聚合：督办台账指派给我的事项，跳转对应话题 | 高 | 1.3.1 | 督办待办点击跳转对应「批次-事项」话题 |
+| F-W04 | 数字员工入口与推送卡片：首页进入 IM；展示催办/汇总卡片 | 高 | 1.3.1 | 入口可达；数字员工推送卡片在首页可见 |
+| F-W05 | 通知模块：公告/活动/规则信息流，类型筛选、未读角标、已读确认 | 高 | 1.4.0 | 重要通知支持强制阅读确认 |
+| F-W06 | 知识模块：邮件/文档/文章聚合，检索与「与我相关」智能聚合 | 高 | 1.4.0 | 知识落地到个人工作支撑 |
+| F-W07 | 已办留存：已办事项与已读通知留存可查 | 中 | 1.4.0 | 默认展示最近 N 条已办 |
+| F-O01 | 创建需求提交：业务部门提交岗位/职责/画像/范围 | 高 | 1.4.0 | 四要素齐全方可提交 |
+| F-O02 | 审批流状态机：草稿→提交→HR审核→入通讯录→赋能部配置→上岗→停用/注销 | 高 | 1.4.0 | 状态对申请人可见；操作留痕 |
+| F-O03 | 通讯录纳入与标识：数字员工入通讯录，带标识，可检索/@/入群 | 高 | 1.4.0 | 与人类员工同体系展示 |
+| F-O04 | 岗位说明书：职责与能力边界，超范围请求转交/拒绝 | 高 | 1.4.0 | 每个数字员工有岗位说明书 |
+| F-O05 | 系统级访问清单：平台侧配置数字员工可访问的业务系统 | 高 | 1.4.0 | 不建设统一数据权限平台 |
+| F-O06 | 技能配置权限：仅人事岗位可配置技能与业务范围 | 高 | 1.4.0 | 非人事无配置入口 |
+| F-O07 | 预设权限包：常见岗位打包权限一键应用 | 中 | 1.4.0 | 至少 2 个预设包 |
+| F-O08 | 数字员工台账与治理：在职列表、活跃度预警、停用/注销审批 | 高 | 1.4.0 | 普通用户无法绕过审批流创建 |
+| F-E01 | 网易邮件接入：API/IMAP/SMTP 接入网易企业邮箱 | 中 | 1.4.1 | 收发/文件夹/附件/搜索可用 |
+| F-E02 | 腾讯→网易迁移：历史邮件全量迁移与对账 | 中 | 1.4.1 | 迁移完整率 100%；双轨期不丢信 |
+| F-E03 | 工作台邮件集成：知识模块聚合邮件 | 中 | 1.4.1 | 知识模块可检索/展示邮件 |
+| F-E04 | 催办邮件渠道：督办催办走邮件渠道 | 中 | 1.4.1 | 按规则发送催办邮件 |
+| F-E05 | 163 邮箱接入：管理端场景接入方案与落地 | 中 | 1.5.1 | 方案评审通过；指定场景可用 |
+| F-R01 | 企微功能盘点：审批/考勤/工资条盘点与迁移清单 | 高 | 1.6.0 | 盘点报告通过评审 |
+| F-R02 | 审批流程引擎：发起/审批/抄送/转交/撤回/加签 | 高 | 1.6.0 | 审批待办进入工作台首页 |
+| F-R03 | 考勤重建：打卡数据链路、排班、审批联动、报表 | 高 | 1.6.0 | 报表可用；与移动端打卡界面链路贯通 |
+| F-R04 | 工资条重建：发放/加密查看/阅后确认/水印审计 | 高 | 1.6.0 | 敏感保护齐备 |
+| F-R05 | 历史数据迁移与对账：审批/考勤/工资条数据迁移 | 高 | 1.6.0 | 对账通过 |
+| F-R06 | 启创全员试用：11 月试用版本与反馈闭环 | 高 | 1.5.0 | 试用版本可用；反馈渠道运行 |
+| F-R07 | EIC 专属版本：启创专属环境部署与流程配置 | 高 | 1.5.1/1.7.x | 主版本功能同步发布到 EIC |
+| F-R08 | 切换预演与完全替换：灰度切换，1 月底停用 SaaS 企微 | 高 | 1.6.1/1.7.x | 旧系统只读保留期生效 |
+
+## 非功能需求
+
+- **个人日程范围**：用户仅关注个人日程；多人事件所有参与人均可见；不与 Outlook/Google 日历互通（对齐 PRD）。
+- **性能**：话题切换、Clarify 弹窗、Plan 卡片渲染前端响应 < 500ms；日程看板 iframe 首屏 < 3s；工作台首页首屏 < 2s。
+- **安全**：iframe 启用 HTTPS、CSP、postMessage 白名单；token 不硬编码、可轮换、权限最小化；胶囊仅展示用户有权限的对象；日程操作按 token 权限收敛；工资条场景强制水印与操作审计。
+- **权限架构**：数字员工平台侧仅维护系统级访问清单；数据权限分散到各业务系统（对齐 9/2 会议纪要）。
+- **兼容性**：桌面端（Tauri/WebView）与 B/S 端表现一致；日程看板仅需 Web/iframe 可用，不要求移动端原生 SDK。
+- **License 合规**：日程后端限定 MIT / Apache-2.0 / AGPL，排除 GPL 家族；最终选型经 PoC 与合规评审确认。
+- **Agent 友好**：日历后端提供 CLI / REST API / MCP server / JMAP 至少一种可编程接口；agent 侧统一封装为 skill / MCP server / CLI，后端可替换。
+- **国产化**：优先国内可部署或有商业买断路径的方案，遵循 issue-3/6/11/14 的国产化约束。
+- **数据**：业务数据最终统一对接企业主数据系统（1.6.1 起，对齐 9/2 会议纪要）。
+
+## 验收映射
+
+- [ ] F-T01 ~ F-T05 → 验收标准「话题管理」全项（话题列表可见；人类可创建；agent 可建议/创建；历史话题可加载继续；切换不丢上下文且消息隔离）
+- [ ] F-C01 ~ F-C03 → 验收标准「Clarify 工具」全项（底部弹窗；3 推荐 + 1 自定义；选择以 user message 发送；支持多轮）
+- [ ] F-P01 ~ F-P06 → 验收标准「Plan 模式」全项（生成 Plan.md 卡片；六章节齐全；通过/修改按钮；输入框修改意见驱动更新；未通过不执行；通过后执行并反馈）
+- [ ] F-X01 ~ F-X07 → 验收标准「胶囊系统」全项（「+」菜单四类胶囊；各胶囊展示约定元信息；agent 解析并调用；统一卡片渲染、删除/替换）
+- [ ] F-F01 ~ F-F02 → 验收标准「Teable 表单 iframe」全项（复用 issue-6；保持原样式；可填写提交；结果同步并反馈）
+- [ ] F-S01 ~ F-S08 → 验收标准「AI 日程」全项（看板入口 iframe；agent 代创建；邀请成员；看板编辑；agent 独立日历身份；事件触发 agent；license 合规；token 可签发回收）
+- [ ] F-L01 ~ F-L08 → 验收标准「龙小督督办场景」全项（要素识别；持续澄清；行文润色；用户确认填报；表格问答；独立 Teable 身份；用户 Token；主动通知话题控制）
+- [ ] F-L09 ~ F-L12 → `supervision-p0.md` S-5 自动催办闭环全项（规则配置；自动催办；回复自动入库；每日汇总）
+- [ ] F-W01 ~ F-W07 → `workbench-home-p0.md` 全项（默认落地页；审批/督办待办聚合；数字员工入口；通知模块；知识模块；已办留存）
+- [ ] F-O01 ~ F-O08 → `org-agent-management-p0.md` 全项（创建审批流；通讯录纳入；岗位说明书；系统级访问清单；人事技能配置；预设权限包；台账治理）
+- [ ] F-E01 ~ F-E05 → `email-p0.md` 全项（网易接入；迁移对账；工作台集成；催办渠道；163 接入）
+- [ ] F-R01 ~ F-R08 → `wework-replacement-p0.md` 全项（盘点；审批；考勤；工资条；数据迁移；试用；EIC；切换替换）
+
+## 修订记录
+
+| 日期 | 修订内容 | 修订人 |
+|------|----------|--------|
+| 2026-08-27 | 与 `prd.md` 对齐：非功能需求区补全「个人日程范围」约束；F-T02 注明 agent 创建能力见 F-T05 | human-pm |
+| 2026-08-28 | 新增「目标版本」列；拆分 1.3.0/1.4.0；新增 F-L01~F-L08 龙小督督办场景功能；验收映射补全龙小督 | agent |
+| 2026-09-03 | 按 9/2 会议纪要重排：F-T04→1.6.0、F-P*→1.6.1、F-X*/F-S*→1.7.x；新增 F-L09~F-L12（督办闭环）、F-W01~F-W07（工作台首页）、F-O01~F-O08（组织化管理）、F-E01~F-E05（邮箱）、F-R01~F-R08（企微替换）；验收映射同步；非功能需求补权限架构/数据两项。待 PM 重新确认 | agent |
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

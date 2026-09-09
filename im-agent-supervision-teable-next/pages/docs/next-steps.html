@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="下一步行动">
+<meta name="nav-group" content="规划文档">
+<meta name="doc-version" content="v0.1">
+<meta name="doc-uid" content="next-steps">
+<title>下一步行动</title>
+<!-- Asset paths assume this page lives at pages/docs/*.html (depth 2). Adjust if placed elsewhere. -->
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="next-steps">
+
+<header class="doc-header">
+    <h1 data-uid="next-steps-h1">下一步行动</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.1</span>
+        <span class="doc-stage">阶段: clarify</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+# 下一步行动：IM / 数字员工 / 督办场景 / 多维表格
+
+<!-- status: draft -->
+
+- **工作包**: im-agent-supervision-teable-next（占位 slug，GitHub issue 待补）
+- **日期**: 2026-09-04
+- **上游基线**: issue-17（commit d0f54f8 后的 PRD 版本规划 R1–R8）
+- **输入摘要**: `../../docs/research/input-sources.md`
+- **文档定位**: 四条主线的近期行动清单（9 月）+ 全路线索引；每条行动标注事项/时间/产出/验收，负责角色待定（建议产品研发牵头、研发配合）
+
+## 总览
+
+| 主线 | 近期焦点 | 最近锚点 |
+|------|----------|----------|
+| IM | 1.3.0 功能验收 + IM 基础功能 MVP 自查（试用版前置） | 1.3.0（9 月上）→ 1.5.0 试用版（11 月上） |
+| 数字员工 | 组织化管理（1.4.0）前置设计 + 龙小督岗位职责说明书 | 1.4.0（10 月上） |
+| 督办场景 | **9/9 V1 定稿** → 1.3.1 全闭环开发 | **9/9 定稿**，1.3.1（9 月下） |
+| 多维表格 | AI 表格下沉为底层能力：BFF 应用层设计 + 督办台账表结构 | 1.3.1（9 月下，与督办协同） |
+
+---
+
+## 主线一：IM（Mattermost 底座）
+
+**近期行动（9 月）**
+
+1. **1.3.0 功能验收**（9 月上发布前）
+   - 事项：按 `issue-17/requirements/2026-08-24-issue-17/topic-windows-p0.md` 验收清单执行话题 tab 栏、历史话题列表、多话题并行、Agent 建议/创建话题；Clarify 底部选项卡（3 推荐 + 1 自定义、多轮）；Teable 表单 iframe 嵌入与填报提交。
+   - 产出：验收记录（勾选清单 + 缺陷清单）。
+   - 验收：topic-windows-p0 验收标准全部通过。
+
+2. **IM 基础功能 MVP 可用性自查**（9 月上，与行动 1 并行）
+   - 背景：9/2 纪要「优先保障 IM 基础功能可用」——11 月试用版的最低门槛。
+   - 事项：输出《IM 基础功能自查表》：登录/掉线重连、单聊/群聊、消息通知、附件/图片、搜索、未读同步、移动端 Web 可用性（移动端原生归伊莎条目，本自查只覆盖 Web/B/S 与桌面端）。
+   - 产出：自查表 + 问题分级（阻断试用 / 可延后）。
+   - 验收：无阻断试用问题；可延后项进入 1.5.0 打磨清单。
+
+3. **试用版（1.5.0）IM 打磨清单预建**（9 月下启动）
+   - 事项：基于行动 1/2 的缺陷与自查结果，建立 1.5.0 的 IM 打磨 backlog（半月版本节奏，11 月上试用）。
+
+**依赖**：issue-14 Mattermost/OpenClaw 运行时（已确认保留）。
+
+## 主线二：数字员工
+
+**近期行动（9 月）**
+
+1. **组织化管理审批流建模**（1.4.0 前置，9 月内启动）
+   - 事项：细化 `org-agent-management-p0.md` O-1 状态机（草稿→提交→HR 审核→入通讯录→赋能部配置→上岗→停用/注销），明确每步操作人、表单字段、通知方式（复用 IM 通知）；设计操作留痕格式。
+   - 产出：审批流模型文档（状态图 + 字段表）。
+   - 验收：状态机覆盖全部迁移路径；每步留痕字段定义完整。
+
+2. **通讯录联动方案**（1.4.0 前置，9 月内启动）
+   - 事项：数字员工纳入企业通讯录的数据链路（来源：HR 配置 → 通讯录 → IM 可见），「数字员工」标识与检索标签设计；停用/注销的同步链路。
+   - 产出：通讯录联动方案（含与组织主数据的接口约定草案）。
+   - 验收：方案通过评审，接口约定可被研发直接排期。
+
+3. **龙小督岗位说明书草案**（9 月下）
+   - 背景：纪要「数字员工定位初级岗位（登记、分发、归集），不追求全能」。
+   - 事项：为龙小督起草岗位说明书（职责边界、超范围请求的拒绝/转交话术、能力边界），作为 org-agent-management O-3 的第一个实例。
+   - 验收：说明书过 PM 评审。
+
+4. **权限分散接入规范草案**（9 月下，与多维表格主线协同）
+   - 事项：平台侧「系统级访问清单」schema（见 fields.md SystemAccessGrant）+ 与各业务系统约定的接入规范（系统标识、授权流程、审计回传）。
+   - 验收：规范草案过评审。
+
+**依赖**：组织主数据/通讯录系统（跨系统）；issue-14 运行时。
+
+## 主线三：督办场景（最高优先级：9/9 定稿）
+
+**近期行动（9 月）**
+
+1. **督办 V1 定稿评审材料**（**9/9 前**，本周内）
+   - 事项：以 `supervision-p0.md`（S-1~S-5 全闭环）为评审主体，补齐四份附件：
+     1. Teable 督办台账表结构草案（与主线四行动 3 同一份）；
+     2. 催办规则配置示例（ReminderRule：批次级默认 + 事项级覆盖，含 IM/邮件渠道）；
+     3. 责任人回复自动入库流程图（回复→识别→润色→确认→写表）；
+     4. 每日汇总报告模板（四分区：当日进展/已催办及反馈/逾期未反馈/明日临近截止）。
+   - 验收：9/9 评审通过，V1 方案定稿。
+
+2. **回复自动入库 PoC**（9 月下，1.3.1 前置）
+   - 事项：用 10~15 条真实风格的责任人回复样本验证自动识别 + 行文润色准确率；验证「不脑补、不篡改、保留负面事实」铁则的自动化边界（识别置信度低时必须转人工确认）。
+   - 产出：PoC 报告（准确率 + 失败案例分类）。
+   - 验收：准确率达标（阈值待定，建议 ≥85% 自动通过、其余转人工）。
+
+3. **行文风格 Skill 测试集**（9 月中，与行动 2 并行）
+   - 事项：整理 20 条测试样本（含负面案例：联系不上、对方拒绝、无法办结），作为 Skill 回归测试集归档。
+
+4. **1.3.1 开发排期**（9/9 定稿后）
+   - 事项：S-5 闭环（催办规则引擎、催办历史、每日汇总定时任务）+ 工作台首页督办数据源（F-W03）排期。
+   - 验收：排期进入 1.3.1 版本计划。
+
+**依赖**：多维表格主线（台账表结构）；邮件主线（催办邮件渠道，1.4.1 前可先 IM）。
+
+## 主线四：多维表格（Teable）
+
+**近期行动（9 月）**
+
+1. **BFF 应用层设计启动**（9 月内）
+   - 背景：研究结论（`issue-17/docs/research/issue-17-gui-vs-custom-system.md` 路线 B：Teable 数据底座 + 轻量 BFF）与纪要「AI 表格下沉为底层能力」「TF 仅作底层数据库、界面产品化封装」一致。
+   - 事项：BFF 服务边界设计（首批接口面向督办场景：台账查询/更新、催办记录、汇总报告数据聚合）；技术栈与部署形态建议；与龙小督 Teable Token 体系的衔接。
+   - 产出：BFF 设计文档（接口清单 + 权限/审计策略）。
+   - 验收：设计通过评审，可支撑 1.3.1 督办闭环开发。
+
+2. **Teable 能力边界盘点**（9 月内，与行动 1 并行）
+   - 事项：盘点 Teable 作为底座的能力（表单/视图/自动化/权限矩阵/API 速率限制），明确「Teable 直接可用 / 需 BFF 封装 / 需绕开」三类边界。
+   - 产出：能力盘点表。
+   - 验收：边界清单过评审，作为 BFF 设计的输入。
+
+3. **督办台账表结构定稿**（**9/9 前**，与主线三行动 1 同一份交付物）
+   - 事项：SupervisionBatch / SupervisionItem / ReminderRule / ReminderLog / DailyDigest 的 Teable 表结构（字段、类型、权限矩阵），满足 S-1~S-5 全部读写路径。
+   - 验收：随 9/9 督办 V1 一起定稿。
+
+**依赖**：issue-6 Teable 集成（已实现）；督办主线（需求来源）。
+
+---
+
+## 全路线索引（R1–R8，详见 issue-17 PRD 版本规划）
+
+| 版本 | 时间 | 四条主线相关内容 |
+|------|------|------------------|
+| 1.3.0 | 9 月上 | IM：话题/Clarify/Teable 表单验收；**9/9 督办 V1 定稿评审** |
+| 1.3.1 | 9 月下 | 督办：S-5 全闭环开发；IM：打磨；多维表格：BFF 首批接口；工作台首页 MVP（督办数据源） |
+| 1.4.0 | 10 月上 | 数字员工：组织化管理（审批流/通讯录/岗位说明书/权限分散）；工作台首页完整版（含知识模块） |
+| 1.4.1 | 10 月下 | 邮箱：网易邮件接入（催办邮件渠道补全）；权限分散配置体系 |
+| 1.5.0 | 11 月上 | **启创全员试用版**：IM 基础功能 + 工作台首页 + 督办闭环 + 邮件 |
+| 1.5.1 | 11 月下 | 试用反馈迭代；163 邮箱接入；EIC 版本部署启动 |
+| 1.6.0 | 12 月上 | 企微替换三件套（审批/考勤/工资条）；话题摘要 P1 |
+| 1.6.1 | 12 月下 | 切换预演；主数据系统对接；Plan 模式 |
+| 1.7.x | 1 月 | **完全替换企微**；EIC 全量；胶囊系统、AI 日程 |
+
+完整功能需求表：`issue-17/designs/issue-17/feature-catalog.md`（F-T/F-C/F-F/F-P/F-X/F-S/F-L/F-W/F-O/F-E/F-R 编号体系）。
+
+## 风险与依赖
+
+| 风险/依赖 | 影响 | 应对 |
+|-----------|------|------|
+| **9/9 督办定稿仅剩 5 天** | 高 | 本周优先交付主线三行动 1 + 主线四行动 3 |
+| OA / 管理端 / 移动端（伊莎）跨团队条目 | 中 | 已在各主线标注为背景依赖；9 月内完成接口约定草案 |
+| 回复自动入库准确率不达标 | 中 | PoC 先行；低置信转人工确认兜底 |
+| 本工作包未关联 GitHub issue | 低 | GitHub 恢复后创建正式 issue 并校准编号/链接/slug |
+
+## 验收标准（本规划文档）
+
+- [ ] 四条主线近期行动均有明确产出物与时间（本周 / 9 月上 / 9 月下）。
+- [ ] 9/9 督办 V1 定稿材料清单四项齐备（supervision-p0 + 表结构 + 催办规则示例 + 汇总模板）。
+- [ ] 每条行动可追溯至 issue-17 的具体子需求文档。
+- [ ] PM 确认后标记 `<!-- status: approved -->`。
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

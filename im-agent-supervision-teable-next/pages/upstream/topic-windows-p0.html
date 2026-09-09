@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="子需求 · 话题多窗口">
+<meta name="nav-group" content="上游需求基线 (issue-17)">
+<meta name="doc-version" content="v0.9-draft">
+<meta name="doc-uid" content="topic-windows-p0">
+<title>子需求 · 话题多窗口</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="topic-windows-p0">
+
+<header class="doc-header">
+    <h1 data-uid="topic-windows-p0-h1">子需求 · 话题多窗口</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.9-draft</span>
+        <span class="doc-stage">阶段: product-prototype</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+> 📄 本文档镜像自 `issue-17/requirements/2026-08-24-issue-17/topic-windows-p0.md`（快照 2026-09-04，以源文件为准）。
+# 子需求：话题多窗口与 Agent 主动创建话题（P0）
+
+<!-- status: draft -->
+
+## 背景与来源
+
+本文件从 issue-17 综合需求中拆分而出，聚焦「数字员工对话窗口按话题组织上下文」这一 P0 能力。
+
+- **来源 Issue**: [WeLink #17](https://github.com/sushanglewis/WeLink/issues/17)
+- **来源访谈**: `issue-17/interviews/2026-08-24-issue-17/transcript.md`
+- **来源摘要**: `issue-17/interviews/2026-08-24-issue-17/summary.md`
+- **上游 PRD**: `issue-17/requirements/2026-08-24-issue-17/prd.md`
+- **上游需求文档**: `issue-17/requirements/2026-08-24-issue-17/requirements.md`
+- **上游用户故事**: `issue-17/requirements/2026-08-24-issue-17/user-stories.md`
+
+原始访谈中产品负责人指出：
+
+> "人-数字员工的对话，要有一个话题列表，人、agent 都可以通过创建一个新的话题，来重新开始讨论一个事情。也可以基于一个话题的历史对话继续讨论。每个话题都有一个窗口。"
+
+随着 issue-17 能力范围扩大（Clarify、Plan、胶囊、Teable、AI 日程），为避免话题管理需求被稀释，特将其拆分为独立子需求文档，作为后续设计、原型与研发的范围边界和验收依据。
+
+## 目标
+
+1. **按话题拆分多窗口**：在单个数字员工 IM 窗口内，通过 tab 形态同时打开多个话题，每个话题拥有独立的消息上下文。
+2. **Agent 主动创建话题**：当 agent 识别到用户新输入与当前话题明显不同时，可主动建议创建新话题；在规则允许时可直接创建。
+
+## 范围（In Scope）
+
+### 话题多窗口
+
+- 在聊天窗口顶部/侧边提供「历史话题」icon。
+- 点击 icon 展开历史话题列表，展示标题、最后活跃时间等元信息。
+- 用户从历史话题列表选中一个话题后，在当前 IM 窗口内新增一个 tab 并加载该话题历史消息。
+- 可同时打开多个话题 tab；当前激活 tab 高亮显示。
+- 用户可关闭任意 tab；关闭 tab 仅关闭前端视图，话题数据及消息仍保留在后台（Mattermost thread）。
+- 新消息始终归属当前激活 tab 对应的话题。
+
+### Agent 主动创建话题
+
+- Agent 持续判断用户最新输入是否与当前话题上下文明显不同。
+- 当判断为新任务时，agent 默认发送建议卡片：「是否创建新话题讨论 X？」，等待用户确认。
+- 用户确认后，agent 创建新话题（Mattermost thread）并将上下文摘要迁移至新话题。
+- 在配置规则允许自动创建的场景下，agent 可直接创建新话题并通知用户，无需逐次确认。
+- 新话题的 `creator_type` 标记为 `agent`，并记录 `creator_id`。
+
+## 非目标
+
+- 不替换 Mattermost 作为 IM 底层。
+- 不建设独立的 AI 工作台落地页；所有交互仍限定在现有数字员工 IM 窗口内。
+- issue-17 中的其他能力（Clarify、Plan、胶囊、Teable 表单 iframe、AI 日程）不归本文件覆盖，仍以上游 PRD/需求文档为准。
+- 不实现 Tauri/浏览器原生多窗口并行显示；本文件定义的「多窗口」为单窗口内多 tab。
+
+## 用户故事
+
+### 故事一：通过历史话题 icon 打开多个话题 tab
+
+- **作为**：企业内部员工
+- **我希望**：在数字员工聊天窗口中点击「历史话题」icon，查看历史话题列表并选中一个话题
+- **以便**：该话题以新 tab 形式打开，我可以同时保留多个话题上下文并快速切换
+- **验收标准**：
+  - 聊天窗口提供「历史话题」icon。
+  - 点击 icon 后展示历史话题列表（含标题、最后活跃时间）。
+  - 选中话题后在窗口内新增 tab 并加载该话题历史消息。
+  - 可同时打开多个 tab，当前 tab 高亮。
+  - 关闭 tab 不影响话题数据，关闭后可重新从历史列表打开。
+
+### 故事二：Agent 主动建议创建话题
+
+- **作为**：数字员工（agent）
+- **我希望**：当用户提出与当前话题明显不同的新任务时，主动建议创建新话题
+- **以便**：将不同任务隔离到独立上下文，提高协作效率
+- **验收标准**：
+  - Agent 可在对话中提示用户「是否创建新话题讨论 X？」。
+  - 用户确认后创建新话题并迁移必要的上下文摘要。
+  - 在规则允许时，agent 可直接创建新话题并通知用户。
+
+## 功能需求表
+
+| 功能 | 描述 | 优先级 |
+|------|------|--------|
+| 历史话题 icon | 在聊天窗口提供可点击的 icon，用于展开历史话题列表 | P0 |
+| 历史话题列表 | 展示当前对话的全部历史话题，含标题与最后活跃时间 | P0 |
+| 话题 tab 打开 | 从历史列表选中话题后，在当前窗口内新增 tab 并加载消息 | P0 |
+| 话题 tab 切换 | 点击 tab 切换当前激活话题，消息区域加载对应上下文 | P0 |
+| 话题 tab 关闭 | 关闭 tab 仅移除前端视图，话题数据保留 | P0 |
+| Agent 建议话题 | 识别新任务时，agent 发送建议卡片等待用户确认 | P0 |
+| Agent 自动创建话题 | 规则允许时，agent 直接创建新话题并通知用户 | P0 |
+| 上下文摘要迁移 | 新话题自动携带必要的上下文摘要（可选，由 agent 生成） | P1 |
+
+## 验收标准
+
+### 话题多窗口
+
+- [ ] 聊天窗口中可见「历史话题」icon。
+- [ ] 点击 icon 后展开历史话题列表。
+- [ ] 历史话题列表展示每个话题的标题与最后活跃时间。
+- [ ] 选中历史话题后，在当前窗口内新增一个 tab。
+- [ ] tab 内加载该话题的全部历史消息。
+- [ ] 可同时打开多个话题 tab。
+- [ ] 当前激活 tab 高亮显示。
+- [ ] 切换 tab 时消息区域加载对应话题上下文。
+- [ ] 关闭 tab 后，该话题仍保留在历史话题列表中，可重新打开。
+- [ ] 关闭 tab 后，对应 Mattermost thread 中的消息不受任何影响。
+- [ ] 新发送的消息始终归属当前激活 tab 对应的话题。
+
+### Agent 主动创建话题
+
+- [ ] Agent 持续评估用户输入与当前话题的相关性。
+- [ ] 当检测到明显不同的新任务时，agent 发送「是否创建新话题讨论 X？」建议卡片。
+- [ ] 用户确认后，agent 创建新 Mattermost thread 作为新话题。
+- [ ] 用户拒绝后，agent 留在当前话题继续对话。
+- [ ] 在规则允许自动创建的场景下，agent 可直接创建新话题并向用户发送通知。
+- [ ] 由 agent 创建的话题，其 `creator_type` 为 `agent`，并记录 `creator_id`。
+- [ ] 新话题可选携带上下文摘要，便于用户理解迁移内容。
+
+## 界面/交互说明
+
+### 整体布局调整
+
+在现有「左侧话题列表 + 右侧消息区域」布局（见 `ui-spec.md`）基础上，于消息区域顶部增加「话题 tab 栏」：
+
+```
++--------------------------------------------------+
+| 数字员工 IM 工作台                                |
++----------+---------------------------------------+
+| 话题列表  | 话题 tab 栏 · 历史话题 icon            |
+| · 新建   | ┌────────┬────────┬───────┐            |
+| · 话题A  | │ 话题A  │ 话题B  │ ＋ ❌ │            |
++----------+├───────────────────────────────────────┤
+|          | 消息区域                               |
+|          | · 历史消息                             |
+|          | · Plan/Clarify/胶囊卡片                |
++----------+---------------------------------------+
+| + | 输入框 | 发送                                |
++----------+---------------------------------------+
+```
+
+### 话题 tab 栏
+
+- 位置：消息区域顶部，话题列表右侧。
+- 元素：
+  - 已打开话题 tab（标题 + 关闭按钮）
+  - 当前激活 tab 高亮（下划线或背景色）
+  - 「历史话题」icon（用于展开历史话题列表）
+- 交互：
+  - 点击 tab 切换激活话题。
+  - 点击关闭按钮关闭 tab（不删除数据）。
+  - 点击「历史话题」icon 展开下拉/侧滑列表。
+  - 选中历史话题后新增 tab。
+
+### 历史话题列表
+
+- 触发：点击「历史话题」icon。
+- 展示：当前 channel 下所有历史话题，按最后活跃时间倒序。
+- 元素：话题标题、最后活跃时间、未读消息数（可选）。
+- 交互：点击后在 tab 栏新增 tab 并加载该话题。
+
+### Agent 建议创建话题卡片
+
+- 触发：agent 识别到用户新任务。
+- 内容：「是否创建新话题讨论「X」？」
+- 操作按钮：「创建并切换」「留在当前话题」。
+- 自动创建场景：以系统提示形式告知用户「已为你创建新话题「X」」。
+
+## 数据模型
+
+复用 `issue-17/designs/issue-17/fields.md` 中定义的 `Topic` 模型：
+
+| 字段 | 说明 |
+|------|------|
+| topic_id | 等于 Mattermost root post id |
+| channel_id | 所属数字员工 channel |
+| title | 话题标题，为空时由 agent 生成摘要回填 |
+| summary | 话题摘要 |
+| creator_type | `human` / `agent` |
+| creator_id | 用户 id / agent id |
+| created_at | 创建时间 |
+| last_active_at | 最后活跃时间，随新消息更新 |
+
+每个话题对应一个 Mattermost thread，消息按 thread 隔离。tab 的打开/关闭状态为前端视图层状态，不写入 Topic 模型。
+
+## 依赖
+
+- **Mattermost thread 模型**（已确认决策）：每个话题映射到一个 Mattermost thread。
+- **Topic 模型**：`issue-17/designs/issue-17/fields.md`
+- **话题管理流程**：`issue-17/designs/issue-17/flows.md` F-T01~F-T05
+- **话题管理场景**：`issue-17/designs/issue-17/scenarios.md` 场景一/二/三
+- **话题管理 UI 规格**：`issue-17/designs/issue-17/ui-spec.md`
+- **功能目录**：`issue-17/designs/issue-17/feature-catalog.md` F-T01~F-T05
+
+## 关联产物
+
+- 上游 PRD：`issue-17/requirements/2026-08-24-issue-17/prd.md`
+- 上游需求文档：`issue-17/requirements/2026-08-24-issue-17/requirements.md`
+- 上游用户故事：`issue-17/requirements/2026-08-24-issue-17/user-stories.md`
+- 设计文档：
+  - `issue-17/designs/issue-17/feature-catalog.md`
+  - `issue-17/designs/issue-17/flows.md`
+  - `issue-17/designs/issue-17/scenarios.md`
+  - `issue-17/designs/issue-17/ui-spec.md`
+  - `issue-17/designs/issue-17/fields.md`
+- 后续 OpenSpec：TDD 计划阶段使用独立 change 名（如 `topic-multi-window`）与本子需求一一对应。
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

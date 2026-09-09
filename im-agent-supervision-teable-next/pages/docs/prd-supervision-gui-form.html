@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="PRD：督办 GUI 看板与聊内填报表单">
+<meta name="nav-group" content="需求文档 (2026-09-07)">
+<meta name="doc-version" content="v0.11-draft">
+<meta name="doc-uid" content="prd-supervision-gui-form">
+<title>PRD：督办 GUI 看板与聊内填报表单</title>
+<!-- Asset paths assume this page lives at pages/docs/*.html (depth 2). Adjust if placed elsewhere. -->
+<link rel="stylesheet" href="../../assets/style.css">
+<style>.mermaid{white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f8fa;border:1px solid #e5e8eb;border-radius:8px;padding:12px;overflow:auto}</style>
+</head>
+<body class="doc-page" data-page-uid="role-scenarios">
+
+<header class="doc-header">
+    <h1 data-uid="prd-supervision-gui-form-h1">PRD：督办 GUI 看板与聊内填报表单</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.11-draft</span>
+        <span class="doc-stage">阶段: clarify</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+# PRD: 2026-09-07-supervision-gui-form
+
+<!-- status: draft -->
+
+> **背景与来源**：2026-09-07 业务方明确 IM 督办两大目标——(1) 基于 Teable 督办台账建设美观 GUI 看板（指标 + 列表 + 跟进记录下钻）；(2) 龙小督 agent 在 IM 聊内以消息表单方式推送填报任务，经办人逐条查看、填报、提交（一人可能有多项）。2026-09-08 PM 五轮决策回填（D-1~D-20；D-19/D-21 状态机与口径决策）；**D-20 聊内不做审核**——聊内弹窗=数据交互 GUI：督办人直接改数据+提交（保存 Teable）+导出 Excel（文件消息送达）+催办，无审核/打回/汇总页，提交存为填报消息可只读回看；D-18 交互模式立场见 `agent-vs-form-interaction.md`）。**2026-09-09 PM 决策 D-22 状态机双字段化（v0.6 修正）**：**状态1**（时间状态）单选 4 值（正常/风险/逾期/完结）+ **状态2**（跟进状态）单选 4 值（暂存/推进中/已填报/逾期未填报），两字段**完全独立**——状态1 仅按当前时间与截止时间计算（截止前 7 天=风险、过截止=逾期，与是否填报无关），**完结**由督办人在 Teable 手动修改（上级督办室线下同意，终态、不再被督办）；**去除「紧急」**（与业务风险定义冲突），其「超期未反馈/通知督办人跟进」职责归「推进中→逾期未填报」（过督办反馈 DDL，T3）；**延期**=督办人回改截止时间、状态1 按新锚点重置；导出 Excel 触发本轮关闭不变（D-21，T5）；D-19/D-21 被 D-22 取代，见 `state-machine.md` v0.6。上游需求：`issue-17/requirements/2026-08-24-issue-17/supervision-p0.md`（S-1~S-5）、`issue-17/designs/issue-17/feature-catalog.md`（F-F01/F-F02）、issue-6 Teable 集成。本文档对应 9/9 督办 V1 定稿评审材料之一。
+
+## 产品目标
+
+1. **督办看板 GUI（领导只读总览）**：面向领导/管理层，将 Teable「督办任务 + 跟进记录」以任务导向看板呈现——指标卡（D-22 双字段口径 7 张）、**筛选条件框可组合筛选**的事项列表、点击行下钻跟进记录时间线，GUI 无任何写操作入口。
+2. **聊内逐条填报（含转办/润色/批量）**：经办人、转办人在 IM 内收到龙小督推送的表单卡片（iframe），以「第 k / 共 N 项」导航逐条填报五字段（落实/困难/下一步/预计完成时间/进度评价），支持**逐条提交、批量提交、转办（弹窗选人）、龙小督润色、暂存续填**（D-20 无申请办结/审核）。
+3. **业务闭环**：任务下发唯一方式 = 督办人发送 Excel 给龙小督（解析校验→落主表〔状态2=暂存〕→督办人启动督办后通知经办人，下发即接收 D-13）；全部事项遵循双字段状态机（状态1 4 值 + 状态2 4 值，两字段完全独立，D-22/v0.6）；24h 填报监督；进入风险窗（截止前 7 天）/逾期未填报/逾期自动催办 = 原表单加急 + push 消息 + 加急可视化，不加新表单、无需人工点击（D-15）；逾期未填报同步通知督办人跟进（T3），逾期升级督办人（只读视图 + 催办手动入口 → IM+邮件）；填报闭环按双字段状态机（D-22+D-20）：提交→已填报（存为填报消息可回看）→督办人 DDL 查收（直接修改保存/导出 Excel/催办，无审核、无办结按钮）→**导出 Excel 后本轮关闭、已填报回暂存（D-21 触发不变，T5）**；完结=上级督办室线下同意后督办人在 Teable 手动将状态1 改为完结（终态、不再被督办），延期=督办人回改截止时间、状态1 按新锚点重置（D-22/v0.6）；转办链最多「经办人→转办人→次级转办人」三级；消息列表龙小督会话旁展示督办状态徽标（待填报事项数，区别于未读数，D-14）；批示过问本期不做（D-17）。
+4. **数据闭环**：提交只写跟进记录表（创建人=实际填报人），主表反馈字段由 Teable 自动化同步；状态字段规范化单选；操作全量留痕。
+5. **架构合规**：GUI 与表单统一走「Teable 数据底座 + 轻量 BFF 应用层」（路线B），share 链接不作为数据通道。
+
+## 数据底座（已探明事实）
+
+- Teable 实例 `http://172.16.198.84:8069`，base `bseAKY1LDuSdW4sjExb`（督办空间）。
+- 督办任务主表 `tblaVFnl1xiS8fLVGYD`（48 字段）：任务编号 `fldZdBIxM7TAytSfSZU`、任务名称 `fldyRGwnpOPGF75SYJZ`、交办事项/交办内容、责任单位 `fldhvu7f6FDOVISJKmn`、协办单位、交办日期 `fldVq2ezU2btV6kquwH`、截止时间 `fldWqgJSlAiUoXFY7WY`（**状态1 风险/逾期判定锚点**）、预计完成时间 `fldIgdw89lHsyI2aWCL`、状态 `fldgIYI60Lz5ztzMANG`（**自由文本，需按 D-22 改造为「状态2」单选 4 值：暂存/推进中/已填报/逾期未填报**；另**新增「状态1」单选 4 值：正常/风险/逾期/完结**，D-10/D-19 被取代）、督办人姓名/账号、**转办人 `fldMkwE6oLgcJsfBUXo` / 次级转办人 `fldFs3fExW588EbZths`**、部门反馈三字段（`fldd7K5Ys7bO81MbuJo`/`fldeFsudM1c8cd1SQBN`/`fldDWexfD6ukncihbiD`，longText）、进度评价 `fldaSz6k8rmzOuathe8`（formula，D-6 改为**单选：推进中/已落实/已滞后**，督办人/经办人均可改并留痕）、领导批示 `fldw7V7xueFXDWK89NR`、跟进记录 link `fldtlBTGjscwsUjNfiU`、已催办时间 `fldTT1NyS43RYDiHTUD`。
+- 跟进记录表 `tbl3Tq7pdThgmvcde7j`：任务编号（主字段）+ link 回主表（对称 `fld9AgubUggQALxcX02`）+ 五填报字段 + 系统创建人/时间（创建人=实际填报人）。
+- **share 链接匿名访问受限** → 所有读写必须经 Teable API Token（S-3：龙小督独立账号 + 每用户 Token，BFF 托管、按 IM 登录身份映射）。
+- Mattermost 能力结论：vanilla 消息不支持聊内 iframe；WeLink IM 自研客户端已具备消息内 iframe 卡片能力（issue-17 F-F01 / issue-6）→ 直接复用。
+
+## 版本规划
+
+| 版本 | 时间 | 范围 |
+|------|------|------|
+| 1.3.1 | 9 月下 | 本 PRD 全部能力：督办看板 GUI + 聊内填报表单（含转办/润色/审批流）+ BFF 首批接口；与 S-5 督办全闭环共用 BFF |
+
+## 功能需求
+
+> 需求编号约定：`GUI-xx` 看板 GUI、`FORM-xx` 聊内表单、`AGT-xx` 龙小督交互；编号用于研发排期、走查用例与验收对账。
+
+### 督办看板 GUI（领导只读总览，D-5/D-9/D-10）
+
+| 编号 | 功能 | 描述 | 优先级 | 目标版本 |
+|------|------|------|--------|----------|
+| GUI-01 | 指标卡 | 7 张指标卡按双字段口径（D-22/v0.6）：总数(不含完结)、推进中、已填报、暂存(在库)、逾期未填报(=超期未反馈，过督办DDL，状态2)、风险(=截止前 7 天，状态1)、逾期(=过截止，状态1)；口径见 `metrics-dictionary.md` v0.6 | P0 | 1.3.1 |
+| GUI-02 | 条件筛选与排序列表 | 筛选条件框支持任意字段组合筛选（D-9）；表头点击排序（默认截止时间升序），逾期标红 | P0 | 1.3.1 |
+| GUI-03 | 跟进记录下钻 | 点击行 → 侧滑抽屉：事项全字段（含转办人/领导批示/催办历史）+ 跟进记录时间线（倒序） | P0 | 1.3.1 |
+| GUI-04 | 只读约束 | GUI 无任何写操作入口；批示/审批/催办引导至 IM（D-5） | P0 | 1.3.1 |
+| GUI-05 | 权限过滤 | 领导/督办人全量；经办人默认仅本人（含「我转办的」只读视角） | P0 | 1.3.1 |
+| GUI-06 | BFF 接口层 | 任务导向接口（metrics/tasks/详情/跟进/表单批次/提交/转办/导出/催办），隔离 schema 变更、统一鉴权审计 | P0 | 1.3.1 |
+| GUI-07 | 看板入口 | IM 左侧导航 + 工作台首页（F-W03 共用接口） | P1 | 1.3.1/1.4.0 |
+| GUI-08 | 列表分页 | 列表底部分页：默认 10 条/页（原型以 5 条/页演示双页），可选 10/20/50；**指标卡始终按筛选后全量计算，与分页无关**；翻页与改页大小保留筛选、排序状态 | P0 | 1.3.1 |
+
+### 聊内填报表单嵌入（D-1/D-2/D-8/D-20）
+
+| 编号 | 功能 | 描述 | 优先级 | 目标版本 |
+|------|------|------|--------|----------|
+| FORM-01 | 表单消息卡片 | 自研 IM 消息卡片渲染 iframe（白名单域名 + CSP frame-ancestors）；`view_mode`: edit（执行人填报）/ supervisor（督办人查收，可修改保存）/ readonly（督办人逾期催办视图）；postMessage 协议 resize/submitted/transferred/remind/completed/closed | P0 | 1.3.1 |
+| FORM-02 | k/N 逐条填报导航 | 头部常驻「当前第 k / 共 N 项」+ 进度条 + 已提交计数 | P0 | 1.3.1 |
+| FORM-03 | 左侧多选列表 + 批量操作 | 左侧事项列表复选 + **督办人设定 DDL（填报截止，区别于任务截止时间）** + 状态标记（未填/暂存/已提交/已转办）；当前项按钮按角色区分——经办人/转办人：暂存/提交/转办/润色；次级转办人：暂存/提交/润色（无转办，链路终点；**全角色无申请办结/审核，D-20**）；转办/批量转办均弹**组织成员选择弹窗**（搜索+列表单选唯一一位，确认后写主表并 IM 通知新执行人）；多选后批量提交（空项报错「{任务编号} {字段名}不能为空」）（D-1） | P0 | 1.3.1 |
+| FORM-04 | 上次进展预填 | 三反馈预填该事项最新跟进记录；预计完成时间默认主表当前值 | P0 | 1.3.1 |
+| FORM-05 | 龙小督润色 | 三反馈文本一键润色为规范公文（行文风格 Skill），弹窗确认后替换、可撤销；不确认不落库（D-2，对齐 S-1 铁则） | P0 | 1.3.1 |
+| FORM-06 | 转办 | 当前项转办 → **弹窗选人**（组织成员列表搜索+单选唯一）→ 写主表转办人字段 → 新执行人收同款表单；链路最多经办人→转办人→次级转办人（D-8）；经办人保留只读可见 | P0 | 1.3.1 |
+| FORM-08 | 填报提交 | BFF 用填报人 Teable Token 写跟进记录表（link + 五字段），创建人=实际填报人 | P0 | 1.3.1 |
+| FORM-09 | 提交回执 | 单项 submitted → 卡片角标「已提交 k/N」；全部完成 → 卡片完成态 + agent 确认话术；**无汇总页（D-20）**——各项提交内容以填报消息留在会话可回看 | P0 | 1.3.1 |
+| FORM-10 | 主表自动化回写 | BFF 不双写；主表三反馈字段由 Teable 自动化（取最新跟进记录）同步，实现期验证 | P0 | 1.3.1 |
+| FORM-11 | 身份与 Token | BFF 托管用户 Token，按 IM 身份映射；表单 URL 短时效一次性签名；签名与身份不匹配拒绝 | P0 | 1.3.1 |
+| FORM-12 | 降级策略 | iframe 失败 → 链接卡片新窗口同 URL（k/N 与批量操作一致） | P1 | 1.3.1 |
+| FORM-13 | 表单状态持久化 | 表单状态服务端持久化（批次+填报人维度草稿）：session 内任意操作（切换会话/重进聊天/刷新）后回到聊天窗口表单仍在，直至整个批次提交完成或卡片关闭；恢复现场含已填内容、暂存稿与 k/N 位置（D-12） | P0 | 1.3.1 |
+| FORM-14 | 提交存档消息 | 单项提交后该项表单转为**只读存档**（不可再打开编辑）；同时以填报人身份在聊天 session 生成一条**提交存档消息**（事项+五字段摘要+进度评价+提交时间，**算作用户发送的一次聊内表单消息**）；**点击该消息呼出只读表单**回看当时提交的全部内容；全部完成后批次卡片置完成态（D-12/D-20） | P0 | 1.3.1 |
+| FORM-16 | 导出 Excel（督办人） | supervisor 查收表单「导出 Excel」→ BFF 生成本批 .xlsx（编号/名称/五字段/进度评价/状态）→ 导出成功后**龙小督以文件消息发送至督办人会话**（可点击下载）（D-20） | P0 | 1.3.1 |
+| FORM-17 | 督办人数据修改 | supervisor 查收表单中督办人可直接修改已填报项（预填最新跟进记录+润色，改评留痕 D-6），逾期项可代录补正；「提交（保存到 Teable）」写跟进记录表（创建人=督办人）→ 主表自动化同步（D-20） | P0 | 1.3.1 |
+| FORM-15 | 消息列表督办状态徽标 | IM 消息列表龙小督会话旁展示督办状态徽标（绿 pill，加急转红）：按当前用户**待填报表事项数**统计（督办人=待查收+逾期未填报事项数，D-22），与未读红点语义独立；数据源 BFF 聚合，提交一项 -1、批次完成消失；点击直达会话表单卡片（D-14/D-15） | P0 | 1.3.1 |
+
+### 龙小督交互（D-1/D-4/D-6/D-7）
+
+| 编号 | 功能 | 描述 | 优先级 | 目标版本 |
+|------|------|------|--------|----------|
+| AGT-01 | 主动通知 | 推送「N 项 + 最近 deadline」+ 事项清单 + 表单卡片（同一话题集中） | P0 | 1.3.1 |
+| AGT-02 | 24h 填报监督 | 下发 24h 后检查五字段是否全部提交；未填齐提醒经办人（列出缺项与最近 deadline）并同步督办人（D-1） | P0 | 1.3.1 |
+| AGT-03 | 催办与逾期升级 | 进入风险窗（完成时限前 7 天）/逾期未填报/逾期**自动催办**：不生成新表单——原表单加急（卡片角标「已加急」/表单截止标红+加急横幅/消息列表徽标转红）+ push 消息，**无需人工点击**（D-15）；风险催经办人（T4）、过督办 DDL 未填报转逾期未填报并同步**通知督办人跟进**（T2）、逾期升级督办人：推只读表单视图（含催办手动入口），IM+邮件通知经办人，留痕「已催办时间」（T5/D-4） | P0 | 1.3.1 |
+| AGT-04 | DDL 查收与本轮关闭 | DDL 到达后 supervisor **查收**表单推送督办人（无审核、无办结按钮）：直接修改保存 / 导出 Excel（文件消息）/ 逾期未填报与逾期项催办（已填报项禁催办）；**督办人导出 Excel 即触发本轮批次关闭**（D-21 触发不变）：已填报→暂存，填报人收「本轮跟进已关闭」通知（T5）；逾期未填报项保持原状态留痕，下轮启动回推进中（T6） | P0 | 1.3.1 |
+| AGT-05 | 进度评价改评 | 督办人、经办人均可修改进度评价，每次留痕（谁/何时/改前改后，D-6） | P0 | 1.3.1 |
+| AGT-06 | 口头回复代填 | 识别→润色→**必须经用户确认**→用户 Token 代填；负面事实保留（S-1/S-5 铁则） | P0 | 1.3.1 |
+| AGT-07 | 通知频控 | 22:00–8:00 延迟至次日 8:30；经办人每日催办类 ≤2 条（D-7） | P0 | 1.3.1 |
+| AGT-08 | 状态机落地 | 状态拆为双字段单选：「状态2」4 值（暂存/推进中/已填报/逾期未填报）+「状态1」4 值（正常/风险/逾期/完结，新增字段，D-22/v0.6，两字段完全独立）；状态1 由 BFF 按当前时间×截止时间定时计算（风险=截止−7d、逾期=过截止，与填报无关），完结由督办人在 Teable 手动修改（上级督办室线下同意，终态、不再被督办）；逾期未填报=过督办DDL（T3，通知督办人跟进）；导出 Excel 触发已填报→暂存（T5）；延期=督办人回改截止时间、状态1 重判；历史数据清洗映射表 PM 确认后执行（D-22 取代 D-10/D-19/D-21） | P0 | 1.3.1 |
+| AGT-09 | 结果通知 | 填报/本轮关闭结果通知督办人；纳入每日汇总报告数据源（S-5） | P1 | 1.3.1 |
+| AGT-10 | DDL 填报情况查收 | 到达督办人设定的 DDL 时，龙小督在督办人 IM 会话推送**填报情况表单（supervisor 视图）**：可查看、直接修改保存、使用龙小督润色，进度评价可改评留痕（D-6），可导出 Excel、可催逾期项（已填报项禁催办）；**无审核按钮**；**替代原「Teable 筛选视图链接」方案**（D-11/D-20） | P0 | 1.3.1 |
+| AGT-11 | Excel 任务下发 | 督办人发送 Excel 表格（**唯一下发方式**，D-13）→ 龙小督解析校验（编号唯一/经办人匹配，失败行逐条反馈、不得丢行）→ 落主表 → 经办人收表单卡片 | P0 | 1.3.1 |
+
+## 非功能需求
+
+- **安全**：Teable Token 服务端托管、最小权限、可轮换；表单签名 URL 短时效一次性；iframe 白名单 + frame-ancestors + postMessage origin 校验；润色仅建议不落库直至确认；数据按身份隔离。
+- **性能**：看板首屏 < 2s；表单预填 < 1s；iframe 高度自适应；组合筛选一次查询。
+- **兼容性**：一期桌面端为主；二期移动端 WebView 直填；降级链接全端可用。
+- **持久性**：表单草稿与批次状态服务端保存（D-12），客户端不依赖 localStorage；会话中断恢复不丢已填内容。
+- **可维护**：Teable schema 变更仅 BFF 适配；状态值集/指标口径集中维护。
+- **审计**：填报（创建人=填报人）、转办、催办、审批、改评全量留痕。
+
+## 发布标准
+
+- [ ] 指标卡（D-22/v0.6 双字段口径，状态1=完结 的事项不出现在任何指标）与 Teable 人工核对一致；筛选条件框组合筛选正确、表头排序正确；分页（页大小切换/翻页）正确且指标卡不受分页影响。
+- [ ] GUI 无任何写操作入口；经办人仅见本人相关事项。
+- [ ] 表单 k/N 导航、左侧多选批量提交（报错文案「{编号} {字段}不能为空」）、暂存续填、润色确认替换、转办全链路正确；提交后状态=已填报。
+- [ ] 督办人只读视图催办按钮点击后经办人收到 IM（邮件渠道未就绪时记录待补发）。
+- [ ] 24h 填报监督触发准确；频控生效（非工作时间延迟、催办类 ≤2/日）。
+- [ ] 提交写跟进表（创建人=填报人）；主表自动化同步时延可接受；状态单选改造与历史清洗完成。
+- [ ] 幂等、签名过期拒绝、非白名单拦截、审计留痕生效。
+- [ ] 表单持久化：session 内切换后再回聊天窗口表单仍在，现场（已填/暂存/k-N 位置）完整恢复。
+- [ ] 提交存档消息以用户身份落入聊天历史，内容（五字段摘要+进度评价）与跟进记录表一致；表单该项转为只读。
+- [ ] Excel 下发：解析校验、失败行逐条反馈、经办人收卡片链路正确（D-13）。
+- [ ] 消息列表督办徽标计数与表单待办一致（提交 -1、完成消失），与未读红点视觉区分；加急时转红（D-14/D-15）。
+- [ ] 自动催办不产生新表单/新卡片；原表单加急可视化（标红+横幅+角标）与 push 消息送达（D-15）。
+- [ ] 完结与延期：督办人在 Teable 手动将状态1 改为完结（审计留痕、经办人收通知、该项退出待填报/风险/逾期/催办全部链路）；回改截止时间后状态1 按新锚点重置（D-22/v0.6）。
+- [ ] 剧本走查通过；研发完成 BFF 架构评估并确认。双字段状态机迁移与迁移表一致（T1–T8，两字段独立、状态1 纯时间口径），本轮关闭回暂存、完结退出全部监控正确（D-20/D-22 v0.6）。
+
+## 风险
+
+- **邮箱催办通道 1.4.1 前未就绪**：D-4 要求 IM+邮箱 → 先 IM 即时发，邮件就绪后补渠道；BFF 通知层做渠道抽象。
+- **状态历史数据清洗**：自由文本/原 6 值→双字段（状态1 4 值 + 状态2 4 值）的映射表需 PM 确认，清洗前备份防误归并。
+- **Teable 自动化能力边界**：「取最新跟进记录同步主表」需 PoC 验证；不达标则回退「提交即回写主表」（BFF 双写+补偿）。状态机逻辑（T1/T2/DDL 判定、批次关闭推进）一律由 BFF/agent 驱动，不用 Teable 自动化硬编（D-18）。
+- **进度评价字段现状为 formula**：值集已确认（推进中/已落实/已滞后，D-6/D-12），仍需字段改造（formula→单选）+改评留痕，影响现有公式依赖，实现期评估。
+- **预警与督办 DDL 配置**：双字段独立判定后无串联约束；若批次督办DDL 晚于完成时限，「逾期未填报」（跟进字段）与「逾期」（预警字段）可并存于同一事项——展示口径实现期与业务确认。
+- **Token 体系依赖 S-3**：用户 Token 托管未就绪将阻塞填报链路。
+- **GUI 架构待研发评估**：范围不变，选型可能调整。
+
+## 待确认（PM）
+
+1. 状态历史数据**清洗映射表**（自由文本/原 6 值 → 双字段：状态1 4 值 + 状态2 4 值的对应关系，清洗前需确认）。
+2. BFF 技术栈与部署形态（建议与 IM/Teable 同内网域部署）。
+3. 移动端填报随移动端 IM 上线的具体版本号。
+4. 批示过问二期排期（「领导批示」字段本期仅保留存储，D-17）。
+5. 风险窗取值（现口径=完成时限−7d，D-21 锚点不变）与批次督办 DDL 的配置策略（两字段独立判定，无串联约束）实现期与业务确认。
+6. D-18 交互模式立场与三条引导权重问题（见 `agent-vs-form-interaction.md` §5）。
+
+## 关联产物
+
+- 设计文档：`designs/im-agent-supervision-teable/role-scenarios.md`（角色场景与决策记录）、`gui-dashboard-spec.md`、`embed-form-spec.md`、`agent-scenario-script.md`
+- 上游基线：`issue-17/requirements/2026-08-24-issue-17/supervision-p0.md`、`issue-17/designs/issue-17/feature-catalog.md`
+- 研究：`docs/research/gui-route-teable-bff.md`
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            if (codeLang === 'mermaid') {
+                html += '<div class="mermaid">' + escapeHtml(codeBuffer.join('\n')) + '</div>\n';
+            } else {
+                html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            }
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    function mermaidFallback(list) {
+        list.forEach(function (el) {
+            if (el.getAttribute('data-fb')) return;
+            el.setAttribute('data-fb', '1');
+            var pre = document.createElement('pre');
+            pre.textContent = el.textContent;
+            el.parentNode.replaceChild(pre, el);
+        });
+    }
+    function runMermaid(diagrams) {
+        diagrams.forEach(function (el, i) { el.id = 'mmd-' + i; });
+        try {
+            mermaid.initialize({ startOnLoad: false, theme: 'neutral', flowchart: { htmlLabels: true } });
+            mermaid.run({ querySelector: '#docContent .mermaid' });
+        } catch (e) { mermaidFallback(diagrams); }
+    }
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+        var diagrams = contentEl.querySelectorAll('.mermaid');
+        if (diagrams.length) {
+            if (window.mermaid) { runMermaid(diagrams); }
+            else {
+                var ms = document.createElement('script');
+                ms.src = 'https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js';
+                ms.onload = function () { if (window.mermaid) { runMermaid(diagrams); } else { mermaidFallback(diagrams); } };
+                ms.onerror = function () { mermaidFallback(diagrams); };
+                document.head.appendChild(ms);
+                setTimeout(function () { if (!window.mermaid) { mermaidFallback(diagrams); } }, 8000);
+            }
+        }
+    }
+})();
+</script>
+</body>
+</html>

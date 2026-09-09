@@ -1,0 +1,161 @@
+schema_version: 2.0.0
+workflow:
+  name: interview-to-knowledge
+  version: 1.0.0
+  template: interview-to-knowledge
+current_run:
+  run_id: 20260904074851-2ef9dde2
+  branch: issue-17
+  current_stage: clarify
+  status: validation_failed
+  started_at: '2026-09-04T07:48:51Z'
+  last_updated_at: '2026-09-09T03:07:07Z'
+  issue_number: ''
+  variables:
+    process_slug: im-agent-supervision-teable-next
+    session_id: 2026-09-03-next-steps
+    design_id: im-agent-supervision-teable
+    issue_number: ''
+    change_name: ''
+    pr_number: ''
+    feature_slug: ''
+  change_name: ''
+  pr_number: ''
+  feature_slug: ''
+  execution_mode: team
+artifact_guidance: "This issue work package holds all artifacts produced while resolving the issue.\n\nHow to use templates:\n\
+  - Document templates live read-only under `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
+  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format reference and author the\n  document\
+  \ directly in the appropriate package directory, replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
+  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n  `interviews/` for recorded session outputs,\
+  \ `openspec/` for implementation proposals,\n  `docs/` for research and decision records, and `recordings/` for raw input\
+  \ files only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage> --action record-artifacts`\n  to persist\
+  \ produced artifact paths back into this workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
+  \ in the package root. Read that\n  index first to learn which documents exist and their approval status.\n\nApproval convention:\n\
+  - Add `<!-- status: approved -->` or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before handoff.\n"
+nodes:
+- stage_id: clarify
+  node_id: clarify-2026-09-04-next-steps
+  status: in_progress
+  started_at: '2026-09-04T07:52:44Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - im-agent-supervision-teable-next/docs/research/input-sources.md
+  - im-agent-supervision-teable-next/requirements/2026-09-03-next-steps/next-steps.md
+  - im-agent-supervision-teable-next/index.html
+  - im-agent-supervision-teable-next/assets/js/package-data.js
+  - im-agent-supervision-teable-next/pages/docs/next-steps.html
+  - im-agent-supervision-teable-next/pages/docs/input-sources.html
+  - im-agent-supervision-teable-next/pages/upstream/
+  - im-agent-supervision-teable-next/docs/research/gui-route-teable-bff.md
+  handoff_file: null
+- stage_id: clarify
+  node_id: clarify-supervision-gui-form
+  status: in_progress
+  started_at: '2026-09-07T11:04:59Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - im-agent-supervision-teable-next/requirements/2026-09-07-supervision-gui-form/prd.md
+  - im-agent-supervision-teable-next/pages/docs/prd-supervision-gui-form.html
+  - im-agent-supervision-teable-next/pages/docs/gui-route-teable-bff.html
+  handoff_file: null
+- stage_id: product-design-docs
+  node_id: pdd-supervision-gui-form
+  status: in_progress
+  started_at: '2026-09-07T11:05:09Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - im-agent-supervision-teable-next/designs/im-agent-supervision-teable/gui-dashboard-spec.md
+  - im-agent-supervision-teable-next/designs/im-agent-supervision-teable/embed-form-spec.md
+  - im-agent-supervision-teable-next/designs/im-agent-supervision-teable/agent-scenario-script.md
+  - im-agent-supervision-teable-next/pages/designs/gui-dashboard-spec.html
+  - im-agent-supervision-teable-next/pages/designs/embed-form-spec.html
+  - im-agent-supervision-teable-next/pages/designs/agent-scenario-script.html
+  handoff_file: null
+- stage_id: product-design-docs
+  node_id: pdd-role-scenarios
+  status: in_progress
+  started_at: '2026-09-07T12:09:16Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - im-agent-supervision-teable-next/designs/im-agent-supervision-teable/role-scenarios.md
+  - im-agent-supervision-teable-next/pages/designs/role-scenarios.html
+  handoff_file: null
+- stage_id: product-prototype
+  node_id: pp-supervision-prototypes
+  status: in_progress
+  started_at: '2026-09-08T01:34:54Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - im-agent-supervision-teable-next/pages/prototypes/kanban.html
+  - im-agent-supervision-teable-next/pages/prototypes/form.html
+  handoff_file: null
+- stage_id: product-prototype
+  node_id: pp-supervision-shell
+  status: in_progress
+  started_at: '2026-09-08T02:05:14Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - im-agent-supervision-teable-next/pages/prototypes/shell-kanban.html
+  handoff_file: null
+- stage_id: product-prototype
+  node_id: pp-eaic-assets
+  status: in_progress
+  started_at: '2026-09-08T02:11:50Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - im-agent-supervision-teable-next/assets/eaic
+  handoff_file: null
+- stage_id: product-design-docs
+  node_id: pdd-metrics-dictionary
+  status: in_progress
+  started_at: '2026-09-08T02:30:49Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - designs/im-agent-supervision-teable/metrics-dictionary.md
+  - pages/designs/metrics-dictionary.html
+  handoff_file: null
+- stage_id: product-design-docs
+  node_id: pdd-state-machine
+  status: in_progress
+  started_at: '2026-09-08T08:27:57Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - designs/im-agent-supervision-teable/state-machine.md
+  - pages/designs/state-machine.html
+  - designs/im-agent-supervision-teable/agent-vs-form-interaction.md
+  - pages/designs/agent-vs-form-interaction.html
+  handoff_file: null
+- stage_id: product-prototype
+  node_id: pp-chat-panel-shell
+  status: in_progress
+  started_at: '2026-09-09T01:32:42Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - pages/prototypes/shell-chat-panel.html
+  handoff_file: null
+recovery:
+  last_validated_checkpoint: ''
+  can_resume_from: ingest
+  abort_reason: null
+  abort_at: null

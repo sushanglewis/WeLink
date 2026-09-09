@@ -101,3 +101,57 @@ projects:
     notes: |
       AWS-centric full-stack reference app. Heavier operational footprint and
       copyleft concerns.
+
+  - name: nextcloud/calendar
+    url: https://github.com/nextcloud/calendar
+    license: AGPL-3.0
+    fit_score: 5.0
+    status: recommended
+    domain: calendar-scheduling
+    decided_at: null
+    notes: |
+      Primary candidate for issue-17 AI schedule. Mature traditional calendar
+      product with month/week/day views, shared calendars, appointments,
+      CalDAV/CardDAV, iMIP invitations, and app-password token auth. Multiple
+      ready-made CalDAV MCP servers available. AGPL-3.0 requires compliance
+      review for embedding into WeLink's proprietary/private-deployed product.
+
+  - name: stalwartlabs/stalwart
+    url: https://github.com/stalwartlabs/stalwart
+    license: AGPL-3.0 (dual-licensed with commercial SELv2)
+    fit_score: 4.0
+    status: candidate
+    domain: calendar-scheduling
+    decided_at: null
+    notes: |
+      Alternative candidate for issue-17 AI schedule. Rust all-in-one mail +
+      collaboration server with CalDAV, CardDAV, WebDAV, and JMAP for Calendars
+      (added 2025 via NLnet grant). JMAP JSON-over-HTTP is the most
+      agent-friendly protocol available, but it is a server, not a calendar
+      product; a board UI must be built or reused. AGPL-3.0 community edition.
+
+  - name: calcom/cal.com
+    url: https://github.com/calcom/cal.com
+    license: AGPLv3 core (2026 closed-source pivot reported, unverified)
+    fit_score: 4.0
+    status: candidate
+    domain: calendar-scheduling
+    decided_at: null
+    notes: |
+      Booking/scheduling-focused alternative. REST API v2 + webhooks. Strong
+      for public booking pages, less so for traditional personal calendar board.
+      CAUTION: secondary sources report Cal.com moved production codebase
+      closed-source in April 2026; verify LICENSE on the official repo before
+      committing.
+
+  - name: sabre-io/dav
+    url: https://github.com/sabre-io/dav
+    license: MIT
+    fit_score: 3.0
+    status: fallback
+    domain: calendar-scheduling
+    decided_at: null
+    notes: |
+      MIT-licensed CalDAV/CardDAV/WebDAV framework. Build-from-scratch baseline
+      if AGPL is not acceptable. Requires implementing invitations, free/busy,
+      recurrence, and timezone handling, which is deceptively complex.

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="子需求 · 企微替换">
+<meta name="nav-group" content="上游需求基线 (issue-17)">
+<meta name="doc-version" content="v0.9-draft">
+<meta name="doc-uid" content="wework-replacement-p0">
+<title>子需求 · 企微替换</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="wework-replacement-p0">
+
+<header class="doc-header">
+    <h1 data-uid="wework-replacement-p0-h1">子需求 · 企微替换</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.9-draft</span>
+        <span class="doc-stage">阶段: product-prototype</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+> 📄 本文档镜像自 `issue-17/requirements/2026-08-24-issue-17/wework-replacement-p0.md`（快照 2026-09-04，以源文件为准）。
+# 子需求：企微替换与 EIC 版本（P0 / 1.5.1-1.7.x）
+
+<!-- status: draft -->
+
+## 背景与来源
+
+本文件从 issue-17 综合需求中拆分而出，聚焦「完全替换现有 SaaS 版企业微信」这一 2026-09-02 领导会议纪要确定的硬目标。
+
+- **来源 Issue**: [WeLink #17](https://github.com/sushanglewis/WeLink/issues/17)
+- **来源会议纪要**: `issue-17/interviews/2026-09-02-roadmap-meeting/summary.md`（2026-09-02）
+- **上游 PRD**: `issue-17/requirements/2026-08-24-issue-17/prd.md`
+- **上游需求文档**: `issue-17/requirements/2026-08-24-issue-17/requirements.md`
+- **目标版本**: 1.5.1 EIC 部署启动；1.6.0 三件套重建；1.6.1 切换预演；**1 月底完全替换**
+
+纪要原始论述：
+
+> 「现有 SaaS 版企微的核心功能包含审批、考勤、工资条三类，日常用户的聊天使用频率极低，具备替换的基础条件。」
+
+> 「新系统上线后引导全员在新平台内完成聊天交互，在实际使用过程中快速暴露产品存在的问题，推动产品快速迭代优化。」
+
+> 「按照时间倒排计划推进开发，最终在 1 月底完成对现有 SaaS 版企微的完全替换。」
+
+> 「同步部署启创专属的 EIC 版本，在该版本内配置适配启创业务的各类流程，实现新系统与启创现有业务的深度整合。」
+
+## 目标
+
+1. **三件套重建**：在新系统重建审批、考勤、工资条三类核心功能，替代 SaaS 版企微。
+2. **11 月启创全员试用**：抓住企微使用低频的切换窗口期，在启创内部全员覆盖试用。
+3. **1 月底完全替换**：按倒排计划完成 SaaS 版企微的完全替换，企业内部办公沟通体系全面升级到新平台。
+4. **EIC 专属版本**：部署启创专属 EIC 版本，配置适配启创业务的流程，与启创现有业务深度整合。
+
+## 范围（In Scope）
+
+### R-1 功能盘点与重建（1.6.0）
+
+- **盘点**：对现有 SaaS 版企微的审批、考勤、工资条功能做全量盘点：流程数量、表单模板、使用部门、数据规模、集成关系（九月计划「SAAS 版企微流程迁移-OA」为背景依赖）。
+- **审批重建**：
+  - 审批流程引擎：发起、审批、抄送、转交、撤回、加签。
+  - 表单模板：迁移企微现有模板并按新平台能力补齐。
+  - 审批待办自动进入工作台首页待办模块（见 `workbench-home-p0.md` W-1）。
+- **考勤重建**：
+  - 打卡（与九月计划「移动端（打卡、IM）」条目联动，移动端打卡界面归伊莎负责条目，本文件约束数据链路）、排班、请假/加班审批联动、考勤报表。
+- **工资条重建**：
+  - 工资条发放、查看（加密/水印/阅后确认）、历史查询。
+  - 高敏感场景：权限最小化、操作审计、阅后水印与防截屏提示。
+- **历史数据迁移**：审批单据、考勤记录、工资条发放记录的迁移与对账。
+
+### R-2 试用与迭代（1.5.0-1.5.1）
+
+- 11 月启创全员试用版本范围：IM 基础功能（Mattermost 底座）+ 工作台首页 + 督办闭环 + 网易邮件。
+- 试用引导：引导全员在新平台完成聊天交互；暴露问题、快速迭代。
+- 反馈闭环：试用问题收集渠道与迭代排期机制（半月版本节奏天然适配）。
+
+### R-3 EIC 专属版本（1.5.1 启动，1.7.x 全量）
+
+- 部署启创专属 EIC 版本（独立环境/租户）。
+- 配置适配启创业务的流程：审批模板、考勤规则、督办批次、工作台栏目等。
+- 与启创现有业务系统深度整合（启创本地 OA 等，跨系统依赖在方案评审时盘点）。
+- EIC 版本与主版本的关系：主版本功能同步发布到 EIC 专属版本，EIC 配置差异化管理。
+
+### R-4 切换与替换（1.6.1-1 月底）
+
+- 切换预演：选定部门/批次灰度切换，验证流程、数据与账号链路。
+- 倒排计划：以 1 月底完全替换为锚点倒排三件套验收、数据迁移、全员培训、旧系统停用公告。
+- 完全替换：SaaS 版企微停用，全员切换至新平台；保留旧系统只读查询期（期限待评审）。
+
+## 非目标
+
+- 不替换/复刻企微的全部功能，仅覆盖审批、考勤、工资条三类核心功能与聊天交互（聊天由 IM 基础功能承担）。
+- 不重建企微的会议/文档/微盘等协作功能（音视频会议、在线文档为九月计划背景条目）。
+- 移动端打卡的界面开发归九月计划「移动端（打卡、IM）-伊莎」条目，本文件只约束其与考勤数据链路的接口。
+- 不评估保留企微作为并行方案（纪要确定完全替换）。
+
+## 用户故事
+
+### 故事一：我在新系统发起和审批流程（R-1）
+
+- **作为**：企业内部员工
+- **我希望**：在新系统发起审批、处理待我审批的单据，待办出现在工作台首页
+- **以便**：审批能力不再依赖企微
+- **验收标准**：
+  - 审批流程引擎支持发起/审批/抄送/转交/撤回/加签。
+  - 企微现有模板完成迁移或等效重建。
+  - 审批待办进入工作台首页并可回跳。
+
+### 故事二：我在新系统打卡和查看考勤（R-1）
+
+- **作为**：企业内部员工
+- **我希望**：移动端/桌面端完成打卡，查看考勤记录与报表
+- **以便**：考勤能力不再依赖企微
+- **验收标准**：
+  - 打卡数据链路贯通（移动端界面归伊莎条目），考勤报表可用。
+  - 请假/加班与审批联动。
+
+### 故事三：我在新系统查看工资条（R-1）
+
+- **作为**：企业内部员工
+- **我希望**：收到工资条发放通知，加密查看、阅后确认
+- **以便**：工资条能力不再依赖企微，且敏感信息受保护
+- **验收标准**：
+  - 工资条发放、查看、阅后确认、历史查询可用。
+  - 水印、权限最小化、操作审计齐备。
+
+### 故事四：参与启创全员试用（R-2）
+
+- **作为**：启创员工
+- **我希望**：11 月起在新平台完成日常聊天与工作，问题能被快速响应
+- **以便**：在真实使用中打磨产品，完成切换准备
+- **验收标准**：
+  - 11 月试用版本（IM + 工作台 + 督办 + 邮件）可用。
+  - 反馈渠道与半月迭代机制运行。
+
+### 故事五：使用启创专属 EIC 版本（R-3）
+
+- **作为**：启创员工
+- **我希望**：使用适配启创本地业务流程的专属版本
+- **以便**：新系统与启创现有业务深度整合
+- **验收标准**：
+  - EIC 版本部署完成，启创业务流程配置生效。
+  - 主版本功能同步发布到 EIC 版本。
+
+### 故事六：彻底告别企微（R-4）
+
+- **作为**：企业管理员
+- **我希望**：1 月底前完成全员切换与企微停用，旧数据可查询
+- **以便**：办公沟通体系统一到自主可控的新平台
+- **验收标准**：
+  - 倒排计划达成：三件套验收、数据迁移、培训、停用公告全部完成。
+  - SaaS 版企微停用，旧系统只读查询期生效。
+
+## 功能需求表
+
+| 功能 | 描述 | 优先级 | 目标版本 |
+|------|------|--------|----------|
+| 企微功能盘点 | 审批/考勤/工资条全量盘点与迁移清单 | P0 | 1.6.0 |
+| 审批流程引擎 | 发起/审批/抄送/转交/撤回/加签 | P0 | 1.6.0 |
+| 审批模板迁移 | 企微模板迁移与补齐 | P0 | 1.6.0 |
+| 考勤重建 | 打卡数据链路、排班、审批联动、报表 | P0 | 1.6.0 |
+| 工资条重建 | 发放/加密查看/阅后确认/历史查询 | P0 | 1.6.0 |
+| 历史数据迁移 | 审批/考勤/工资条数据迁移与对账 | P0 | 1.6.0 |
+| 试用版本与引导 | 11 月启创全员试用，反馈闭环 | P0 | 1.5.0 |
+| EIC 版本部署 | 启创专属环境部署与流程配置 | P0 | 1.5.1/1.7.x |
+| 切换预演 | 灰度切换验证 | P0 | 1.6.1 |
+| 完全替换 | 1 月底停用 SaaS 企微，旧系统只读保留 | P0 | 1.7.x |
+
+## 验收标准
+
+### 三件套（1.6.0）
+
+- [ ] 审批、考勤、工资条三类功能在新系统可用并通过业务验收。
+- [ ] 企微现有审批模板完成迁移或等效重建。
+- [ ] 历史数据迁移完成且对账通过。
+- [ ] 工资条具备加密、水印、阅后确认与操作审计。
+- [ ] 审批待办进入工作台首页待办模块。
+
+### 试用与替换
+
+- [ ] 11 月启创全员试用版本可用，反馈闭环运行。
+- [ ] EIC 专属版本部署并配置启创业务流程。
+- [ ] 切换预演通过（灰度部门流程、数据、账号链路验证）。
+- [ ] 1 月底 SaaS 版企微完全停用，全员切换完成。
+- [ ] 旧系统进入只读查询期。
+
+## 数据模型
+
+复用 `issue-17/designs/issue-17/fields.md` 与 `designs/issue-17-gui-strategy/` 中 Teable+BFF 架构思路（业务数据表结构在 1.6.0 设计阶段定稿），关键概念：
+
+| 概念 | 说明 |
+|------|------|
+| ApprovalFlow / ApprovalInstance | 审批流程模板与审批实例 |
+| AttendanceRecord / LeaveRequest | 考勤记录与请假/加班申请（与审批联动） |
+| Payslip / PayslipDelivery | 工资条与发放批次（含阅后确认状态） |
+| MigrationChecklist | 迁移清单：对象、范围、对账结果、回滚标记 |
+| EICProfile | EIC 专属版本配置差异（流程模板、规则、栏目） |
+
+## 界面/交互说明
+
+- 审批、考勤、工资条的用户界面遵循「工作台首页待办 → 详情处理 → 状态回写」的统一路径。
+- 管理端提供三件套配置界面（模板、规则、发放批次），形态与组织化管理端对齐。
+- 工资条查看页：强水印、阅后确认弹窗、防截屏提示。
+
+## 依赖
+
+- **工作台首页**：`workbench-home-p0.md`（待办聚合与入口）
+- **移动端打卡界面**：九月计划「移动端（打卡、IM）-伊莎」（背景依赖，跨团队）
+- **OA 集成**：九月计划「工作台内部系统接入（EAIC 部署）-OA」「SAAS 版企微流程迁移-OA」（背景依赖，跨团队）
+- **组织账号体系**：`org-agent-management-p0.md`（全员账号与新用户开通）
+- **主数据**：纪要「所有业务数据最终统一对接企业主数据系统」（1.6.1 起）
+
+## 关联产物
+
+- 上游 PRD：`issue-17/requirements/2026-08-24-issue-17/prd.md`
+- 会议纪要摘要：`issue-17/interviews/2026-09-02-roadmap-meeting/summary.md`
+- 九月计划图：`issue-17/recordings/2026-09-September-plan.png`
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>
