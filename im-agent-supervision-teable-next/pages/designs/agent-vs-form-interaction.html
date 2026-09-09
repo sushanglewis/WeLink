@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="表单化 vs 数字员工：交互模式立场（D-18）">
+<meta name="nav-group" content="设计文档 (im-agent-supervision-teable)">
+<meta name="doc-version" content="v0.4-draft">
+<meta name="doc-uid" content="agent-vs-form-interaction">
+<title>表单化 vs 数字员工：交互模式立场（D-18）</title>
+<!-- Asset paths assume this page lives at pages/docs/*.html (depth 2). Adjust if placed elsewhere. -->
+<link rel="stylesheet" href="../../assets/style.css">
+<style>.mermaid{white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f8fa;border:1px solid #e5e8eb;border-radius:8px;padding:12px;overflow:auto}</style>
+</head>
+<body class="doc-page" data-page-uid="agent-vs-form-interaction">
+
+<header class="doc-header">
+    <h1 data-uid="agent-vs-form-interaction-h1">交互模式决策备忘录</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.4-draft</span>
+        <span class="doc-stage">阶段: product-design-docs</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+# 决策备忘录：表单化 vs 数字员工——龙小督的交互模式立场
+
+<!-- status: draft -->
+
+- **日期**: 2026-09-09 v0.4（**v0.4 按 D-22/v0.6 修正**：两字段完全独立——状态1（正常/风险/逾期/完结，纯时间计算，完结=督办人 Teable 手动修改）+ 状态2（暂存/推进中/已填报/逾期未填报，无办结）；聊内仍无审核/审批流、表单内无办结操作；延期 = 督办人回改截止时间、状态1 按新锚点重置；v0.3/v0.2：按 D-22/D-20 更新；v0.1（回应 PM 核心关切：设计是否退回传统流程 IT）
+- **上游**: `prd.md`、`state-machine.md`、`embed-form-spec.md`
+- **状态**: 待 PM 决策（建议采纳「混合交互」立场，D-18）
+
+## 1. 问题
+
+> 经办人与龙小督的所有交互都回归到系统页面（表单），而非自然语言。龙小督退化为消息通知渠道，不再是灵活的数字员工；基于 Teable 的数据表、回调逻辑（尤其审核功能）在流程 IT 形态下可能不适用。
+
+## 2. 风险分析（承认问题真实存在）
+
+| # | 风险 | 表现 |
+|---|------|------|
+| P-1 | 交互单通道化 | 经办人学会「等表单、填表单」，不再对龙小督说话 → agent 的智能（理解、澄清、润色、代填、追问）失去用武之地 |
+| P-2 | 流程刚性 | 状态机 + 固定表单 = 传统 OA 流转；异常路径（部分填报、口头说明、跨事项合并汇报）难以表达 |
+| P-3 | Teable 错位 | 用表格自动化承载分支流程（T1/T2/DDL 判定、批次关闭、重估预警态）超出 Teable 自动化舒适区，硬编脆弱 |
+
+## 3. 设计立场：表单是消息的富媒体载体，不是独立流程入口（建议 D-18）
+
+**龙小督的第一交互是自然语言；表单是龙小督在对话中递出的一块「结构化便签」。** 五条防线：
+
+1. **双通道等价**：表单能做的，自然语言都能做。口头/文字填报 → 龙小督识别 → 润色 → **确认后代填**（AGT-06 已实现，S-1 铁则）；表单只是降低填写成本的快捷键，不是唯一入口。
+2. **agent 主动性不变**：触发、预警、加急、升级、审核提醒全部由龙小督主动发起并解释（「为什么现在要填」）；用户任何时刻可用自然语言追问、申请延期、说明困难、讨价还价——这些不进状态机的自由对话由 agent 理解后转化为受控动作（确认后执行）。
+3. **无审核环节（D-20）**：聊内弹窗不做审核/打回——DDL 后督办人在查收表单**直接修改数据并提交（保存 Teable）**，可导出 Excel、可催逾期项；不建任何审核系统/审核待办页面。本轮关闭由批次关闭动作触发，状态写回主表。
+4. **状态机归 BFF/agent，Teable 归记录**：T1/T2/DDL 判定、批次关闭推进是**代码逻辑**（BFF 定时任务 + agent），状态写回主表单选字段；Teable 自动化只做无分支的数据同步（最新跟进记录→主表三反馈）。Teable 是 system of record，不是流程引擎——**状态机的引入恰恰说明流程逻辑不能塞进表格自动化**，这是本次设计对 P-3 的回答。
+5. **表单本身长在会话里**：聊内 iframe 卡片、提交即存档消息、会话内状态持久化（D-12）——表单从不离开对话上下文，用户始终知道「我在和龙小督打交道」，而不是「我在用一个系统」。
+
+## 4. 对「审核功能」的直接回答（D-20 后：不存在审核）
+
+- **PM 决策 D-20：聊内不做审核**。原「审核不流程 IT 化」的顾虑以釜底抽薪方式解决——没有审核环节，就没有流程 IT 化审核。
+- 督办人对数据的把控通过**直接修改 + 保存留痕**实现（改评留痕 D-6），对进度的把控通过**催办（逾期项）+ 下一轮启动**实现；不再存在「通过/打回」状态分支。
+- 因此 Teable 只需存：状态1（4 值单选：正常/风险/逾期/完结）、状态2（4 值单选：暂存/推进中/已填报/逾期未填报）、跟进记录（含督办人修改记录）、督办DDL/截止时间字段。回调逻辑（何时催、催谁、升级谁、何时关批、状态1 时间计算与完结锁定）在 BFF/agent。
+
+## 5. 待 PM 决策
+
+1. **D-18 立场确认**：采纳「混合交互」五条防线？（建议采纳；若采纳，PRD 增补非功能需求「双通道等价」）
+2. 表单与自然语言的**引导权重**：推送时「表单优先、语言兜底」还是「语言优先、表单为可选附件」？（建议前者——填报结构化程度高，但话术必须保留自然语言出口，如现稿「有困难请直接回复我」）
+3. ~~审核打回后……~~（D-20 已取消审核/打回，此问题关闭；若未来恢复审核机制再重开）
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            if (codeLang === 'mermaid') {
+                html += '<div class="mermaid">' + escapeHtml(codeBuffer.join('\n')) + '</div>\n';
+            } else {
+                html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            }
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    function mermaidFallback(list) {
+        list.forEach(function (el) {
+            if (el.getAttribute('data-fb')) return;
+            el.setAttribute('data-fb', '1');
+            var pre = document.createElement('pre');
+            pre.textContent = el.textContent;
+            el.parentNode.replaceChild(pre, el);
+        });
+    }
+    function runMermaid(diagrams) {
+        diagrams.forEach(function (el, i) { el.id = 'mmd-' + i; });
+        try {
+            mermaid.initialize({ startOnLoad: false, theme: 'neutral', flowchart: { htmlLabels: true } });
+            mermaid.run({ querySelector: '#docContent .mermaid' });
+        } catch (e) { mermaidFallback(diagrams); }
+    }
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+        var diagrams = contentEl.querySelectorAll('.mermaid');
+        if (diagrams.length) {
+            if (window.mermaid) { runMermaid(diagrams); }
+            else {
+                var ms = document.createElement('script');
+                ms.src = 'https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js';
+                ms.onload = function () { if (window.mermaid) { runMermaid(diagrams); } else { mermaidFallback(diagrams); } };
+                ms.onerror = function () { mermaidFallback(diagrams); };
+                document.head.appendChild(ms);
+                setTimeout(function () { if (!window.mermaid) { mermaidFallback(diagrams); } }, 8000);
+            }
+        }
+    }
+})();
+</script>
+</body>
+</html>

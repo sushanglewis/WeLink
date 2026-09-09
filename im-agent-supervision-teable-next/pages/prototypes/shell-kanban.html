@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="事项看板（EAIC 壳内）">
+<meta name="nav-group" content="界面原型">
+<meta name="doc-version" content="v0.4-proto">
+<meta name="doc-uid" content="proto-shell-kanban">
+<title>EAIC 原型 · 主界面 · 事项看板</title>
+<link rel="stylesheet" href="../../assets/eaic/tokens.css">
+<link rel="stylesheet" href="../../assets/eaic/base.css">
+<link rel="stylesheet" href="../../assets/eaic/app.css">
+<style>
+/* 事项看板 WebView：真实 iframe 替代占位（.wv-body 去居中内边距） */
+.wv-kanban iframe{width:100%;height:100%;border:0;display:block}
+</style>
+<style>
+/* 龙小督督办状态徽标（D-14）：区别于未读红点的绿色督办徽标 */
+.sv-wrap{padding:14px 16px;display:flex;flex-direction:column;gap:2px;background:var(--bg,#F2F4F6);height:100%;overflow:auto}
+.sv-row{display:flex;gap:12px;padding:12px 12px;border-radius:10px;cursor:pointer;align-items:center}
+.sv-row:hover{background:rgba(0,0,0,.04)}
+.sv-row.on{background:rgba(0,174,104,.08)}
+.sv-av{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0}
+.sv-main{flex:1;min-width:0}
+.sv-top{display:flex;align-items:center;gap:8px}
+.sv-name{font-size:13.5px;font-weight:600}
+.sv-time{margin-left:auto;font-size:11.5px;color:var(--sub,#6B7280)}
+.sv-preview{font-size:12.5px;color:var(--sub,#6B7280);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-badge-unread{background:var(--error,#F53F3F);color:#fff;border-radius:10px;font-size:11px;padding:1px 7px}
+.sv-sup{background:var(--brand,#00AE68);color:#fff;border-radius:10px;font-size:11px;padding:2px 8px;white-space:nowrap}
+.sv-sup.urgent{background:var(--error,#F53F3F)}
+</style>
+</head>
+<body>
+<div class="window full" id="win"></div>
+<script src="../../assets/eaic/js/data.js"></script>
+<script src="../../assets/eaic/js/components.js"></script>
+<script src="../../assets/eaic/js/proto.js"></script>
+<script>
+var ui = EAIC.ui;
+
+var q = location.search || '?role=leader';
+var kanbanSrc = 'kanban.html' + q;
+
+function wvKanban() {
+    return '<div class="wv wv-kanban"><div class="wv-body" style="padding:0;align-items:stretch;justify-content:stretch">'
+        + '<iframe id="kanbanFrame" title="事项看板" src="' + kanbanSrc + '"></iframe>'
+        + '</div></div>';
+}
+
+function svBadgeForRole(role){
+    if(role==='jb')return {t:'督办 · 5 项待填报',urgent:true};
+    if(role==='zb')return {t:'督办 · 2 项待填报',urgent:false};
+    if(role==='czb')return {t:'督办 · 1 项待填报',urgent:false};
+    return {t:'督办 · 3 项待查收',urgent:false};
+}
+function chatListDemo(role){
+    var sup=svBadgeForRole(role||'leader');
+    return '<div class="sv-wrap">'
+        +'<div class="sv-row on"><div class="sv-av" style="background:#00AE68">督</div><div class="sv-main">'
+        +'<div class="sv-top"><span class="sv-name">龙小督</span><span class="sv-sup'+(sup.urgent?' urgent':'')+'">'+sup.t+'</span><span class="sv-time">09:12</span></div>'
+        +'<div class="sv-preview">'+(sup.urgent?'[加急] 你有 5 项督办事项待反馈，最早截止 09-09：':'你有 5 项督办事项待反馈，最早截止 09-12：')+'SJ2609041005 城区道路维修…</div>'
+        +'</div></div>'
+        +'<div class="sv-row"><div class="sv-av" style="background:#5B6B7C">李</div><div class="sv-main">'
+        +'<div class="sv-top"><span class="sv-name">李四</span><span class="sv-badge-unread">3</span><span class="sv-time">14:32</span></div>'
+        +'<div class="sv-preview">周报模板我已经更新到 AI 表格里了…</div></div></div>'
+        +'<div class="sv-row"><div class="sv-av" style="background:#8A63D2">产</div><div class="sv-main">'
+        +'<div class="sv-top"><span class="sv-name">产品评审群</span><span class="sv-badge-unread">2</span><span class="sv-time">13:58</span></div>'
+        +'<div class="sv-preview">王五：明天上午十点评审新版原型…</div></div></div>'
+        +'<div style="padding:10px 12px;font-size:11.5px;color:var(--sub,#6B7280)">督办徽标（绿/红）≠ 未读红点：显示当前用户待填报表事项数，由 BFF 聚合，点击直达会话表单卡片（D-14）；催办加急时转红（D-15）。</div>'
+        +'</div>';
+}
+
+var VIEW = (new URLSearchParams(location.search).get('view') || 'kanban');
+var content = ui.frameMain(VIEW === 'chat' ? chatListDemo((new URLSearchParams(location.search).get('role') || 'leader')) : wvKanban(), {
+    active: VIEW === 'chat' ? 'chat' : 'kanban',
+    badge: EAIC.data.unreadTotal,
+    base: '../'
+});
+
+EAIC.proto.mount(content);
+
+/* 侧栏其它一级功能：原型占位（与主聊天页一致的 WebView 占位） */
+document.querySelectorAll('.side-item').forEach(function (el) {
+    var href = el.getAttribute('href') || '';
+    if (href.indexOf('kanban') >= 0) {
+        el.addEventListener('click', function (e) { e.preventDefault(); location.reload(); });
+        return;
+    }
+    el.addEventListener('click', function (e) {
+        e.preventDefault();
+        var kind = href.match(/main\/(\w+)\.html/);
+        kind = kind ? kind[1] : 'chat';
+        document.querySelector('.app-main').innerHTML = (kind === 'chat')
+            ? chatListDemo((new URLSearchParams(location.search).get('role') || 'leader'))
+            : ui.wvPlaceholder(kind);
+        document.querySelectorAll('.side-item').forEach(function (x) { x.classList.remove('active'); });
+        el.classList.add('active');
+    });
+});
+</script>
+</body>
+</html>

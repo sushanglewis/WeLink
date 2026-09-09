@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="聊内填报表单原型">
+<meta name="nav-group" content="界面原型">
+<meta name="doc-version" content="v0.7-proto">
+<meta name="doc-uid" content="proto-form">
+<title>督办事项进展填报 · 原型</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--line:#e5e7eb;--text:#1f2329;--sub:#646a73;--blue:#3370ff;--red:#f54a45;--orange:#ff8800;--green:#34c724}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:13px}
+.page{max-width:1080px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px}
+.form-head{display:flex;align-items:center;gap:18px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.form-head h1{font-size:15px}
+.kn{font-size:13px;color:var(--sub)} .kn b{color:var(--text);font-size:16px}
+.pbar{width:160px;height:6px;background:#eef0f2;border-radius:3px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--blue);width:40%}
+.count{margin-left:auto;font-size:12px;color:var(--sub)}
+.layout{display:flex;min-height:520px}
+.side{width:300px;border-right:1px solid var(--line);padding:12px}
+.side .batch{display:flex;gap:8px;margin-bottom:10px}
+.batch button{flex:1;padding:7px 0;border-radius:7px;border:1px solid var(--blue);background:#fff;color:var(--blue);font-size:12.5px;cursor:pointer}
+.batch button.transfer{border-color:var(--orange);color:var(--orange)}
+.batch button:disabled{opacity:.4;cursor:not-allowed}
+.item{display:flex;gap:9px;padding:10px;border:1px solid var(--line);border-radius:9px;margin-bottom:8px;cursor:pointer;align-items:flex-start}
+.item.on{border-color:var(--blue);background:#f5f8ff}
+.item .no{font-weight:600;font-size:12.5px}
+.item .meta{font-size:11.5px;color:var(--sub);margin-top:3px}
+.st{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:9px;white-space:nowrap}
+.st-ok{background:#e8f9e8;color:#2ea121}.st-blue{background:#eef3ff;color:#3370ff}.st-warn{background:#fef3e6;color:#b45309}.st-hot{background:#fff1e8;color:#d4380d}.st-od{background:#fdeceb;color:#d83931}.st-todo{background:#f0f1f2;color:#646a73}.st-draft{background:#f0f1f2;color:#646a73}.st-tr{background:#fdeceb;color:#d83931}
+.main{flex:1;padding:16px 20px}
+.task-info{background:#f8f9fa;border:1px solid var(--line);border-radius:9px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;line-height:1.9}
+.task-info b{font-size:13.5px}
+.task-info .warn{color:var(--red);font-weight:600}
+.fld{margin-bottom:13px}
+.fld label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+.fld label .req{color:var(--red)}
+.fld textarea{width:100%;min-height:62px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12.5px;font-family:inherit;resize:vertical;line-height:1.6;background:#fff}
+.fld textarea[readonly]{background:#f5f6f8;color:var(--sub)}
+.fld .tools{display:flex;justify-content:flex-end;margin-top:5px}
+.polish{font-size:11.5px;color:var(--blue);background:#eef3ff;border:1px solid #d6e2ff;border-radius:6px;padding:4px 10px;cursor:pointer}
+.row2{display:flex;gap:18px}
+.row2 .fld{flex:1}
+input[type=date]{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;font-family:inherit}
+.opts{display:flex;gap:10px;flex-wrap:wrap}
+.opt{border:1px solid var(--line);border-radius:16px;padding:6px 14px;font-size:12.5px;cursor:pointer;background:#fff}
+.opt.on{border-color:var(--blue);color:var(--blue);background:#f5f8ff;font-weight:600}
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.btn{padding:8px 20px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:13px;cursor:pointer}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.warn{border-color:var(--orange);color:var(--orange)}
+.btn.remind{background:var(--red);border-color:var(--red);color:#fff}
+.summary table{width:100%;border-collapse:collapse}
+.summary th{background:#fafbfc;color:var(--sub);font-weight:500;padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:12px}
+.summary td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:12.5px}
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#1f2329;color:#fff;border-radius:8px;padding:10px 18px;font-size:12.5px;z-index:99;display:none;max-width:70%;line-height:1.6}
+.toast small{display:block;color:#bbb;font-size:11.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50}
+.mask.show{display:flex}
+.modal{background:#fff;border-radius:12px;width:470px;max-height:72vh;display:flex;flex-direction:column;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+.m-head{padding:14px 18px;border-bottom:1px solid var(--line);font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.m-head .x{cursor:pointer;color:var(--sub);font-size:15px;border:none;background:none}
+.m-sub{padding:10px 18px 0;font-size:12px;color:var(--sub);line-height:1.7}
+.m-search{margin:10px 18px 6px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12.5px;font-family:inherit}
+.m-list{overflow:auto;padding:4px 10px 10px;flex:1}
+.m-item{display:flex;gap:10px;align-items:center;padding:9px 8px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.m-item:hover{background:#f5f8ff}
+.m-item.on{border-color:var(--blue);background:#f5f8ff}
+.m-item .ava{width:30px;height:30px;border-radius:50%;background:#eef3ff;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;flex-shrink:0}
+.m-item .nm{font-size:13px;font-weight:600}
+.m-item .dp{font-size:11.5px;color:var(--sub)}
+.m-item .rd{margin-left:auto;width:16px;height:16px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;flex-shrink:0}
+.m-item.on .rd{background:var(--blue);border-color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="page"><div class="card" id="app"></div></div>
+<div class="mask" id="mask"></div>
+<div class="toast" id="toast"></div>
+<script>
+var MODE=(new URLSearchParams(location.search).get("case")||"jb");
+var CASE_IDX={jb:[0,1,2,3,4],zb:[5,6],czb:[7],db:[0,8],ro:[0]};
+if(!CASE_IDX[MODE])MODE="jb";
+var VISIBLE=CASE_IDX[MODE];
+var ITEMS=[
+ {no:"SJ2609041005",name:"城区道路维修",unit:"市政中心",jb:"詹少鹏",zb:"李良龙",czb:"王强",ddl:"2026-09-12",supDdl:"2026-09-10",st:"done",a:"完成路面修补约80%，剩余人行道砖待铺设。",b:"无。",c:"本周内完成人行道砖铺设。",ddl2:"2026-09-12",ev:"推进中"},
+ {no:"SJ2608311909",name:"老旧小区管线改造",unit:"住建局",jb:"詹少鹏",zb:"—",czb:"—",ddl:"2026-09-15",supDdl:"2026-09-11",st:"done",a:"已完成小区入户调查与工程量统计。",b:"设计图纸尚未出具，施工暂无法启动。",c:"待图纸出具后立即进场，同步准备施工队伍。",ddl2:"2026-09-16",ev:"已滞后"},
+ {no:"SJ2608311922",name:"污水管网排查",unit:"水务集团",jb:"苏尚",zb:"—",czb:"—",ddl:"2026-09-15",supDdl:"2026-09-11",st:"draft",a:"已完成主干道管网摸排。",b:"部分路段需封路作业，审批中。",c:"获批后 3 日内完成排查。",ddl2:"2026-09-18",ev:"推进中"},
+ {no:"SJ2608261503",name:"背街小巷照明",unit:"城管委",jb:"詹少鹏",zb:"王强",czb:"—",ddl:"2026-09-18",supDdl:"2026-09-12",st:"tr",trTo:"王强",a:"完成两条巷道灯具采购招标。",b:"部分巷道管线老化需同步改造，协调中。",c:"先易后难分批安装。",ddl2:"2026-09-22",ev:"已滞后"},
+ {no:"SJHRM20260812T001",name:"绿地养护招标",unit:"园林局",jb:"张秋缘",zb:"—",czb:"—",ddl:"2026-09-09",supDdl:"2026-09-09",st:"todo",urg:1,a:"",b:"",c:"",ddl2:"",ev:""},
+ {no:"SJ2609051107",name:"主干道窨井更换",unit:"市政中心",jb:"詹少鹏",zb:"李良龙",czb:"—",ddl:"2026-09-14",supDdl:"2026-09-10",st:"todo",wst:"风险",a:"",b:"",c:"",ddl2:"",ev:""},
+ {no:"SJ2609041005",name:"城区道路维修",unit:"市政中心",jb:"詹少鹏",zb:"李良龙",czb:"王强",ddl:"2026-09-12",supDdl:"2026-09-10",st:"tr",trTo:"王强",a:"完成路面修补约80%，剩余人行道砖待铺设。",b:"无。",c:"本周内完成人行道砖铺设。",ddl2:"2026-09-12",ev:"推进中"},
+ {no:"SJ2609031518",name:"人行天桥护栏加固",unit:"市政中心",jb:"詹少鹏",zb:"李良龙",czb:"王强",ddl:"2026-09-16",supDdl:"2026-09-12",st:"todo",wst:"推进中",a:"",b:"",c:"",ddl2:"",ev:""},
+ {no:"SJ2609070612",name:"行道树补植",unit:"园林局",jb:"张秋缘",zb:"—",czb:"—",ddl:"2026-09-08",supDdl:"2026-09-08",st:"todo",wst:"逾期未填报",a:"",b:"",c:"",ddl2:"",ev:""}];
+var CUR=MODE==="jb"?2:0;
+function toast(m,s){var t=document.getElementById("toast");t.innerHTML=m+(s?("<small>"+s+"</small>"):"");t.style.display="block";clearTimeout(t._h);t._h=setTimeout(function(){t.style.display="none"},2600)}
+function stTag(x){
+ if(x.st==="done")return '<span class="st st-ok">✓ 已填报</span>';
+ if(x.st==="draft")return '<span class="st st-draft">草稿</span>';
+ if(x.st==="tr")return '<span class="st st-tr">↷ 已转办'+(x.trTo?' · '+x.trTo:'')+'</span>';
+ var w=x.wst||"推进中";
+ var cls=w==="推进中"?"st-blue":(w==="风险"?"st-warn":(w==="逾期未填报"?"st-hot":"st-od"));
+ return '<span class="st '+cls+'">'+w+'</span>';}
+function x_kn(){return "共 1 条填报记录"}
+function headHTML(){
+ var rows=VISIBLE.map(function(i){return [ITEMS[i],i]});
+ var done=rows.filter(function(r){return r[0].st==="done"}).length;
+ var pct=Math.round(done/(rows.length||1)*100);
+ if(MODE==="db"){var dn=rows.filter(function(r){return r[0].st==="done"}).length;return '<div class="form-head"><h1>督办事项 · 查收（supervisor）</h1><span class="kn">当前第 <b>'+(CUR+1)+'</b> / 共 '+rows.length+' 项 · 已到督办截止（D-11/D-20）</span><div class="pbar"><i style="width:'+pct+'%"></i></div><span class="count">'+dn+' 项已填报 · '+(rows.length-dn)+' 项逾期未填报</span></div>';}
+ if(MODE==="ro")return '<div class="form-head"><h1>督办事项 · 提交存档（只读回顾）</h1><span class="kn">'+x_kn()+'</span><div class="pbar"><i style="width:100%"></i></div><span class="count">本消息由 詹少鹏 提交 · 09-08 15:30</span></div>';
+ if(MODE==="sum")return '<div class="form-head"><h1>督办事项进展填报 · 汇总</h1><span class="kn">共 '+rows.length+' 项 · 已填报 '+done+'/'+rows.length+'</span><div class="pbar"><i style="width:'+pct+'%"></i></div></div>';
+ return '<div class="form-head"><h1>督办事项进展填报</h1><span class="kn">当前第 <b>'+(CUR+1)+'</b> / 共 '+rows.length+' 项</span><div class="pbar"><i style="width:'+pct+'%"></i></div><span class="count">已填报 '+done+' · 待填 '+rows.filter(function(r){return r[0].st==="todo"}).length+'</span></div>';
+}
+function renderList(){
+ var rows=VISIBLE.map(function(i){return [ITEMS[i],i]});
+ return '<div class="side">'+(MODE==="db"?'<div class="batch"><button class="transfer" onclick="exportExcel()">导出 Excel</button></div>':'<div class="batch"><button onclick="batchSubmit()">批量提交</button><button class="transfer" onclick="openTransfer(\'batch\')">批量转办</button></div>')
+ +rows.map(function(r,idx){var x=r[0],i=r[1];return '<div class="item '+(idx===CUR?'on':'')+'" onclick="goItem('+i+')"><input type="checkbox" onclick="event.stopPropagation()"><div><div class="no">'+x.no+'</div><div class="meta"'+(x.urg&&x.st!=="done"?' style="color:var(--red)"':'')+'>'+x.name+' · 督办DDL '+x.supDdl.slice(5)+(x.urg&&x.st!=="done"?' · 已加急':'')+'</div></div>'+stTag(x)+'</div>'}).join('')+'</div>';
+}
+function goItem(i){CUR=i;render()}
+function curItem(){return ITEMS[VISIBLE[CUR]]}
+function pickEv(el){el.parentNode.querySelectorAll(".opt").forEach(function(o){o.classList.remove("on")});el.classList.add("on")}
+var POLISH='<div class="tools"><button class="polish" onclick="toast(\'龙小督润色（行文规范 Skill）\',\'弹窗展示规范文本 → 你确认后替换，可撤销；负面事实原样保留（D-2）\')">龙小督润色</button></div>';
+function renderMain(){
+ var x=curItem(),ro=x.st==="done"||x.st==="tr"||MODE==="ro";
+ var urgent=x.urg&&x.st!=="done"&&x.st!=="tr";
+ var info='<div class="task-info"><b>'+x.no+' '+x.name+'</b>　责任单位：'+x.unit+'　经办人：'+x.jb+'　转办人：'+(x.zb||"—")+(x.czb&&x.czb!=="—"?'　次级转办人：'+x.czb:'')+'　任务截止：'+x.ddl+'　督办DDL（填报截止）：<span class="'+((x.ddl<"2026-09-09"||urgent)?"warn":"")+'"><b>'+x.supDdl+'</b></span></div>'
+ +(urgent?'<div class="task-info" style="background:#fff1f0;border-color:#ffccc7;color:#cf1322">⚠ 龙小督已催办加急：本项督办 DDL 09-09（明天），请优先填报；加急已在卡片角标与你的消息列表督办徽标同步标红（D-15/D-14）。该提醒未生成新表单。</div>':'');
+ var flds='<div class="fld"><label>部门反馈工作落实情况 <span class="req">*</span></label><textarea id="fA" '+(ro?'readonly':'')+'>'+x.a+'</textarea>'+(ro?'':POLISH)+'</div>'
+ +'<div class="fld"><label>部门反馈存在困难问题</label><textarea id="fB" '+(ro?'readonly':'')+'>'+x.b+'</textarea>'+(ro?'':POLISH)+'</div>'
+ +'<div class="fld"><label>部门反馈下一步工作计划</label><textarea id="fC" '+(ro?'readonly':'')+'>'+x.c+'</textarea>'+(ro?'':POLISH)+'</div>'
+ +'<div class="row2"><div class="fld"><label>预计完成时间 <span class="req">*</span></label><input type="date" id="fD" value="'+x.ddl2+'" '+(ro?'disabled':'')+'></div>'
+ +'<div class="fld"><label>进度评价 <span class="req">*</span></label><div class="opts">'+["推进中","已落实","已滞后"].map(function(o){return '<span class="opt '+(x.ev===o?'on':'')+'" onclick="pickEv(this)">'+o+'</span>'}).join('')+'</div></div></div>';
+ if(x.st==="tr"){
+  return info
+  +'<div class="task-info" style="background:#fff7e6;border-color:#ffe1b0;color:#ad4e00">本事项已转办给 <b>'+x.trTo+'</b>，由其继续填报；此处仅只读留痕，进展仍计入你的批次汇总。</div>'
+  +flds
+  +'<div class="actions"><button class="btn" onclick="navItem(-1)">上一项</button><button class="btn" disabled>已转办</button><button class="btn" onclick="toast(\'已展开该事项全部跟进记录（倒序）\')">查看跟进记录</button></div>';
+ }
+ if(MODE==="db"){
+  var od=x.st!=="done"&&(x.wst==="逾期未填报"||x.wst==="逾期");
+  return info
+  +(x.wst==="逾期未填报"?'<div class="task-info" style="background:#fdeceb;border-color:#f5b1ae;color:#d83931">该项到达督办 DDL 仍未填报（状态2=<b>逾期未填报</b>）；五字段可直接代录补正（补报后转已填报，T4），或催办经办人 '+x.jb+' 补报。</div>':'')
+  +flds
+  +'<div class="actions"><button class="btn" onclick="navItem(-1)">上一项</button>'
+  +'<button class="btn" onclick="toast(\'已展开该事项全部跟进记录（倒序）\')">查看跟进记录</button>'
+  +(od
+    ?'<button class="btn remind" onclick="toast(\'已向\'+x.jb+\'发送 IM + 邮件催办通知\',\'主表「已催办时间」已留痕 · 逾期升级督办人（D-4）；自动催办已先行加急（D-15）\')">催办</button>'
+    :'<button class="btn" disabled title="已填报/推进中事项不可催办（督办人仅可催办 逾期未填报/逾期 事项）">催办（未逾期无需催办）</button>')
+  +'<button class="btn primary" onclick="doSave()">提交（保存到 Teable）</button></div>';
+ }
+ var transferBtn=MODE==="czb"
+  ?'<button class="btn" disabled>转办（链路终点）</button>'
+  :'<button class="btn warn" onclick="openTransfer(\'single\')">转办</button>';
+ if(MODE==="ro"){
+  return info+flds
+  +'<div class="actions"><button class="btn" disabled>已提交存档 · 只读</button><button class="btn" onclick="toast(\'已展开该事项全部跟进记录（倒序）\')">查看跟进记录</button></div>';
+ }
+ return info+flds
+ +'<div class="actions"><button class="btn" onclick="navItem(-1)">上一项</button>'
+ +(ro?'<button class="btn" disabled>已填报</button>':'<button class="btn" onclick="doDraft()">暂存</button><button class="btn primary" onclick="doSubmit()">提交</button>'+transferBtn)
+ +'</div>';
+}
+var MEMBERS=[{n:"李良龙",d:"市政中心 · 养护科"},{n:"王强",d:"市政中心 · 工程科"},{n:"赵磊",d:"水务集团 · 工程部"},{n:"苏尚",d:"水务集团 · 调度室"},{n:"张秋缘",d:"园林局 · 绿化科"}];
+var TR={idx:[],sel:null};
+function mItemHTML(m,i){return '<div class="m-item" data-i="'+i+'" onclick="pickM(this)"><div class="ava">'+m.n.slice(0,1)+'</div><div><div class="nm">'+m.n+'</div><div class="dp">'+m.d+'</div></div><div class="rd"></div></div>'}
+function openTransfer(kind){
+ if(kind==="batch"){
+  var selIdx=Array.from(document.querySelectorAll(".sel:checked")).map(function(c){return +c.dataset.i});
+  if(!selIdx.length){toast("请先在左侧勾选要转办的事项","批量转办：可勾选 1 项或多项，统一转给同一位成员（D-1）");return;}
+  TR.idx=selIdx;
+ }else{TR.idx=[VISIBLE[CUR]];}
+ TR.sel=null;
+ var role=MODE==="zb"?"次级转办人":"转办人";
+ document.getElementById("mask").innerHTML='<div class="modal"><div class="m-head">选择'+role+'<span style="font-weight:400;font-size:12px;color:var(--sub)">单选 · 共 '+TR.idx.length+' 项待转办</span><button class="x" onclick="closeTransfer()">✕</button></div>'
+ +'<div class="m-sub">从组织成员列表中选择<b>唯一一位</b>'+role+'；确认后写主表转办字段并 IM 通知新执行人（D-1/D-8）</div>'
+ +'<input class="m-search" placeholder="搜索组织成员（姓名 / 部门）" oninput="filterM(this.value)">'
+ +'<div class="m-list">'+MEMBERS.map(function(m,i){return mItemHTML(m,i)}).join('')+'</div>'
+ +'<div class="m-foot"><button class="btn" onclick="closeTransfer()">取消</button><button class="btn primary" id="mOk" disabled onclick="confirmTransfer()">确认转办</button></div></div>';
+ document.getElementById("mask").classList.add("show");
+}
+function filterM(k){k=k.trim();document.querySelectorAll(".m-item").forEach(function(el){var m=MEMBERS[+el.dataset.i];el.style.display=(!k||m.n.indexOf(k)>-1||m.d.indexOf(k)>-1)?"flex":"none"})}
+function pickM(el){document.querySelectorAll(".m-item").forEach(function(e){e.classList.remove("on");e.querySelector(".rd").textContent=""});el.classList.add("on");el.querySelector(".rd").textContent="✓";TR.sel=MEMBERS[+el.dataset.i];document.getElementById("mOk").disabled=false}
+function closeTransfer(){document.getElementById("mask").classList.remove("show")}
+function confirmTransfer(){
+ if(!TR.sel)return;
+ TR.idx.forEach(function(i){var it=ITEMS[i];it.st="tr";it.trTo=TR.sel.n;});
+ closeTransfer();render();
+ toast("已转办给 "+TR.sel.n+"（"+TR.sel.d+"）","写主表转办人字段 + IM 通知新执行人；表单该项转 ↷已转办 只读留痕，进展仍计入批次汇总（D-1/D-8）");
+}
+function doSave(){collect();toast("已保存修改","写入跟进记录表（创建人=督办人，进度评价改评留痕 D-6）+ 主表自动化同步")}
+function navItem(d){var n=CUR+d;if(n>=0&&n<VISIBLE.length){CUR=n;render()}}
+function collect(){var x=curItem();x.a=document.getElementById("fA").value;x.b=document.getElementById("fB").value;x.c=document.getElementById("fC").value;x.ddl2=document.getElementById("fD").value;var on=document.querySelector(".main .opt.on");x.ev=on?on.textContent:""}
+function doDraft(){collect();var x=curItem();if(x.st==="todo")x.st="draft";render();toast("已暂存（草稿服务端保留，可断点续填）")}
+function doSubmit(){
+ collect();var x=curItem(),errs=[];
+ if(!x.a.trim())errs.push(x.no+" 部门反馈工作落实情况不能为空");
+ if(!x.ddl2)errs.push(x.no+" 预计完成时间不能为空");
+ if(!x.ev)errs.push(x.no+" 进度评价不能为空");
+ if(errs.length){toast(errs.join("；"),"请先填写必填项再提交（批量提交时逐条列出所有空项）");return;}
+ x.st="done";render();
+ var done=VISIBLE.map(function(i){return ITEMS[i]}).filter(function(i){return i.st==="done"}).length;
+ toast("已填报："+x.no,"已写入跟进记录表（创建人=填报人）+ 存为**你的填报消息**（聊天历史可点击回看）· 卡片角标 已填报 "+done+"/5");
+ if(done===VISIBLE.length){toast("本批 "+VISIBLE.length+" 项全部提交：卡片置完成态，龙小督将发送汇总回执");return;}
+ if(CUR<VISIBLE.length-1)CUR++;
+}
+function batchSubmit(){
+ var empties=ITEMS.filter(function(x){return x.st!=="done"&&x.st!=="tr"&&(!x.a.trim()||!x.ddl2||!x.ev)});
+ if(empties.length){var msgs=[];empties.forEach(function(x){if(!x.a.trim())msgs.push(x.no+" 部门反馈工作落实情况不能为空");if(!x.ddl2)msgs.push(x.no+" 预计完成时间不能为空");if(!x.ev)msgs.push(x.no+" 进度评价不能为空")});toast(msgs.join("；"),"补全后可再提交（D-1）");return;}
+ toast("批量提交：校验通过","已写入跟进记录表（创建人=当前填报人），事项转为已填报");
+}
+function exportExcel(){
+ toast("已导出 Excel（本批 "+VISIBLE.length+" 项）","龙小督已以**文件消息**发送至本会话（可点击下载）；同时触发**本轮批次关闭**：已填报项已回暂存（在库），填报人将收「本轮跟进已关闭」通知（T5，D-21）");
+}
+function render(){
+ var app=document.getElementById("app");
+ app.innerHTML=headHTML()+'<div class="layout">'+(MODE==="ro"?'':renderList())+'<div class="main">'+renderMain()+'</div></div>';
+ if(MODE==="ro"){
+  document.querySelector(".main").insertAdjacentHTML("afterbegin",'<div class="task-info" style="background:#eef3ff;border-color:#d6e2ff;color:#2456b3">这是一条<strong>已提交的填报消息</strong>（存档，只读）：你提交的每一项表单都会存为这样的消息，点击即可回看当时提交的内容；如需修改请在本会话中告诉龙小督（D-12/D-20）。</div>');
+ }
+}
+render();
+</script>
+</body>
+</html>

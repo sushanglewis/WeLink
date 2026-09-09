@@ -54,12 +54,26 @@
         container.innerHTML = html;
     }
 
-    function renderPanel(panel, page) {
+    function renderPanel(panel, page, caseData) {
         if (!page) {
             panel.innerHTML = '<p>点击左侧页面索引加载文档或原型。</p>';
             return;
         }
         var html = '';
+        if (page.cases && page.cases.length) {
+            html += '<div class="ann-kicker-case">场景切换（原型外）</div>';
+            html += '<div class="case-list">';
+            page.cases.forEach(function (c) {
+                var on = caseData && (c.query || '') === (caseData.query || '');
+                html += '<button class="case-btn' + (on ? ' on' : '') + '" data-query="' + escapeHtml(c.query || '') + '">' + escapeHtml(c.label) + '</button>';
+            });
+            html += '</div>';
+        }
+        if (caseData) {
+            html += '<div class="ann-kicker-case">当前场景</div>';
+            html += '<h2>' + escapeHtml(caseData.label || '') + '</h2>';
+            html += '<div class="ann-case">' + escapeHtml(caseData.desc || '').replace(/\n/g, '<br>') + '</div>';
+        }
         html += '<div class="ann-kicker">' + escapeHtml(page.group || 'Document') + '</div>';
         html += '<h2>' + escapeHtml(page.title || page.label || '') + '</h2>';
         html += '<div class="p-path">' + escapeHtml(page.path) + '</div>';
@@ -88,6 +102,7 @@
     }
 
     function bindPortal(nav, frame, panel, packageData) {
+        var currentPage = null;
         var pages = packageData.nav || [];
 
         nav.addEventListener('click', function (e) {
@@ -95,15 +110,27 @@
             if (!link) return;
             e.preventDefault();
             var path = link.getAttribute('data-path');
-            frame.src = path;
+            var page = findPage(path, pages);
+            currentPage = page || null;
+            var firstCase = (page && page.cases && page.cases.length) ? page.cases[0] : null;
+            frame.src = firstCase ? (page.path + (firstCase.query || '')) : path;
             nav.querySelectorAll('.pnav-link').forEach(function (l) { l.classList.remove('active'); });
             link.classList.add('active');
-            var page = findPage(path, pages);
-            renderPanel(panel, page);
+            renderPanel(panel, page, firstCase);
             if (page && page.title) {
                 var winTitle = document.getElementById('winTitle');
                 if (winTitle) winTitle.textContent = page.title;
             }
+        });
+
+        panel.addEventListener('click', function (e) {
+            var btn = e.target.closest ? e.target.closest('.case-btn') : null;
+            if (!btn || !currentPage) return;
+            var q = btn.getAttribute('data-query') || '';
+            var c = null;
+            (currentPage.cases || []).forEach(function (x) { if ((x.query || '') === q) c = x; });
+            frame.src = currentPage.path + q;
+            renderPanel(panel, currentPage, c);
         });
 
         frame.addEventListener('load', function () {
@@ -166,6 +193,15 @@
         if (frame && panel) bindPortal(nav, frame, panel, packageData);
         if (nav && frame) bindPrototypeLinks(nav, frame, panel, packageData.nav || []);
         initPanelToggle();
+        // Landing page: open the configured entry (defaults to the first nav item)
+        // so the portal never shows an empty canvas on load.
+        var landing = packageData.landing;
+        if (!landing && packageData.nav && packageData.nav.length && packageData.nav[0].items && packageData.nav[0].items.length) {
+            landing = packageData.nav[0].items[0].path;
+        }
+        if (landing) {
+            selectByPath(landing, nav, frame, panel, packageData.nav || []);
+        }
     }
 
     if (document.readyState === 'loading') {

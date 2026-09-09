@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="龙小督会话 · 台账面板壳">
+<meta name="nav-group" content="界面原型">
+<meta name="doc-version" content="v0.1-proto">
+<meta name="doc-uid" content="proto-shell-chat-panel">
+<title>EAIC 原型 · 龙小督会话 · 台账面板</title>
+<link rel="stylesheet" href="../../assets/eaic/tokens.css">
+<link rel="stylesheet" href="../../assets/eaic/base.css">
+<link rel="stylesheet" href="../../assets/eaic/app.css">
+<style>
+/* 会话 + 右侧台账插件 panel 壳（仅壳形式，panel 内交互细节不在本原型范围） */
+.cp-wrap{display:flex;height:100%;min-height:0;background:#fff}
+.cp-chat{flex:1;display:flex;flex-direction:column;min-width:0}
+/* 插件 tab 栏：聊天窗口上方 */
+.cp-tabs{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid #E5E7EB;background:#FAFBFC}
+.cp-tab{display:flex;align-items:center;gap:7px;border:1px solid transparent;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;color:#1F2329;background:transparent;cursor:pointer}
+.cp-tab:hover{background:rgba(0,174,104,.06)}
+.cp-tab.on{background:rgba(0,174,104,.1);border-color:rgba(0,174,104,.35);color:#00875A}
+.cp-tab .ic{font-size:14px}
+.cp-count{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#00AE68;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.cp-count.urgent{background:#F53F3F}
+.cp-count.zero{display:none}
+/* 对话区 */
+.cp-conv{flex:1;overflow:auto;padding:18px 22px;display:flex;flex-direction:column;gap:14px;background:#F7F8FA}
+.msg{display:flex;gap:10px;max-width:78%}
+.msg .av{width:34px;height:34px;border-radius:9px;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.msg .bubble{background:#fff;border:1px solid #E8EAED;border-radius:10px;padding:10px 13px;font-size:13px;line-height:1.75}
+.msg .who{font-size:11.5px;color:#969BA1;margin-bottom:4px}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .bubble{background:#00AE68;border-color:#00AE68;color:#fff}
+.msg .card{border:1px solid rgba(0,174,104,.4);background:rgba(0,174,104,.05);border-radius:8px;padding:8px 11px;margin-top:8px;font-size:12.5px;line-height:1.7}
+/* 输入区 */
+.cp-input{border-top:1px solid #E5E7EB;padding:12px 16px;display:flex;gap:10px;align-items:center}
+.cp-input .box{flex:1;border:1px solid #E5E7EB;border-radius:9px;padding:9px 13px;font-size:13px;color:#646A73;background:#FAFBFC}
+.cp-send{width:36px;height:36px;border-radius:9px;background:#00AE68;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px}
+/* 右侧台账 panel */
+.cp-panel{width:400px;border-left:1px solid #E5E7EB;display:flex;flex-direction:column;background:#fff;flex-shrink:0}
+.cp-panel.closed{display:none}
+.cp-p-head{padding:13px 16px;border-bottom:1px solid #EEF0F2;display:flex;align-items:center;gap:9px}
+.cp-p-head .dot{width:8px;height:8px;border-radius:50%;background:#00AE68}
+.cp-p-head .t{font-size:13.5px;font-weight:600}
+.cp-p-head .tag{margin-left:auto;font-size:11px;color:#00875A;background:rgba(0,174,104,.1);border-radius:9px;padding:2px 9px}
+.cp-p-body{flex:1;padding:16px;display:flex;flex-direction:column;gap:11px;overflow:auto}
+.sk{border-radius:8px;background:#F2F4F6}
+.sk.l1{height:16px;width:62%}
+.sk.l2{height:34px}
+.sk.l3{height:34px}
+.sk.l4{height:34px}
+.sk.l5{height:16px;width:45%}
+.sk.gap{height:6px;background:transparent}
+.sk.btn{height:32px;width:96px;align-self:flex-end;background:rgba(0,174,104,.16)}
+</style>
+</head>
+<body>
+<div class="window full" id="win"></div>
+<script src="../../assets/eaic/js/data.js"></script>
+<script src="../../assets/eaic/js/components.js"></script>
+<script src="../../assets/eaic/js/proto.js"></script>
+<script>
+var ui = EAIC.ui;
+var qs = new URLSearchParams(location.search);
+var N = Math.max(0, parseInt(qs.get('n') || '5', 10) || 0);
+var URGENT = qs.get('urgent') === '1';
+var PANEL = (qs.get('panel') || 'open') !== 'closed';
+
+function convHTML() {
+    return '<div class="cp-conv">'
+        + '<div class="msg"><div class="av" style="background:#00AE68">督</div><div><div class="who">龙小督 · 09:12</div><div class="bubble">詹少鹏，你有 <b>5 项</b>督办事项待反馈，最早督办 DDL <b>09-09</b>：① SJ2609041005 城区道路维修 ② SJ2608311909 老旧小区管线改造 ③ SJ2608311922 污水管网排查 ④ SJ2608261503 背街小巷照明 ⑤ SJHRM20260812T001 绿地养护招标。<div class="card">右侧「事项」台账已打开，可直接逐条填报；也可以直接在对话里告诉我进展，我帮你整理进台账。</div></div></div></div>'
+        + '<div class="msg me"><div class="av" style="background:#5B6B7C">詹</div><div><div class="who" style="text-align:right">詹少鹏 · 09:20</div><div class="bubble">背街小巷照明那条，灯具这周能装完，就是管线老化协调有点慢</div></div></div>'
+        + '<div class="msg"><div class="av" style="background:#00AE68">督</div><div><div class="who">龙小督 · 09:20</div><div class="bubble">收到，已按你的口述整理到台账（SJ2608261503），目前是<b>暂存</b>状态：<br>· 落实情况：完成两条巷道灯具采购招标，本周开始安装<br>· 存在困难：部分巷道管线老化，改造协调中<br>· 下一步：先易后难分批安装<br>需要我润色成规范行文吗？也可以直接打开右侧台账检查、修改。</div></div></div>'
+        + '<div class="msg me"><div class="av" style="background:#5B6B7C">詹</div><div><div class="who" style="text-align:right">詹少鹏 · 09:24</div><div class="bubble">润色一下</div></div></div>'
+        + '<div class="msg"><div class="av" style="background:#00AE68">督</div><div><div class="who">龙小督 · 09:24</div><div class="bubble">已润色（规范行文），替换进台账了，你过目：<br>「已完成两条巷道灯具采购招标工作，本周内启动安装；部分巷道存在管线老化问题，需同步实施改造，目前正在协调；下一步将按照先易后难原则分批组织安装。」<br>确认无误后，在台账里点<b>「提交」</b>即可上报——提交动作使用你的账号写入 Teable，我无权代你提交。</div></div></div>'
+        + '</div>';
+}
+
+function panelHTML() {
+    return '<div class="cp-panel' + (PANEL ? '' : ' closed') + '" id="cpPanel">'
+        + '<div class="cp-p-head"><span class="dot"></span><span class="t">龙小督 · 工作台账</span><span class="tag">督办事项 · ' + N + ' 项待办</span></div>'
+        + '<div class="cp-p-body">'
+        + '<div class="sk l1"></div><div class="sk l2"></div><div class="sk l3"></div><div class="sk l4"></div>'
+        + '<div class="sk gap"></div><div class="sk l5"></div>'
+        + '<div class="sk btn"></div>'
+        + '</div></div>';
+}
+
+function contentHTML() {
+    var badge = N > 0 ? ('<span class="cp-count' + (URGENT ? ' urgent' : '') + '">' + N + '</span>') : '<span class="cp-count zero">0</span>';
+    return '<div class="cp-wrap">'
+        + '<div class="cp-chat">'
+        + '<div class="cp-tabs"><button class="cp-tab on" id="cpTab" onclick="togglePanel()"><span class="ic">▦</span>事项 ' + badge + '</button></div>'
+        + convHTML()
+        + '<div class="cp-input"><div class="box">与龙小督对话，或 @ 它开始新的督办协作…</div><div class="cp-send">➤</div></div>'
+        + '</div>'
+        + panelHTML()
+        + '</div>';
+}
+
+function togglePanel() {
+    var p = document.getElementById('cpPanel');
+    if (p) p.classList.toggle('closed');
+}
+
+var content = ui.frameMain(contentHTML(), { active: 'chat', badge: EAIC.data.unreadTotal, base: '../' });
+EAIC.proto.mount(content);
+</script>
+</body>
+</html>

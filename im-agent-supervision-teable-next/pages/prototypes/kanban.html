@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="事项看板">
+<meta name="nav-group" content="界面原型">
+<meta name="doc-version" content="v0.7-proto">
+<meta name="doc-uid" content="proto-kanban">
+<title>事项看板</title>
+<style>
+:root{
+  --bg:#F2F4F6; --card:#FFFFFF; --line:#E5E8EB; --text:#171918; --sub:#6B7280; --sub3:#9CA3AF;
+  --brand:#00AE68; --brand-dark:#008D55; --brand-light:#E8F7F0; --brand-line:#C9EBDA;
+  --error:#F53F3F; --error-bg:#FDECEC; --error-dark:#CB2634;
+  --warning:#F59E0B; --warning-bg:#FEF3E6; --warning-dark:#B45309;
+  --surface-2:#F5F6F7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:13px}
+.metrics{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;padding:14px 20px 0}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.metric .label{color:var(--sub);font-size:12px}
+.metric .value{font-size:26px;font-weight:700;margin-top:4px}
+.metric .msub{font-size:10.5px;color:#969ba1;margin-top:2px}
+.metric.warn .value{color:var(--error)} .metric.orange .value{color:var(--warning)} .metric.green .value{color:var(--brand)} .metric.urgent .value{color:#D4380D}
+.filters{display:flex;gap:10px;padding:12px 20px;align-items:center;flex-wrap:wrap}
+.filters .f{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--sub)}
+.filters select,.filters input{border:none;outline:none;font-size:12px;background:transparent;color:var(--text);font-family:inherit}
+.table-wrap{margin:0 20px 20px;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{background:var(--surface-2);color:var(--sub);font-weight:500;font-size:12px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--brand-dark)}
+th .arrow{color:var(--brand);margin-left:4px;font-size:10px}
+td{padding:11px 12px;border-bottom:1px solid var(--line);font-size:12.5px;white-space:nowrap}
+tbody tr{cursor:pointer} tbody tr:hover{background:var(--brand-light)}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11.5px}
+.b-blue{background:var(--brand-light);color:var(--brand-dark)} .b-red{background:var(--error-bg);color:var(--error-dark)}
+.b-orange{background:var(--warning-bg);color:var(--warning-dark)} .b-urgent{background:#FFF1E8;color:#D4380D}
+.warnrow td:first-child{border-left:3px solid var(--warning)}.urgrow td:first-child{border-left:3px solid #D4380D} .b-green{background:var(--brand-light);color:var(--brand-dark)} .b-gray{background:#EDF0F2;color:var(--sub)}
+.pager{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--sub)}
+.pager .grp{display:flex;align-items:center;gap:6px}
+.pager select{border:1px solid var(--line);border-radius:6px;padding:3px 4px;font-size:12px;font-family:inherit;background:#fff;color:var(--text)}
+.pg-btn{border:1px solid var(--line);background:#fff;border-radius:6px;min-width:26px;height:24px;cursor:pointer;font-size:12px;color:var(--sub);font-family:inherit}
+.pg-btn.on{border-color:var(--brand);color:var(--brand-dark);font-weight:600}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed}
+.pg-btn:not(:disabled):hover{color:var(--brand-dark);border-color:var(--brand)}
+.overdue td:first-child{border-left:3px solid var(--error)}
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:9}
+.drawer{position:fixed;top:0;right:0;width:520px;height:100%;background:#fff;z-index:10;box-shadow:-4px 0 16px rgba(0,0,0,.12);display:none;flex-direction:column}
+.drawer.open{display:flex} .drawer-mask.open{display:block}
+.drawer-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:10px}
+.drawer-head h2{font-size:15px} .drawer-head .close{margin-left:auto;cursor:pointer;color:var(--sub);font-size:18px;border:none;background:none}
+.drawer-body{flex:1;overflow-y:auto;padding:16px 20px}
+.sec-title{font-size:13px;font-weight:600;margin:14px 0 8px;color:var(--text)}
+.sec-title:first-child{margin-top:0}
+.kv{display:grid;grid-template-columns:110px 1fr;row-gap:7px;font-size:12.5px}
+.kv .k{color:var(--sub)}
+.timeline{border-left:2px solid var(--line);margin-left:6px;padding-left:16px}
+.tl-item{position:relative;padding-bottom:16px}
+.tl-item::before{content:"";position:absolute;left:-22px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 0 0 2px var(--brand)}
+.tl-head{display:flex;gap:8px;font-size:12px;color:var(--sub);margin-bottom:6px}
+.tl-head b{color:var(--text);font-size:12.5px}
+.tl-fields{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.7}
+.tl-fields .fk{color:var(--sub);margin-top:4px} .tl-fields .fk:first-child{margin-top:0}
+</style>
+</head>
+<body>
+<div class="metrics" id="metrics"></div>
+<div class="filters">
+  <div class="f">状态1 <select id="fSt1"><option value="">全部</option><option>正常</option><option>风险</option><option>逾期</option><option>完结</option></select></div>
+  <div class="f">状态2 <select id="fSt2"><option value="">全部</option><option>暂存</option><option>推进中</option><option>已填报</option><option>逾期未填报</option></select></div>
+  <div class="f">责任单位 <select id="fUnit"><option value="">全部</option><option>市政中心</option><option>住建局</option><option>水务集团</option><option>城管委</option><option>园林局</option><option>教育局</option><option>商务局</option><option>民政局</option><option>自然资源局</option></select></div>
+  <div class="f">经办人 <select id="fJb"><option value="">全部</option><option>詹少鹏</option><option>苏尚</option><option>张秋缘</option><option>陈刚</option><option>李良龙</option></select></div>
+  <div class="f">截止时间 <input type="date" id="fDdl1"> ~ <input type="date" id="fDdl2"></div>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr id="theadRow"></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+<div class="pager" id="pager"></div>
+</div>
+<div class="drawer-mask" id="mask" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head"><div><h2 id="dTitle"></h2><div id="dSub" style="color:var(--sub);font-size:12px;margin-top:4px"></div></div><button class="close" onclick="closeDrawer()">✕</button></div>
+  <div class="drawer-body" id="dBody"></div>
+</div>
+<script>
+var TASKS=[
+ {no:"SJ2609041005",name:"城区道路维修",unit:"市政中心",jb:"詹少鹏",zb:"李良龙",czb:"王强",ddl:"2026-09-16",st1:"正常",st2:"推进中",ev:"推进中",n:3},
+ {no:"SJ2608311909",name:"老旧小区管线改造",unit:"住建局",jb:"詹少鹏",zb:"—",czb:"—",ddl:"2026-09-16",st1:"正常",st2:"已填报",ev:"已滞后",n:2,supTime:"09-02 10:00",fillTime:"09-05 10:05",resp:"72.1"},
+ {no:"SJ2608311922",name:"污水管网排查",unit:"水务集团",jb:"苏尚",zb:"—",czb:"—",ddl:"2026-09-16",st1:"正常",st2:"逾期未填报",ev:"已滞后",n:4,supDdl:"2026-09-07"},
+ {no:"SJ2608261503",name:"背街小巷照明",unit:"城管委",jb:"詹少鹏",zb:"王强",czb:"—",ddl:"2026-09-05",st1:"逾期",st2:"推进中",ev:"已滞后",n:1,supTime:"08-28 09:12"},
+ {no:"SJHRM20260812T001",name:"绿地养护招标",unit:"园林局",jb:"张秋缘",zb:"—",czb:"—",ddl:"2026-09-20",st1:"正常",st2:"推进中",ev:"推进中",n:2},
+ {no:"SJ2609061012",name:"学校周边交通秩序整治",unit:"教育局",jb:"陈刚",zb:"—",czb:"—",ddl:"2026-09-25",st1:"正常",st2:"暂存",ev:"推进中",n:1},
+ {no:"SJ2609020815",name:"河道清淤",unit:"水务集团",jb:"苏尚",zb:"赵磊",czb:"—",ddl:"2026-09-16",st1:"正常",st2:"已填报",ev:"推进中",n:5,supTime:"08-29 14:00",fillTime:"09-01 09:20",resp:"67.3"},
+ {no:"SJ2608150733",name:"农贸市场改造",unit:"商务局",jb:"李良龙",zb:"—",czb:"—",ddl:"2026-09-13",st1:"风险",st2:"推进中",ev:"推进中",n:3},
+ {no:"SJ2608200901",name:"社区养老设施建设",unit:"民政局",jb:"陈刚",zb:"—",czb:"—",ddl:"2026-10-08",st1:"正常",st2:"暂存",ev:"推进中",n:1},
+ {no:"SJ2607010442",name:"历史街区保护规划",unit:"自然资源局",jb:"张秋缘",zb:"—",czb:"—",ddl:"2026-10-15",st1:"正常",st2:"暂存",ev:"已滞后",n:6}
+];;
+var TODAY="2026-09-08";
+var FOLLOWS={
+ "SJ2609041005":[
+  {who:"李良龙（转办人）",when:"09-06 14:22",a:"完成路面修补约80%，剩余人行道砖待铺设。",b:"无。",c:"本周内完成人行道砖铺设。",ddl:"2026-09-11",ev:"推进中"},
+  {who:"詹少鹏（经办人）",when:"09-03 09:10",a:"已进场施工，完成破损路面铣刨。",b:"无。",c:"本周完成基层铺设。",ddl:"2026-09-11",ev:"推进中"},
+  {who:"詹少鹏（经办人）",when:"08-30 16:40",a:"完成施工方案报审。",b:"无。",c:"下周进场。",ddl:"2026-09-11",ev:"推进中"}],
+ "SJ2608311909":[
+  {who:"詹少鹏（经办人）",when:"09-05 10:05",a:"已完成小区入户调查与工程量统计。",b:"设计图纸尚未出具，施工暂无法启动。",c:"待图纸出具后立即进场，同步准备施工队伍。",ddl:"2026-09-17",ev:"已滞后"}],
+ "SJ2608261503":[
+  {who:"王强（转办人）",when:"09-02 11:30",a:"完成两条巷道灯具采购招标。",b:"部分巷道管线老化需同步改造，协调中。",c:"先易后难分批安装。",ddl:"2026-09-22",ev:"已滞后"}]
+};
+var ROLE=(new URLSearchParams(location.search).get("role")||"leader");
+var PERM={
+ leader:{f:function(x){return true}},
+ jb:{f:function(x){return x.jb==="詹少鹏"}},
+ zb:{f:function(x){return x.zb==="李良龙"||x.jb==="李良龙"}},
+ czb:{f:function(x){return x.czb==="王强"||x.zb==="王强"}}
+};
+if(!PERM[ROLE])ROLE="leader";
+var COLS=[["no","任务编号"],["name","任务名称"],["unit","责任单位"],["jb","经办人"],["zb","转办人"],["ddl","截止时间"],["st1","状态1"],["st2","状态2"],["ev","进度评价"],["n","跟进"]];
+var sortKey="ddl",sortAsc=true;
+var PG={size:5,page:1};
+var st1Cls={"正常":"b-gray","风险":"b-orange","逾期":"b-red","完结":"b-gray"};
+var st2Cls={"暂存":"b-gray","推进中":"b-blue","已填报":"b-green","逾期未填报":"b-urgent"};
+var evCls={"推进中":"b-blue","已落实":"b-green","已滞后":"b-red"};
+function visibleTasks(){
+ var rows=TASKS.filter(PERM[ROLE].f);
+ var st1=document.getElementById("fSt1").value,st2=document.getElementById("fSt2").value,unit=document.getElementById("fUnit").value,jb=document.getElementById("fJb").value;
+ var d1=document.getElementById("fDdl1").value,d2=document.getElementById("fDdl2").value;
+ return rows.filter(function(x){
+  if(st1&&x.st1!==st1)return false;
+  if(st2&&x.st2!==st2)return false;
+  if(unit&&x.unit!==unit)return false;
+  if(jb&&x.jb!==jb)return false;
+  if(d1&&x.ddl<d1)return false;
+  if(d2&&x.ddl>d2)return false;
+  return true;
+ }).sort(function(a,b){
+  var va=a[sortKey],vb=b[sortKey];
+  if(typeof va==="number")return sortAsc?va-vb:vb-va;
+  va=String(va);vb=String(vb);
+  return sortAsc?(va<vb?-1:va>vb?1:0):(va<vb?1:va>vb?-1:0);
+ });
+}
+function render(){
+ var rows=visibleTasks();
+ var cnt1=function(st){return rows.filter(function(x){return x.st1===st}).length};
+ var cnt2=function(st){return rows.filter(function(x){return x.st2===st}).length};
+ var m=[
+  {l:"事项总数",v:rows.length,c:""},{l:"推进中",v:cnt2("推进中"),c:""},
+  {l:"已填报",v:cnt2("已填报"),c:"green"},{l:"暂存（在库）",v:cnt2("暂存"),c:""},
+  {l:"逾期未填报",v:cnt2("逾期未填报"),c:cnt2("逾期未填报")?"urgent":"",sub:"过督办DDL未填报"},
+  {l:"风险",v:cnt1("风险"),c:cnt1("风险")?"orange":"",sub:"截止前7天"},
+  {l:"逾期",v:cnt1("逾期"),c:cnt1("逾期")?"warn":"",sub:"过截止时间"}];
+ document.getElementById("metrics").innerHTML=m.map(function(x){return '<div class="metric '+x.c+'"'+(x.sub?' title="'+x.sub+'"':'')+'><div class="label">'+x.l+'</div><div class="value">'+x.v+'</div>'+(x.sub?'<div class="msub">'+x.sub+'</div>':'')+'</div>'}).join("");
+ document.getElementById("theadRow").innerHTML=COLS.map(function(c){
+  var arrow=(sortKey===c[0])?('<span class="arrow">'+(sortAsc?"▲":"▼")+'</span>'):"";
+  return '<th onclick="setSort(\''+c[0]+'\')">'+c[1]+arrow+'</th>';}).join("");
+ var pages=Math.max(1,Math.ceil(rows.length/PG.size));
+ if(PG.page>pages)PG.page=pages;
+ var slice=rows.slice((PG.page-1)*PG.size,PG.page*PG.size);
+ document.getElementById("tbody").innerHTML=slice.map(function(x){
+  var transferred=(ROLE==="jb"&&x.zb!=="—")||(ROLE==="zb"&&x.czb!=="—");
+  var stBadge='<span class="badge '+st1Cls[x.st1]+'">'+x.st1+'</span> <span class="badge '+st2Cls[x.st2]+'">'+x.st2+'</span>'+(transferred?' <span class="badge b-orange" title="已转给其他人执行，状态仍按真实状态展示">已转办</span>':'');
+  var rowCls=x.st1==="逾期"?"overdue":(x.st2==="逾期未填报"?"urgrow":(x.st1==="风险"?"warnrow":""));
+  return '<tr class="'+rowCls+'" onclick="openDrawer(\''+x.no+'\')"><td>'+x.no+'</td><td>'+x.name+'</td><td>'+x.unit+'</td><td>'+x.jb+'</td><td>'+x.zb+'</td><td>'+x.ddl.slice(5)+'</td><td>'+stBadge+'</td><td><span class="badge '+evCls[x.ev]+'">'+x.ev+'</span></td><td>'+x.n+'</td></tr>';}).join("");
+ var pgBtns="";
+ for(var pi=1;pi<=pages;pi++){pgBtns+='<button class="pg-btn '+(pi===PG.page?"on":"")+'" onclick="pgGo('+pi+')">'+pi+'</button>';}
+ document.getElementById("pager").innerHTML='<div class="grp">共 '+rows.length+' 条</div><div class="grp"><select onchange="pgSize(this.value)">'+[5,10,20,50].map(function(n){return '<option value="'+n+'" '+(n===PG.size?"selected":"")+'>'+n+'</option>'}).join("")+'</select> 条/页</div><div class="grp"><button class="pg-btn" '+(PG.page<=1?"disabled":"")+' onclick="pgPrev()">‹</button>'+pgBtns+'<button class="pg-btn" '+(PG.page>=pages?"disabled":"")+' onclick="pgNext()">›</button></div>';
+}
+function pgSize(v){PG.size=+v;PG.page=1;render();}
+function pgGo(p){PG.page=p;render();}
+function pgPrev(){if(PG.page>1){PG.page--;render();}}
+function pgNext(){PG.page++;render();}
+function onFilter(){PG.page=1;render();}
+function setSort(k){if(sortKey===k){sortAsc=!sortAsc;}else{sortKey=k;sortAsc=true;}render();}
+["fSt1","fSt2","fUnit","fJb","fDdl1","fDdl2"].forEach(function(id){document.getElementById(id).addEventListener("change",onFilter);});
+function openDrawer(no){
+ var t=TASKS.find(function(x){return x.no===no});
+ document.getElementById("dTitle").textContent=t.no+" "+t.name;
+ document.getElementById("dSub").textContent=t.unit+" · 截止 "+t.ddl.slice(5)+" · 状态1 "+t.st1+" · 状态2 "+t.st2;
+ var fs=FOLLOWS[no]||[{who:t.jb+"（经办人）",when:"09-01 09:00",a:"已完成前期准备。",b:"无。",c:"按计划推进。",ddl:t.ddl,ev:"推进中"}];
+ document.getElementById("dBody").innerHTML=
+  '<div class="sec-title">事项详情</div><div class="kv">'+
+  '<div class="k">任务编号</div><div>'+t.no+'</div><div class="k">责任单位</div><div>'+t.unit+'</div>'+
+  '<div class="k">经办人</div><div>'+t.jb+'</div><div class="k">转办人 / 次级</div><div>'+t.zb+' / '+t.czb+'</div>'+
+  '<div class="k">截止时间</div><div>'+t.ddl+'</div><div class="k">状态1 / 状态2</div><div>'+t.st1+' / '+t.st2+'</div>'+
+  '<div class="k">进度评价</div><div>'+t.ev+'</div>'+
+  (t.resp?'<div class="k">督办 / 填报完成</div><div>'+t.supTime+' / '+t.fillTime+'（响应 '+t.resp+' 小时）</div>':'')+
+  '<div class="k">领导批示</div><div style="color:var(--warning-dark)">'+(t.no==="SJ2608311909"?"请督办人协调设计院，每周通报出图进度。":"—")+'</div>'+
+  '<div class="k">已催办</div><div>2 次（最近 09-06 10:12）</div></div>'+
+  '<div class="sec-title">跟进记录（倒序 '+fs.length+' 条）</div><div class="timeline">'+
+  fs.map(function(f){return '<div class="tl-item"><div class="tl-head"><b>'+f.who+'</b> · '+f.when+' · 进度评价：<b>'+f.ev+'</b> · 预计完成 '+f.ddl.slice(5)+'</div><div class="tl-fields"><div class="fk"><b>落实情况：</b>'+f.a+'</div><div class="fk"><b>困难问题：</b>'+f.b+'</div><div class="fk"><b>下一步计划：</b>'+f.c+'</div></div></div>'}).join("")+'</div>';
+ document.getElementById("drawer").classList.add("open");
+ document.getElementById("mask").classList.add("open");
+}
+function closeDrawer(){document.getElementById("drawer").classList.remove("open");document.getElementById("mask").classList.remove("open");}
+render();
+</script>
+</body>
+</html>
