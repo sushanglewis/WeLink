@@ -1,0 +1,53 @@
+process_slug: issue-dashboard
+issue_number: ''
+current_stage: product-design-docs
+last_updated: '2026-10-08T09:30:00Z'
+documents:
+- path: README.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: index.html
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: prototype/kanban.html
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: requirements/2026-09-28-dashboard/requirements.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: assets/js/package-data.js
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: requirements/2026-09-28-dashboard/requirements.html
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: changelog.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: changelog.html
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null

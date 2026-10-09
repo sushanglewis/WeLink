@@ -1,0 +1,18 @@
+/* EAIC 原型 · 设计变量（自旧 index.html :root 抽取） */
+:root {
+    --brand: #00AE68;
+    --brand-dark: #008D55;
+    --brand-light: #E8F7F0;
+    --bg: #F2F4F6;
+    --surface: #FFFFFF;
+    --surface-2: #F5F6F7;
+    --surface-3: #EDF0F2;
+    --text: #171918;
+    --text-2: #6B7280;
+    --text-3: #9CA3AF;
+    --border: #E5E8EB;
+    --error: #F53F3F;
+    --warning: #F59E0B;
+    --sidebar-w: 240px;
+    --radius: 8px;
+}

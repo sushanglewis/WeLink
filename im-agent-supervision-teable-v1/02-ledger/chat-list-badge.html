@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="聊天列表 · 龙小督待办事项徽标">
+<meta name="nav-group" content="02-ledger">
+<meta name="doc-version" content="v1.2-d41">
+<title>龙小督聊天列表提醒改造 · 待办事项徽标</title>
+<link rel="stylesheet" href="../assets/eaic/tokens.css">
+<link rel="stylesheet" href="../assets/eaic/base.css">
+<link rel="stylesheet" href="../assets/eaic/app.css">
+<style>
+/* 龙小督待办事项徽标（D-41）：仅一种形态「待处理事项 N」，不做未读红点 */
+.cl-wrap{display:flex;flex-direction:column;height:100%;background:var(--bg,#F2F4F6)}
+.cl-tabs{display:flex;gap:4px;padding:10px 14px 6px;background:var(--surface,#fff);border-bottom:1px solid var(--border,#E5E8EB);flex-shrink:0}
+.cl-tab{font-size:13px;color:var(--text-2,#6B7280);padding:5px 12px;border-radius:14px;cursor:pointer;text-decoration:none}
+.cl-tab:hover{background:var(--surface-2,#F5F6F7)}
+.cl-tab.on{background:var(--brand-light,#E8F7F0);color:var(--brand-dark,#008D55);font-weight:600}
+.cl-list{flex:1;overflow:auto;padding:8px}
+.cl-row{display:flex;gap:12px;padding:12px;border-radius:10px;cursor:pointer;align-items:center}
+.cl-row:hover{background:rgba(0,0,0,.04)}
+.cl-row.on{background:rgba(0,174,104,.08)}
+.cl-av{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:600;flex-shrink:0}
+.cl-main{flex:1;min-width:0}
+.cl-top{display:flex;align-items:center;gap:8px}
+.cl-name{font-size:13.5px;font-weight:600}
+.cl-time{margin-left:auto;font-size:11.5px;color:var(--text-3,#9CA3AF);flex-shrink:0}
+.cl-preview{font-size:12.5px;color:var(--text-2,#6B7280);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 红点徽标 = 未读消息数（仅普通会话行，IM 通用能力；龙小督行不做） */
+.cl-badge-unread{background:var(--error,#F53F3F);color:#fff;border-radius:10px;font-size:11px;line-height:16px;padding:0 6px;min-width:17px;text-align:center;font-weight:600;flex-shrink:0}
+.cl-sup{border-radius:10px;font-size:11px;line-height:16px;padding:1px 8px;white-space:nowrap;font-weight:600;flex-shrink:0;
+    background:var(--brand-light,#E8F7F0);color:var(--brand-dark,#008D55);border:1px solid var(--brand,#00AE68)}
+.cl-note{padding:10px 14px;font-size:11.5px;line-height:1.7;color:var(--text-2,#6B7280);border-top:1px solid var(--border,#E5E8EB);background:var(--surface,#fff);flex-shrink:0}
+.cl-note a{color:var(--brand-dark,#008D55);text-decoration:none}
+.cl-note a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="window full" id="win"></div>
+<script src="../assets/eaic/js/data.js"></script>
+<script src="../assets/eaic/js/components.js"></script>
+<script src="../assets/eaic/js/proto.js"></script>
+<script>
+var ui = EAIC.ui;
+
+/* 角色口径（D-41）：经办人 jb / 转办人 zb / 次级转办人 czb / 督办人 leader（默认）
+ * 徽标仅一种形态「待处理事项 N」：N = 当前节点归属人=该用户的未归档跟进记录数（推进中/已填报/逾期未填报，即流转到该用户头上等待处理/提交/查收导出的事项） */
+var ROLES = {
+    jb:     { label: '经办人',     n: 3 },
+    zb:     { label: '转办人',     n: 1 },
+    czb:    { label: '次级转办人', n: 1 },
+    leader: { label: '督办人',     n: 3 }
+};
+
+function params() {
+    var p = new URLSearchParams(location.search);
+    return { role: p.get('role') || 'leader' };
+}
+
+/* 返回 {n}；n=0 时不显示徽标 */
+function supBadgeFor(role) {
+    return { n: (ROLES[role] || ROLES.leader).n };
+}
+
+function chatListHtml() {
+    var q = params();
+    var roleLabel = (ROLES[q.role] || ROLES.leader).label;
+    var sup = supBadgeFor(q.role);
+    var supHtml = '';
+    var preview;
+    if (sup.n > 0) {
+        supHtml = '<span class="cl-sup" title="待处理事项：当前节点归属人=本人的未归档跟进记录数（推进中/已填报/逾期未填报，即流转到你头上等待处理/提交/查收导出的事项）">待处理事项 ' + sup.n + '</span>';
+        preview = '你有 ' + sup.n + ' 项督办事项待处理：城区道路维修进展…';
+    } else {
+        preview = '暂无待处理督办事项';
+    }
+
+    var html = '<div class="cl-wrap">'
+        + '<div class="cl-tabs">'
+        + '<a class="cl-tab on" href="#">全部</a>'
+        + '<a class="cl-tab" href="#">单聊</a>'
+        + '<a class="cl-tab" href="#">群组</a>'
+        + '<a class="cl-tab" href="#">未读</a>'
+        + '</div>'
+        + '<div class="cl-list">'
+        /* 龙小督：待办事项徽标（D-41 单一形态），不做未读红点 */
+        + '<div class="cl-row on" title="点击直达龙小督会话"><div class="cl-av" style="background:#00AE68">督</div><div class="cl-main">'
+        + '<div class="cl-top"><span class="cl-name">龙小督</span>' + supHtml
+        + '<span class="cl-time">09:12</span></div>'
+        + '<div class="cl-preview">' + preview + '</div>'
+        + '</div></div>'
+        /* 普通会话行对照：仅未读红点（IM 通用能力），无督办徽标 */
+        + '<div class="cl-row"><div class="cl-av" style="background:#5B6B7C">李</div><div class="cl-main">'
+        + '<div class="cl-top"><span class="cl-name">李四</span><span class="cl-badge-unread">3</span><span class="cl-time">14:32</span></div>'
+        + '<div class="cl-preview">周报模板我已经更新到 AI 表格里了…</div></div></div>'
+        + '<div class="cl-row"><div class="cl-av" style="background:#8A63D2">产</div><div class="cl-main">'
+        + '<div class="cl-top"><span class="cl-name">产品评审群</span><span class="cl-badge-unread">2</span><span class="cl-time">13:58</span></div>'
+        + '<div class="cl-preview">王五：明天上午十点评审新版原型…</div></div></div>'
+        + '<div class="cl-row"><div class="cl-av" style="background:#3E7CC7">王</div><div class="cl-main">'
+        + '<div class="cl-top"><span class="cl-name">王五</span><span class="cl-time">12:20</span></div>'
+        + '<div class="cl-preview">好的，那我先按这个方案改。</div></div></div>'
+        + '</div>'
+        /* 口径注解（D-41） + 角色演示切换 */
+        + '<div class="cl-note">'
+        + '徽标口径（当前角色：' + roleLabel + '）：仅一种形态「待处理事项 N」，N=当前节点归属人=该用户的未归档跟进记录数（流转到该用户头上等待处理/提交/查收导出）；'
+        + '所有人可见，N=0 时该行不显示徽标；'
+        + '龙小督会话行不做未读红点（普通会话的未读红点为 IM 通用能力，保留不变）；'
+        + '点击徽标直达龙小督会话。'
+        + '<div style="margin-top:6px">角色演示：'
+        + '<a href="?role=jb">经办人（待处理事项 3）</a> · '
+        + '<a href="?role=zb">转办人（待处理事项 1）</a> · '
+        + '<a href="?role=czb">次级转办人（待处理事项 1）</a> · '
+        + '<a href="?role=leader">督办人（待处理事项 3）</a>'
+        + '</div></div>'
+        + '</div>';
+    return html;
+}
+
+/* EAIC 壳：仅展示聊天列表面板（base 占位链接无需真实存在） */
+EAIC.proto.mount(ui.frameMain(chatListHtml(), {
+    active: 'chat',
+    badge: EAIC.data.unreadTotal,
+    base: '../'
+}));
+
+/* 占位链接：preventDefault 即可 */
+document.querySelectorAll('.cl-tab, .cl-row, .side-item, .userbar').forEach(function (el) {
+    el.addEventListener('click', function (e) { e.preventDefault(); });
+});
+</script>
+</body>
+</html>
