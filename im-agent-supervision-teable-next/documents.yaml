@@ -1,7 +1,7 @@
 process_slug: im-agent-supervision-teable-next
 issue_number: ''
 current_stage: clarify
-last_updated: '2026-09-09T03:07:07Z'
+last_updated: '2026-09-14T02:26:44Z'
 documents:
 - path: assets/eaic
   stage: product-prototype
@@ -22,6 +22,12 @@ documents:
   human_confirmed: false
   approved_by: null
 - path: designs/im-agent-supervision-teable/agent-vs-form-interaction.md
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: designs/im-agent-supervision-teable/desktop-shell-spec.md
   stage: product-design-docs
   status: in_progress
   gate_passed: false
@@ -70,7 +76,7 @@ documents:
   human_confirmed: false
   approved_by: null
 - path: index.html
-  stage: clarify
+  stage: product-prototype
   status: in_progress
   gate_passed: false
   human_confirmed: false
@@ -82,6 +88,12 @@ documents:
   human_confirmed: false
   approved_by: null
 - path: pages/designs/agent-vs-form-interaction.html
+  stage: product-design-docs
+  status: in_progress
+  gate_passed: false
+  human_confirmed: false
+  approved_by: null
+- path: pages/designs/desktop-shell-spec.html
   stage: product-design-docs
   status: in_progress
   gate_passed: false
@@ -137,12 +149,6 @@ documents:
   approved_by: null
 - path: pages/docs/prd-supervision-gui-form.html
   stage: clarify
-  status: in_progress
-  gate_passed: false
-  human_confirmed: false
-  approved_by: null
-- path: pages/prototypes/form.html
-  stage: product-prototype
   status: in_progress
   gate_passed: false
   human_confirmed: false

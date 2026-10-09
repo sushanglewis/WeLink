@@ -458,3 +458,16 @@
 
 .doc-index tr:hover { background: var(--surface-2); }
 .doc-index td code { background: transparent; padding: 0; }
+
+/* ---------- D-25：功能菜单 icon bar ---------- */
+.side-item{display:flex;align-items:center;gap:8px}
+.side-item .ico{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sidebar.rail{width:56px!important}
+.sidebar.rail .side-item{justify-content:center;gap:0;padding:10px 0;position:relative}
+.sidebar.rail .side-item .lbl{display:none}
+.sidebar.rail .side-item .ico{font-size:17px;width:auto}
+.sidebar.rail .side-item .badge{position:absolute;top:2px;right:6px}
+.sidebar.rail .u-name{display:none}
+.sidebar.rail .userbar{justify-content:center}
+.rail-toggle{border:1px solid var(--border,#E5E8EB);background:var(--surface,#fff);border-radius:8px;margin:6px 10px;padding:6px 0;font-size:12px;color:var(--sub,#6B7280);cursor:pointer;font-family:inherit;flex-shrink:0}
+.sidebar.rail .rail-toggle{margin:6px 8px}

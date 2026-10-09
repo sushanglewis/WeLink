@@ -97,6 +97,7 @@ EAIC.proto = (function () {
     function mount(html) {
         document.getElementById('win').innerHTML = html;
         bindPortalLinks();
+        if (window.EAIC && EAIC.ui && EAIC.ui.initShell) EAIC.ui.initShell();
     }
 
     return {

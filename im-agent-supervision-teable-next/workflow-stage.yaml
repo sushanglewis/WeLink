@@ -9,7 +9,7 @@ current_run:
   current_stage: clarify
   status: validation_failed
   started_at: '2026-09-04T07:48:51Z'
-  last_updated_at: '2026-09-09T03:07:07Z'
+  last_updated_at: '2026-09-14T02:26:44Z'
   issue_number: ''
   variables:
     process_slug: im-agent-supervision-teable-next
@@ -23,16 +23,22 @@ current_run:
   pr_number: ''
   feature_slug: ''
   execution_mode: team
-artifact_guidance: "This issue work package holds all artifacts produced while resolving the issue.\n\nHow to use templates:\n\
-  - Document templates live read-only under `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
-  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format reference and author the\n  document\
-  \ directly in the appropriate package directory, replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
-  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n  `interviews/` for recorded session outputs,\
-  \ `openspec/` for implementation proposals,\n  `docs/` for research and decision records, and `recordings/` for raw input\
-  \ files only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage> --action record-artifacts`\n  to persist\
-  \ produced artifact paths back into this workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
-  \ in the package root. Read that\n  index first to learn which documents exist and their approval status.\n\nApproval convention:\n\
-  - Add `<!-- status: approved -->` or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before handoff.\n"
+artifact_guidance: "This issue work package holds all artifacts produced while resolving\
+  \ the issue.\n\nHow to use templates:\n- Document templates live read-only under\
+  \ `.claude/templates/issue-package/`.\n  Do NOT copy `.tpl` files into this package.\
+  \ When a stage needs a document,\n  read the matching `.tpl` file there as a format\
+  \ reference and author the\n  document directly in the appropriate package directory,\
+  \ replacing\n  placeholders ({issue_number}, {session_id}, {design_id}, {change_name}).\n\
+  - Use `designs/` for product design docs, `requirements/` for clarified needs,\n\
+  \  `interviews/` for recorded session outputs, `openspec/` for implementation proposals,\n\
+  \  `docs/` for research and decision records, and `recordings/` for raw input files\
+  \ only.\n- When a stage completes, run `scripts/stage_loader.py --stage <stage>\
+  \ --action record-artifacts`\n  to persist produced artifact paths back into this\
+  \ workflow-stage.yaml; this also\n  refreshes `documents.yaml`, the document index\
+  \ in the package root. Read that\n  index first to learn which documents exist and\
+  \ their approval status.\n\nApproval convention:\n- Add `<!-- status: approved -->`\
+  \ or `[x] PM 已确认<文档类型>` to mark a document\n  as reviewed by the human PM before\
+  \ handoff.\n"
 nodes:
 - stage_id: clarify
   node_id: clarify-2026-09-04-next-steps
@@ -98,7 +104,25 @@ nodes:
   approved_by: null
   artifacts:
   - im-agent-supervision-teable-next/pages/prototypes/kanban.html
-  - im-agent-supervision-teable-next/pages/prototypes/form.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-engine.js
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger.css
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-jb-01.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-jb-02.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-jb-03.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-jb-04.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-jb-05.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-jb-06.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-zb-01.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-zb-02.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-zb-03.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-zb-04.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-czb-01.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-czb-02.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-db-01.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-db-02.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-db-03.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-db-04.html
+  - im-agent-supervision-teable-next/pages/prototypes/ledger/ledger-db-05.html
   handoff_file: null
 - stage_id: product-prototype
   node_id: pp-supervision-shell
@@ -144,6 +168,17 @@ nodes:
   - designs/im-agent-supervision-teable/agent-vs-form-interaction.md
   - pages/designs/agent-vs-form-interaction.html
   handoff_file: null
+- stage_id: product-design-docs
+  node_id: pdd-desktop-shell
+  status: in_progress
+  started_at: '2026-09-10T08:05:00Z'
+  completed_at: null
+  gate_passed: false
+  approved_by: null
+  artifacts:
+  - designs/im-agent-supervision-teable/desktop-shell-spec.md
+  - pages/designs/desktop-shell-spec.html
+  handoff_file: null
 - stage_id: product-prototype
   node_id: pp-chat-panel-shell
   status: in_progress
@@ -152,6 +187,7 @@ nodes:
   gate_passed: false
   approved_by: null
   artifacts:
+  - im-agent-supervision-teable-next/index.html
   - pages/prototypes/shell-chat-panel.html
   handoff_file: null
 recovery:

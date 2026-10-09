@@ -113,7 +113,7 @@
             var page = findPage(path, pages);
             currentPage = page || null;
             var firstCase = (page && page.cases && page.cases.length) ? page.cases[0] : null;
-            frame.src = firstCase ? (page.path + (firstCase.query || '')) : path;
+            frame.src = firstCase ? (firstCase.path ? firstCase.path : page.path + (firstCase.query || '')) : path;
             nav.querySelectorAll('.pnav-link').forEach(function (l) { l.classList.remove('active'); });
             link.classList.add('active');
             renderPanel(panel, page, firstCase);
@@ -129,7 +129,7 @@
             var q = btn.getAttribute('data-query') || '';
             var c = null;
             (currentPage.cases || []).forEach(function (x) { if ((x.query || '') === q) c = x; });
-            frame.src = currentPage.path + q;
+            frame.src = (c && c.path) ? c.path : currentPage.path + q;
             renderPanel(panel, currentPage, c);
         });
 

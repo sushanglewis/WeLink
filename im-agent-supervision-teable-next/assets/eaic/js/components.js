@@ -29,15 +29,16 @@ EAIC.ui = (function () {
         opts = opts || {};
         var base = opts.base || '../';
         var items = [
-            ['chat', '聊天', opts.badge || 0],
-            ['contacts', '通讯录', 0],
-            ['tables', 'AI 表格', 0],
-            ['kanban', '事项看板', 0]
+            ['chat', '聊天', opts.badge || 0, '💬'],
+            ['contacts', '通讯录', 0, '👥'],
+            ['tables', 'AI 表格', 0, '▦'],
+            ['kanban', '事项看板', 0, '📊']
         ];
         var html = '<div class="sidebar"><div class="side-nav">';
         items.forEach(function (it) {
             html += '<a class="side-item' + (active === it[0] ? ' active' : '') + '" href="'
-                + base + 'main/' + it[0] + '.html">' + it[1] + badge(it[2]) + '</a>';
+                + base + 'main/' + it[0] + '.html" title="' + it[1] + '"><span class="ico">' + it[3]
+                + '</span><span class="lbl">' + it[1] + '</span>' + badge(it[2]) + '</a>';
         });
         var u = D().currentUser;
         html += '</div><a class="userbar" href="' + base + 'overlays/avatar-menu.html">'
@@ -54,6 +55,22 @@ EAIC.ui = (function () {
             + '<div class="app-main">' + contentHtml + '</div>'
             + '</div>'
             + (opts.overlay || '');
+    }
+
+    /* D-25：功能菜单收起为 icon bar（shell 级，mount 后调用） */
+    function initShell() {
+        var sb = document.querySelector('.sidebar');
+        if (!sb || sb.querySelector('.rail-toggle')) return;
+        var b = document.createElement('button');
+        b.className = 'rail-toggle';
+        b.title = '收起/展开功能菜单（D-25）';
+        b.textContent = '⇤';
+        b.addEventListener('click', function () {
+            sb.classList.toggle('rail');
+            b.textContent = sb.classList.contains('rail') ? '⇥' : '⇤';
+        });
+        var ub = sb.querySelector('.userbar');
+        sb.insertBefore(b, ub || null);
     }
 
     /* ---------- WebView 占位 ---------- */
@@ -247,6 +264,7 @@ EAIC.ui = (function () {
         titleBar: titleBar,
         sidebar: sidebar,
         frameMain: frameMain,
+        initShell: initShell,
         wvPlaceholder: wvPlaceholder,
         wvLoading: wvLoading,
         wvError: wvError,

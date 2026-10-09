@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="doc-title" content="事项看板（EAIC 壳内）">
 <meta name="nav-group" content="界面原型">
-<meta name="doc-version" content="v0.4-proto">
+<meta name="doc-version" content="v0.7-proto">
 <meta name="doc-uid" content="proto-shell-kanban">
 <title>EAIC 原型 · 主界面 · 事项看板</title>
 <link rel="stylesheet" href="../../assets/eaic/tokens.css">
@@ -30,6 +30,8 @@
 .sv-badge-unread{background:var(--error,#F53F3F);color:#fff;border-radius:10px;font-size:11px;padding:1px 7px}
 .sv-sup{background:var(--brand,#00AE68);color:#fff;border-radius:10px;font-size:11px;padding:2px 8px;white-space:nowrap}
 .sv-sup.urgent{background:var(--error,#F53F3F)}
+/* 龙小督双徽标（D-25）：红点=未读数、绿 pill=待办数（样式见 app.css 共享层） */
+.sv-ava{position:relative}
 </style>
 </head>
 <body>
@@ -50,17 +52,18 @@ function wvKanban() {
 }
 
 function svBadgeForRole(role){
-    if(role==='jb')return {t:'督办 · 5 项待填报',urgent:true};
-    if(role==='zb')return {t:'督办 · 2 项待填报',urgent:false};
-    if(role==='czb')return {t:'督办 · 1 项待填报',urgent:false};
-    return {t:'督办 · 3 项待查收',urgent:false};
+    /* 双徽标=未读红点(unread) + 待办事项数(n；0 隐藏；加急转红) */
+    if(role==='jb')return {t:'待办 2',n:2,unread:2,urgent:true};
+    if(role==='zb')return {t:'待办 1',n:1,unread:1,urgent:false};
+    if(role==='czb')return {t:'待办 0',n:0,unread:0,urgent:false};
+    return {t:'待办 5',n:5,unread:1,urgent:false};
 }
 function chatListDemo(role){
     var sup=svBadgeForRole(role||'leader');
     return '<div class="sv-wrap">'
         +'<div class="sv-row on"><div class="sv-av" style="background:#00AE68">督</div><div class="sv-main">'
-        +'<div class="sv-top"><span class="sv-name">龙小督</span><span class="sv-sup'+(sup.urgent?' urgent':'')+'">'+sup.t+'</span><span class="sv-time">09:12</span></div>'
-        +'<div class="sv-preview">'+(sup.urgent?'[加急] 你有 5 项督办事项待反馈，最早截止 09-09：':'你有 5 项督办事项待反馈，最早截止 09-12：')+'SJ2609041005 城区道路维修…</div>'
+        +'<div class="sv-top"><span class="sv-name">龙小督</span>'+(sup.unread?'<span class="sv-badge-unread" title="未读消息数">'+sup.unread+'</span>':'')+(sup.n?'<span class="sv-sup'+(sup.urgent?' urgent':'')+'" title="待办事项数（区别于未读数）">'+sup.t+'</span>':'')+'<span class="sv-time">09:12</span></div>'
+        +'<div class="sv-preview">'+(sup.urgent?'[加急] ':'')+'你有 '+sup.n+' 项督办事项待反馈，最早截止 09-12：SJ2609041005 城区道路维修…</div>'
         +'</div></div>'
         +'<div class="sv-row"><div class="sv-av" style="background:#5B6B7C">李</div><div class="sv-main">'
         +'<div class="sv-top"><span class="sv-name">李四</span><span class="sv-badge-unread">3</span><span class="sv-time">14:32</span></div>'
@@ -68,7 +71,7 @@ function chatListDemo(role){
         +'<div class="sv-row"><div class="sv-av" style="background:#8A63D2">产</div><div class="sv-main">'
         +'<div class="sv-top"><span class="sv-name">产品评审群</span><span class="sv-badge-unread">2</span><span class="sv-time">13:58</span></div>'
         +'<div class="sv-preview">王五：明天上午十点评审新版原型…</div></div></div>'
-        +'<div style="padding:10px 12px;font-size:11.5px;color:var(--sub,#6B7280)">督办徽标（绿/红）≠ 未读红点：显示当前用户待填报表事项数，由 BFF 聚合，点击直达会话表单卡片（D-14）；催办加急时转红（D-15）。</div>'
+        +'<div style="padding:10px 12px;font-size:11.5px;color:var(--sub,#6B7280)">D-25 双徽标：红点=未读消息数；绿色「待办 N」=待填报/待查收督办事项数（区别于未读数，0 隐藏），点击直达会话并打开督办 panel；加急转红。左侧功能菜单可收起为 icon bar（sidebar 底部 ⇤）。</div>'
         +'</div>';
 }
 
