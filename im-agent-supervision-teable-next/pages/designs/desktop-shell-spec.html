@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="桌面端外壳改造：侧栏收起 + 督办待办徽标（D-25）">
+<meta name="nav-group" content="设计文档 (im-agent-supervision-teable)">
+<meta name="doc-version" content="v0.4-draft">
+<meta name="doc-uid" content="desktop-shell-spec">
+<title>桌面端外壳改造（D-25）</title>
+<!-- Asset paths assume this page lives at pages/docs/*.html (depth 2). Adjust if placed elsewhere. -->
+<link rel="stylesheet" href="../../assets/style.css">
+<style>.mermaid{white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f8fa;border:1px solid #e5e8eb;border-radius:8px;padding:12px;overflow:auto}</style>
+</head>
+<body class="doc-page" data-page-uid="desktop-shell-spec">
+
+<header class="doc-header">
+    <h1 data-uid="desktop-shell-spec-h1">桌面端外壳改造：侧栏收起 + 督办待办徽标</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v0.4-draft</span>
+        <span class="doc-stage">阶段: product-design-docs</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+# 桌面端外壳改造：侧栏收起 + 督办待办徽标（D-25）
+
+<!-- status: draft -->
+
+- **日期**: 2026-09-10 v0.4（v0.4 按 PM 2026-09-10 修正：聊天面板/台账面板收起后为**分隔栏 26px 窄条、窄条即展开按钮**；面板内不再内嵌输入框，输入统一走会话底部与聊天窗口共用的输入窗口（横跨两栏））（v0.3 按 PM 2026-09-10 布局截图定稿**四态布局**（L0~L3，见 §2）：L0 默认=功能菜单 icon bar＋对话列表＋聊天记录＋插件面板，**用户输入窗口横跨聊天记录与插件面板两栏**；L1=收起插件面板；L2=收起聊天记录；L3=收起对话列表；三个内容区均可独立收起/展开、任意组合，输入窗口任一收起态下持久显示。v0.1 按 PM 决策 D-25 建立：①左侧功能菜单、聊天列表可收起，功能菜单收起为**只含 icon 的窄栏**；②聊天列表中龙小督条目除未读消息数外，展示**待办事项数量徽标**）
+- **上游**: `embed-form-spec.md`（DM 右侧扩展 panel，D-24）、`gui-dashboard-spec.md`、`role-scenarios.md`（D-14 徽标）
+- **定位**: EAIC 桌面端外壳（自研 IM 客户端）改造需求，服务督办高频用户在宽屏下的专注填报/查收场景。现状参照 PM 截图（`.context/attachments/cZ8bao/image.png`：功能菜单固定宽度〔聊天/通讯录/AI 表格〕、聊天列表常驻，右侧 panel 打开后横向空间受限）。
+
+## 1. 需求（PM 口径）
+
+| # | 需求 | 说明 |
+|---|------|------|
+| SH-1 | **左侧功能菜单可收起为 icon bar** | 收起后仅保留 icon 窄栏（聊天 / 通讯录 / AI 表格 / 事项看板），hover 显示名称 tooltip；点击 icon 展开对应模块并恢复菜单；再点收起按钮回到 icon bar。展开/收起状态会话内记忆。 |
+| SH-2 | **对话列表可收起（L3）** | 对话列表收起后，聊天记录＋插件面板占满主区（PM 布局截图 EG1dLe）；列表右缘保留展开把手；收起时不影响新消息未读提醒与龙小督待办徽标提示。 |
+| SH-4 | **聊天记录可收起（L2）** | 聊天记录（聊天面板）可收起，插件面板扩宽（PM 布局截图 kxaMOG）；tab 栏保留可重新展开；与对话列表收起可叠加。 |
+| SH-5 | **插件面板可收起（L1）** | 台账插件面板可收起，聊天记录扩宽为单栏（PM 布局截图 igx7ZP）；会话内「台账」tab/徽标点击重新打开（D-14/D-24）。 |
+| SH-6 | **输入窗口与聊天窗口共用** | 会话输入窗口=聊天窗口输入框，位于聊天记录＋插件面板**两栏底部横跨**（PM 布局截图 Q8qHT9）；插件面板内**不单独内嵌输入框**（PM 修正）；任一/两个面板收起时输入窗口**持久显示可用**（NL 代填入口不丢，D-24）。 |
+| SH-3 | **龙小督条目双徽标** | 聊天列表中龙小督会话除**未读消息数红点**（现有）外，追加**待办事项数量徽标**：绿色数字=当前用户待填报/待查收督办事项数（BFF 聚合，D-14 升级为数徽标）；0 不显示；有催办加急项时转红（D-15）。点击直达会话并打开督办 panel。 |
+
+## 2. 四态布局（PM 2026-09-10 截图定稿）
+
+```
+L0 默认（Q8qHT9）          L1 收插件面板（igx7ZP）     L2 收聊天记录（kxaMOG）     L3 收对话列表（EG1dLe）
+┌──┬────┬──────┬─────┐    ┌──┬────┬──────────┐      ┌──┬────┬───────────┐      ┌──┬──────┬─────┐
+│ic│列表│聊天  │插件 │    │ic│列表│聊天      │      │ic│列表│插件       │      │ic│聊天  │插件 │
+│o │    │记录  │面板 │    │o │    │记录      │      │o │    │面板(宽)   │      │o │记录  │面板 │
+│n │    ├──────┴─────┤    │n │    ├──────────┤      │n │    ├───────────┤      │n ├──────┴─────┤
+│bar│   │  输入窗口    │    │bar│  │  输入窗口  │      │bar│  │  输入窗口   │      │bar│  输入窗口   │
+└──┴────┴─────────────┘    └──┴────┴──────────┘      └──┴────┴───────────┘      └──┴─────────────┘
+```
+
+- 四态以功能菜单 **icon bar 为壳默认态**；对话列表/聊天记录/插件面板三个内容区各自独立收起/展开，任意组合（如 L2+L3=插件面板近全宽填报）。
+- 截图引用：`.context/attachments/Q8qHT9|igx7ZP|kxaMOG|EG1dLe/image.png`。
+
+## 2+. 交互细节
+
+- 收起按钮位于功能菜单底部（sidebar ⇤，共享组件提供，全壳一致）、tab 栏（收聊天/收台账）与对话列表右缘把手；**聊天面板/台账面板收起后成为分隔栏 26px 窄条，窄条本身即展开按钮**（竖排文字+箭头，hover 高亮，点击展开；PM 口径）；快捷键二期。
+- icon bar 宽 56px，icon 24px，纵向排列 + 底部用户头像；当前模块高亮角标。
+- 聊天列表收起态保留一条 12px 展开把手（hover 展开预览）。
+- 待办徽标与未读红点同时存在时：未读红点靠头像（左上），待办数徽标靠条目右侧时间列（与现有督办徽标位置一致），两者样式明显区分。
+- 徽标口径与 D-14 一致（BFF 聚合，区别于未读数）；数字随 panel 内提交/批次关闭实时刷新（postMessage `badge_update`）。
+
+## 3. 与本期其他决策的关系
+
+- **D-24**：panel 为表单主载体；SH-2 收起聊天列表后 panel 可达接近全宽，配合 panel 自带 Splitter 覆盖聊天区，形成「全宽专注填报」。
+- **D-14/D-15**：徽标从「文字徽标（督办 · N 项待填报）」升级为「数字徽标」，语义不变。
+- 本期不改移动端；移动端 WebView 二期（沿用 `embed-form-spec.md` 降级策略）。
+
+## 4. 验收
+
+- [ ] 功能菜单可收起为 icon bar（56px），hover tooltip、点击展开、状态记忆。
+- [ ] 对话列表可收起/展开（L3），收起后聊天记录+panel 占满主区，新消息仍有未读提醒。
+- [ ] 聊天记录可收起（L2）、插件面板可收起（L1），三个内容区任意组合；输入窗口始终横跨两栏且持久可用。
+- [ ] 龙小督条目同时展示未读红点与待办数徽标；数徽标=BFF 聚合待办数；0 隐藏；加急转红；点击直达会话+panel。
+- [ ] 与 D-24 panel 叠加：收起列表 + panel 拖宽后，填报表单可用宽度 ≥ 70% 屏宽。
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            if (codeLang === 'mermaid') {
+                html += '<div class="mermaid">' + escapeHtml(codeBuffer.join('\n')) + '</div>\n';
+            } else {
+                html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            }
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    function mermaidFallback(list) {
+        list.forEach(function (el) {
+            if (el.getAttribute('data-fb')) return;
+            el.setAttribute('data-fb', '1');
+            var pre = document.createElement('pre');
+            pre.textContent = el.textContent;
+            el.parentNode.replaceChild(pre, el);
+        });
+    }
+    function runMermaid(diagrams) {
+        diagrams.forEach(function (el, i) { el.id = 'mmd-' + i; });
+        try {
+            mermaid.initialize({ startOnLoad: false, theme: 'neutral', flowchart: { htmlLabels: true } });
+            mermaid.run({ querySelector: '#docContent .mermaid' });
+        } catch (e) { mermaidFallback(diagrams); }
+    }
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+        var diagrams = contentEl.querySelectorAll('.mermaid');
+        if (diagrams.length) {
+            if (window.mermaid) { runMermaid(diagrams); }
+            else {
+                var ms = document.createElement('script');
+                ms.src = 'https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js';
+                ms.onload = function () { if (window.mermaid) { runMermaid(diagrams); } else { mermaidFallback(diagrams); } };
+                ms.onerror = function () { mermaidFallback(diagrams); };
+                document.head.appendChild(ms);
+                setTimeout(function () { if (!window.mermaid) { mermaidFallback(diagrams); } }, 8000);
+            }
+        }
+    }
+})();
+</script>
+</body>
+</html>

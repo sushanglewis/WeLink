@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="数据模型">
+<meta name="nav-group" content="产品设计">
+<meta name="doc-version" content="v1.0">
+<meta name="doc-uid" content="data-model">
+<title>数据模型</title>
+<!-- Asset paths assume this page lives at pages/docs/*.html (depth 2). Adjust if placed elsewhere. -->
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="data-model">
+
+<header class="doc-header">
+    <h1 data-uid="data-model-h1">数据模型</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v1.0</span>
+        <span class="doc-stage">阶段: product-design-docs</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+<!-- version: v1.0 -->
+
+# 数据模型: issue-17
+
+> 说明：话题消息本体复用 Mattermost Post/Thread 存储；日程事件本体复用日历后端的 iCalendar VEVENT（CalDAV）或 JSCalendar（JMAP）对象。下列实体中，标注「映射」的表示以既有系统对象为准，WeLink 侧仅保存引用与扩展字段。
+
+## 实体
+
+### Topic（话题，映射 Mattermost Thread）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| topic_id | string | PK | 等于 Mattermost root post id（thread id） |
+| channel_id | string | 必填 | 所属 Mattermost channel（数字员工对话） |
+| title | string | 可空 | 话题标题；可空，由 agent 生成回填 |
+| summary | string | 可空 | 话题摘要，agent 生成 |
+| creator_type | enum(human, agent) | 必填 | 创建者类型 |
+| creator_id | string | 必填 | 创建者用户 id / agent id |
+| created_at | datetime | 必填 | 创建时间 |
+| last_active_at | datetime | 必填 | 最后活跃时间（随新消息更新） |
+
+### ClarifySession（澄清会话）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| clarify_session_id | string | PK | 澄清会话 id |
+| topic_id | string | FK → Topic | 所属话题（thread） |
+| round | int | ≥1 | 第几轮澄清 |
+| status | enum(open, answered, expired, cancelled) | 必填 | 会话状态 |
+| created_by_agent | string | 必填 | 发起 agent id |
+| created_at | datetime | 必填 | 创建时间 |
+| answered_at | datetime | 可空 | 用户提交时间 |
+
+### ClarifyQuestion（澄清问题）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| question_id | string | PK | 问题 id |
+| clarify_session_id | string | FK → ClarifySession | 所属澄清会话 |
+| question_text | string | 必填 | 问题文案 |
+| options | string[3] | 必填，恰好 3 项 | 推荐选项 |
+| allow_custom | bool | 默认 true | 是否提供自定义输入（本期固定 true） |
+| multi_select | bool | 默认 false | 是否多选 |
+| answer | object | 可空 | `{ selected: string[], custom_text: string \| null }` |
+
+### PlanDocument（Plan 文档）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| plan_id | string | PK | Plan id |
+| topic_id | string | FK → Topic | 所属话题（thread） |
+| storage_path | string | 必填 | agent 后端 Plan.md 文件路径（按 thread 关联） |
+| current_revision | int | ≥1 | 当前版本号 |
+| status | enum(draft, pending_approval, approved, changes_requested, executing, completed, cancelled) | 必填 | Plan 状态 |
+| created_at | datetime | 必填 | 创建时间 |
+| approved_by | string | 可空 | 审批通过的用户 id |
+| approved_at | datetime | 可空 | 审批通过时间 |
+
+### PlanRevision（Plan 版本）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| plan_revision_id | string | PK | 版本 id |
+| plan_id | string | FK → PlanDocument | 所属 Plan |
+| revision | int | ≥1 | 版本号，递增 |
+| content_md | string | 必填 | Plan.md 内容（背景/目标/步骤/依赖/验收标准/风险） |
+| change_note | string | 可空 | 用户修改意见 |
+| created_at | datetime | 必填 | 版本生成时间 |
+
+### Capsule（胶囊）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| capsule_id | string | PK | 胶囊实例 id |
+| message_id | string | 必填 | 所属 Mattermost post id |
+| capsule_type | enum(skill, mcp, plugin, teable) | 必填 | 胶囊类型 |
+| schema_version | string | 必填 | 统一自定义 JSON schema 版本 |
+| display | object | 必填 | `{ title, summary, icon? }` 卡片展示信息 |
+| payload | object | 必填 | 类型负载：skill→`{ skill_name, description, input_preview }`；mcp→`{ server_name, tool_count, key_tools[] }`；plugin→`{ plugin_name, version, feature_summary }`；teable→`{ base_id, table_id, view_id, table_name }` |
+| permissions | object | 可空 | 权限范围声明（如 teable 的可读/可写范围） |
+| created_by | string | 必填 | 插入者用户 id |
+| created_at | datetime | 必填 | 创建时间 |
+
+胶囊统一 schema（自定义 JSON，随消息 metadata 存储）：
+
+```json
+{
+  "capsule_type": "skill | mcp | plugin | teable",
+  "capsule_id": "uuid",
+  "schema_version": "1.0",
+  "display": { "title": "...", "summary": "...", "icon": "optional" },
+  "payload": { "type_specific": "..." },
+  "permissions": { "scope": "optional" },
+  "created_by": "user_id",
+  "created_at": "ISO-8601"
+}
+```
+
+### ScheduleEvent（日程事件，映射 VEVENT / JSCalendar）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| event_id | string | PK | 日历后端事件 uid |
+| calendar_owner | string | 必填 | 所属日历身份（用户 id 或 agent id） |
+| title | string | 必填 | 事件标题 |
+| description | string | 可空 | 描述/备注 |
+| start_at | datetime | 必填 | 开始时间（含时区） |
+| end_at | datetime | 必填 | 结束时间（含时区） |
+| organizer | string | 必填 | 组织者（用户或 agent） |
+| source_topic_id | string | FK → Topic，可空 | 来源话题（从对话创建时回填） |
+| visibility | enum(private, participants) | 必填 | 个人日程范围；多人事件对所有参与人可见 |
+| status | enum(confirmed, tentative, cancelled) | 必填 | 事件状态 |
+
+### ScheduleParticipant（日程参与人）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| event_id | string | FK → ScheduleEvent | 所属事件 |
+| participant_id | string | 必填 | 参与人用户 id / agent id |
+| participant_type | enum(human, agent) | 必填 | 参与人类型 |
+| rsvp_status | enum(needs_action, accepted, declined, tentative) | 必填 | 响应状态 |
+| notified_via | enum(im, email, none) | 必填 | 通知通道 |
+
+联合主键 (event_id, participant_id)。
+
+### AgentCalendarIdentity（Agent 日历身份）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| agent_id | string | PK | agent 在组织中的成员 id |
+| calendar_account | string | 必填 | 日历后端独立账户名 |
+| principal_uri | string | 必填 | 日历后端 principal/calendar home 地址 |
+| created_at | datetime | 必填 | 身份开通时间 |
+| status | enum(active, suspended) | 必填 | 身份状态 |
+
+### ScheduleToken（日程访问令牌）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| token_id | string | PK | token 记录 id（非 token 本体） |
+| subject_type | enum(user, agent) | 必填 | 授权对象类型 |
+| subject_id | string | 必填 | 用户 id / agent id |
+| scope | string[] | 必填 | 权限范围（read_events / write_events / invite_members） |
+| token_type | enum(app_password, oauth_token) | 必填 | 依后端选型确定 |
+| issued_by | string | 必填 | 签发人 |
+| issued_at | datetime | 必填 | 签发时间 |
+| expires_at | datetime | 可空 | 过期时间 |
+| revoked_at | datetime | 可空 | 撤销时间 |
+
+### ScheduleTriggerRule（日程触发规则）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| rule_id | string | PK | 规则 id |
+| agent_id | string | FK → AgentCalendarIdentity | 目标 agent |
+| event_match | object | 必填 | 匹配条件（如 organizer=self、标题模式、时间窗） |
+| trigger_offset | string | 必填 | 触发偏移（如 `-PT5M` 表示开始前 5 分钟） |
+| action | object | 必填 | 触发动作（send_reminder / push_materials / invoke_skill + 参数） |
+| channel | enum(webhook, push, polling) | 必填 | 触发通道；polling 为兜底 |
+| enabled | bool | 默认 true | 是否启用 |
+
+## 关系
+
+- Topic 与 Mattermost Thread：一对一（topic_id = root post id）。
+- Topic 与 ClarifySession：一对多（一个话题可多轮澄清）。
+- ClarifySession 与 ClarifyQuestion：一对多（一轮澄清包含 1..n 个问题）。
+- Topic 与 PlanDocument：一对一（一个话题同一时刻至多一个进行中的 Plan；历史 Plan 保留）。
+- PlanDocument 与 PlanRevision：一对多（每次生成/修改递增版本）。
+- Mattermost Post 与 Capsule：一对多（一条消息可携带多个胶囊）。
+- ScheduleEvent 与 ScheduleParticipant：一对多（多人事件多参与人）。
+- AgentCalendarIdentity 与 ScheduleEvent：一对多（agent 自身日程）。
+- AgentCalendarIdentity 与 ScheduleTriggerRule：一对多。
+- ScheduleToken 与 用户/Agent：多对一（一个主体可持有多个 token，支持轮换）。
+- Topic 与 ScheduleEvent：一对多（对话中创建的多个日程可回溯来源话题）。
+
+## 约束
+
+- 话题消息读写一律经 Mattermost thread API，禁止跨话题串写。
+- Plan 状态机强制：`pending_approval` 之前不得进入 `executing`；`approved` 是进入 `executing` 的唯一前置状态。
+- PlanRevision 只增不改；Plan.md 文件与最新 revision 保持一致。
+- Capsule 必须通过统一 schema 校验方可渲染与解析；schema_version 不兼容时降级为「无法解析」展示。
+- Teable 胶囊仅允许写入用户有权限的 base_id/table_id/view_id。
+- ScheduleEvent 的 visibility=participants 时，所有 ScheduleParticipant 在其日历视图中必须可见该事件。
+- ScheduleToken 仅存元数据，token 本体加密存储于密钥管理设施；撤销即时生效。
+- 日程后端不提供与 Outlook/Google 的任何同步字段，数据模型中不出现外部日历映射。
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>

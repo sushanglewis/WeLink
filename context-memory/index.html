@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>龙小督上下文与记忆管理 · 方案与研究</title>
+<style>
+:root {
+    --primary: #00AE68; --primary-dark: #008D55; --primary-light: #E8F7F0;
+    --background: #F7F8FA; --foreground: #171918; --muted: #F5F6F7;
+    --border: #E5E8EB; --text-muted: #6B7280; --text-subtle: #9CA3AF;
+    --warning: #F59E0B; --error: #F53F3F; --radius: 8px;
+    --nav-width: 232px; --maxw: 880px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    margin: 0; background: var(--background); color: var(--foreground);
+    font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", ui-sans-serif, sans-serif, system-ui;
+    font-size: 14px; line-height: 1.7;
+}
+a { color: var(--primary-dark); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, .mono { font-family: "JetBrains Mono", "SFMono-Regular", ui-monospace, monospace; font-size: 0.92em; }
+code { background: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
+
+/* ---------- layout ---------- */
+.layout { display: flex; min-height: 100vh; }
+.sidenav {
+    width: var(--nav-width); flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+    background: #fff; border-right: 1px solid var(--border); padding: 20px 0; overflow: auto;
+}
+.sidenav .brand { display: flex; gap: 10px; align-items: center; padding: 0 18px 16px; border-bottom: 1px solid var(--border); }
+.sidenav .logo { width: 30px; height: 30px; border-radius: 7px; background: var(--primary); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.sidenav .brand .t1 { font-size: 14px; font-weight: 600; }
+.sidenav .brand .t2 { font-size: 11px; color: var(--text-muted); }
+.sidenav .grp { font-size: 11px; font-weight: 700; color: var(--text-subtle); text-transform: uppercase; margin: 18px 18px 6px; }
+.sidenav a.navlink { display: block; padding: 7px 18px; font-size: 13px; color: var(--text-muted); border-left: 2px solid transparent; }
+.sidenav a.navlink:hover { background: var(--muted); color: var(--foreground); text-decoration: none; }
+.sidenav a.navlink.active { color: var(--primary-dark); font-weight: 600; border-left-color: var(--primary); background: var(--primary-light); }
+.sidenav .stage-chip { margin: 16px 18px 0; padding: 9px 12px; background: var(--muted); border-radius: var(--radius); font-size: 12px; color: var(--text-muted); }
+.sidenav .stage-chip b { color: var(--foreground); }
+
+.main { flex: 1; min-width: 0; padding: 40px 48px 120px; }
+.section { max-width: var(--maxw); margin: 0 auto 56px; scroll-margin-top: 24px; }
+.section > h2 { font-size: 22px; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
+.section > h2 .no { font-size: 12px; color: #fff; background: var(--primary); border-radius: 5px; padding: 2px 7px; font-weight: 600; }
+.section .lede { color: var(--text-muted); margin: 0 0 20px; }
+h3 { font-size: 16px; margin: 26px 0 10px; }
+p { margin: 8px 0; }
+
+/* ---------- hero ---------- */
+.hero {
+    max-width: var(--maxw); margin: 0 auto 48px; background: linear-gradient(135deg, #0B3D2E 0%, #00AE68 130%);
+    color: #fff; border-radius: 14px; padding: 36px 40px;
+}
+.hero .kicker { font-size: 12px; opacity: .8; letter-spacing: 1px; }
+.hero h1 { font-size: 26px; margin: 8px 0 10px; }
+.hero p { opacity: .92; max-width: 640px; }
+.hero .stats { display: flex; gap: 32px; margin-top: 24px; flex-wrap: wrap; }
+.hero .stat .n { font-size: 24px; font-weight: 700; }
+.hero .stat .d { font-size: 12px; opacity: .8; }
+
+/* ---------- cards & tables ---------- */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.card h4 { margin: 0 0 6px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.card h4 .tag { font-size: 11px; font-weight: 600; color: var(--primary-dark); background: var(--primary-light); border-radius: 4px; padding: 1px 6px; }
+.card p { font-size: 13px; color: var(--text-muted); margin: 0; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; font-size: 13px; }
+th, td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+th { background: var(--muted); font-weight: 600; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+td.num { text-align: center; font-weight: 600; }
+td.best { color: var(--primary-dark); }
+tr.total td { background: var(--primary-light); font-weight: 700; }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 4px; padding: 1px 7px; margin-right: 4px; }
+.badge.rec { background: var(--primary-light); color: var(--primary-dark); }
+.badge.evolve { background: #FEF3E2; color: #B45309; }
+.badge.hard { background: #FDE8E8; color: var(--error); }
+.badge.p0 { background: var(--primary-light); color: var(--primary-dark); }
+.badge.p1 { background: var(--muted); color: var(--text-muted); }
+
+ul.tight { margin: 8px 0; padding-left: 20px; }
+ul.tight li { margin: 4px 0; }
+.callout { border-left: 3px solid var(--primary); background: var(--primary-light); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 16px; margin: 14px 0; font-size: 13px; }
+.callout.warn { border-left-color: var(--warning); background: #FEF8EC; }
+pre.diagram { background: #10231C; color: #D7E8DF; border-radius: var(--radius); padding: 16px 18px; overflow: auto; font-size: 12.5px; line-height: 1.6; }
+pre.diagram .cm { color: #6FA98C; }
+.artifact-list { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 0; }
+.artifact-list a { display: flex; justify-content: space-between; gap: 12px; padding: 8px 16px; font-size: 13px; color: var(--foreground); }
+.artifact-list a:hover { background: var(--muted); text-decoration: none; }
+.artifact-list a .path { color: var(--text-subtle); font-size: 12px; }
+@media (max-width: 900px) {
+    .sidenav { display: none; }
+    .main { padding: 24px 18px 80px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="sidenav">
+    <div class="brand">
+        <div class="logo">龙</div>
+        <div>
+            <div class="t1">上下文与记忆管理</div>
+            <div class="t2">context-memory · 2026-09-08</div>
+        </div>
+    </div>
+    <div class="grp">方案</div>
+    <a class="navlink" href="#overview">概览与场景事实</a>
+    <a class="navlink" href="#architecture">四层架构设计</a>
+    <a class="navlink" href="#comparison">记忆层方案对比</a>
+    <a class="navlink" href="#pipeline">写入 · 回顾 · 沉降</a>
+    <a class="navlink" href="#requirements">需求与验收</a>
+    <div class="grp">研究</div>
+    <a class="navlink" href="#research-decisions">决策记录</a>
+    <a class="navlink" href="#research-options">候选方案调研</a>
+    <a class="navlink" href="#research-correction">底座事实纠正</a>
+    <div class="grp">产物</div>
+    <a class="navlink" href="#artifacts">文档索引</a>
+    <div class="stage-chip">工作流: interview-to-knowledge<br>阶段: <b>clarify → 设计文档</b><br>Human gate: 等待 PM 确认</div>
+</nav>
+
+<main class="main">
+
+<!-- ============ HERO ============ -->
+<div class="hero" id="top">
+    <div class="kicker">龙小督 · IM 数字员工的场生命周期上下文与记忆体系</div>
+    <h1>短周期对话连续，长周期基于「用户 × 督办事项」被记得</h1>
+    <p>龙小督嵌入 IM 组织架构，与多名成员长期 DM 协作。本方案按 IM + Teable 的真实使用方式重设计上下文窗口与记忆：通用 AI 工作台的窗口策略、压缩策略、记忆方案均不完全适配，这里给出贴合场景的四层架构与有据可依的记忆层选型。</p>
+    <div class="stats">
+        <div class="stat"><div class="n">6h</div><div class="d">短窗口功能性连续</div></div>
+        <div class="stat"><div class="n">3h</div><div class="d">不活跃触发归档</div></div>
+        <div class="stat"><div class="n">4 层</div><div class="d">会话/压缩/账本/沉降</div></div>
+        <div class="stat"><div class="n">3 选 1</div><div class="d">账本 vs Graphiti vs mem0</div></div>
+        <div class="stat"><div class="n">数年</div><div class="d">长期记忆尺度</div></div>
+    </div>
+</div>
+
+<!-- ============ 方案 ============ -->
+<div class="section" id="overview">
+    <h2><span class="no">01</span>概览与场景事实</h2>
+    <p class="lede">已锁定的场景事实（PM 确认，2026-09-08 讨论），是全部设计的输入。</p>
+    <div class="cards">
+        <div class="card"><h4>底座 <span class="tag">已确认</span></h4><p>AgentScope 框架自研（纠正 issue-17 调研的 OpenClaw 记载），7×24 驻留；会话持久化于 PostgreSQL；本期仅 DM。</p></div>
+        <div class="card"><h4>规模 <span class="tag">已确认</span></h4><p>小型：几十名成员 / 几百个督办事项。文件系统 + 命名规范即可满足检索，无需向量库。</p></div>
+        <div class="card"><h4>使用方式 <span class="tag">场生命周期</span></h4><p>上线后在一个窗口内持续使用同一 session 聊天；「会话结束」由用户不活跃界定，而非显式关闭。</p></div>
+        <div class="card"><h4>Teable 定位 <span class="tag">业务事实</span></h4><p>Teable 是业务事实唯一权威源，经 Teable skills 查询；不充当记忆存储，账本只存引用键。</p></div>
+    </div>
+    <div class="callout"><b>设计命题</b>：既保证 6 小时内上下文窗口的连续性（省略/指代输入可凭近期对话理解），又保证数周/数月/数年后，龙小督能基于与一个用户、一个事项的背景，在新鲜会话中继续协作。</div>
+</div>
+
+<div class="section" id="architecture">
+    <h2><span class="no">02</span>四层架构设计</h2>
+    <p class="lede">全栈四层：会话管理 → 滚动压缩 → 账本记忆层（核心）→ 分层沉降。详见 <code>designs/context-memory-v1/architecture.md</code>。</p>
+    <pre class="diagram">┌─ 组织成员（IM DM）──────────────────────────────┐
+│ <span class="cm">① 会话管理层</span>  6h 功能性连续 · 跨重启恢复(PG 回放)   │
+│ <span class="cm">② 滚动压缩</span>    token>60k → 早期消息摘要化·近期原文   │
+│ <span class="cm">③ 账本记忆层</span>  3h 不活跃 → 摘要归档 → .md 账本     │
+│ <span class="cm">④ 分层沉降</span>    活跃账本 → 摘要卡 → 冷存          │
+└─ Teable（业务事实源，经 Teable skills 查询）────┘</pre>
+    <div class="cards">
+        <div class="card"><h4>① 会话管理层</h4><p>「6 小时」是连续性体验目标而非会话边界；session 持续累积，长度控制交给滚动压缩。重启后从 PG 回放窗口内消息恢复。</p></div>
+        <div class="card"><h4>② 滚动压缩</h4><p>超预算时最早一批消息替换为滚动摘要（作为上下文头部「准消息」），原文始终保留在 PG 可回查；用户无感、对话不中断。</p></div>
+        <div class="card"><h4>③ 账本记忆层</h4><p>事件驱动：3h 不活跃事件 → 轻量模型摘要 agent 拉取未归档对话 → 写入「用户 × 督办事项」.md 账本；回顾采用混合触发。</p></div>
+        <div class="card"><h4>④ 分层沉降</h4><p>活跃事项详细账本 → 完结/90 天未活跃压缩为事项摘要卡 → 1 年未访问冷存；任何层级保留来源指针可回查原文。</p></div>
+    </div>
+</div>
+
+<div class="section" id="comparison">
+    <h2><span class="no">03</span>记忆层方案对比</h2>
+    <p class="lede">三方案按本场景五维度评分（1–5，等权）。硬约束：开发者服务器直查、契合 3h 归档管道、不引入与规模不匹配的重型运维。</p>
+    <table>
+        <tr><th>维度</th><th>A 自研 .md 账本</th><th>B Graphiti</th><th>C mem0</th></tr>
+        <tr><td>场景契合度</td><td class="num best">5</td><td class="num">3</td><td class="num">3</td></tr>
+        <tr><td>基础设施/运维成本</td><td class="num best">5</td><td class="num">2</td><td class="num">2</td></tr>
+        <tr><td>AgentScope+PG 集成难度</td><td class="num best">5</td><td class="num">3</td><td class="num">3</td></tr>
+        <tr><td>可审计性（开发者直查）</td><td class="num best">5</td><td class="num">2</td><td class="num">1</td></tr>
+        <tr><td>规模演进空间</td><td class="num">4</td><td class="num">5</td><td class="num">4</td></tr>
+        <tr class="total"><td>总分</td><td class="num">24 ★</td><td class="num">15</td><td class="num">13</td></tr>
+    </table>
+    <h3>结论</h3>
+    <p><span class="badge rec">推荐</span><b>A 自研 .md 账本为基线</b>：零新增基础设施、cat 文件即审计（满足硬约束）、与既定 3h 摘要归档管道天然一体，规模内检索成本可控。</p>
+    <p><span class="badge evolve">演进</span><b>B Graphiti / C mem0 作为规模演进选项</b>。触发条件（同时满足）：活跃记忆条目 &gt; 5,000 个事项账本或检索 P95 &gt; 2s；且出现明确的跨事项/跨人多跳关系查询需求。复评顺序：先 mem0 自托管 PoC，Graphiti 作为关系推理确需时的候选。</p>
+    <div class="callout warn"><b>否决项说明</b>：mem0 托管版存在 IM 对话内容数据出域问题，合规上基本不可行；Graphiti/mem0 的记忆均黑盒化于图库/向量库，与「开发者服务器直查」硬约束冲突（需另做导出层）。</div>
+</div>
+
+<div class="section" id="pipeline">
+    <h2><span class="no">04</span>写入 · 回顾 · 沉降</h2>
+    <p class="lede">三条核心流程，详见 <code>designs/context-memory-v1/flows.md</code>；数据规范详见 <code>data-model.md</code>。</p>
+    <h3>写入管道（F2，事件驱动归档）</h3>
+    <pre class="diagram">PG last_active_at 扫描 ──▶ 用户 3h 无消息 ──▶ archive_task(幂等, cursor 断点)
+    ──▶ 轻量摘要 agent 拉未归档消息 ──┬──▶ 已识别事项: append {matter_id}.md
+                                    └──▶ 未识别: _misc.md（候选主题, 可升格）</pre>
+    <h3>回顾（F3，混合触发）</h3>
+    <ul class="tight">
+        <li><b>激活注入</b>：话题/事项激活时读 INDEX 定位账本，注入「背景 + 待续事宜」摘要；</li>
+        <li><b>信号检索</b>：对话出现事项名/编号、「上次/之前」等旧事信号时主动检索并标注「据 N 月 N 日记录」；</li>
+        <li><b>任务预载</b>：督办定时任务（通知/催办/每日汇总）执行前自动加载对应事项背景——覆盖 agent 主动发起的会话。</li>
+    </ul>
+    <h3>分层沉降（F4）</h3>
+    <pre class="diagram">L1 活跃账本 ──(事项完结 或 90 天未活跃)──▶ L2 事项摘要卡 ──(1 年未访问)──▶ L3 冷存
+         热                                     温                              按需加载</pre>
+</div>
+
+<div class="section" id="requirements">
+    <h2><span class="no">05</span>需求与验收</h2>
+    <p class="lede">clarify 阶段产物（human_gate 待 PM 确认）。功能需求：<span class="badge p0">P0</span> F-CM01~06、08、09　<span class="badge p1">P1</span> F-CM07、10。</p>
+    <table>
+        <tr><th>#</th><th>验收标准</th></tr>
+        <tr><td>1</td><td>6h 窗口内多轮对话，省略式/指代式输入被正确理解（案例 ≥ 90%）</td></tr>
+        <tr><td>2</td><td>滚动压缩后近期原文、早期摘要，对话无缝继续</td></tr>
+        <tr><td>3</td><td>3h 不活跃后账本按规范生成，摘要准确、结构合规</td></tr>
+        <tr><td>4</td><td>隔日/隔周新会话提及旧事项，能凭账本回顾并正确引用背景、决定与承诺</td></tr>
+        <tr><td>5</td><td>督办定时任务执行前自动预载事项背景</td></tr>
+        <tr><td>6</td><td>完结事项自动沉降为摘要卡，冷存事项可检索加载</td></tr>
+        <tr><td>7</td><td>方案对比含三方案场景化评分表与明确推荐、对接设计</td></tr>
+        <tr><td>8</td><td>开发者服务器直查记忆文件，无需登录额外系统</td></tr>
+    </table>
+</div>
+
+<!-- ============ 研究 ============ -->
+<div class="section" id="research-decisions">
+    <h2><span class="no">06</span>决策记录</h2>
+    <p class="lede">2026-09-08 PM 确认的 12 项决策，来源：<code>interviews/2026-09-08-context-memory/summary.md</code>。</p>
+    <table>
+        <tr><th>#</th><th>决策点</th><th>结论</th></tr>
+        <tr><td>1</td><td>设计范围</td><td>全栈四层：会话管理 / 窗口策略 / 压缩摘要 / 记忆层</td></tr>
+        <tr><td>2</td><td>记忆锚点</td><td>用户 × 督办事项；批次是事项的维度信息，非并列锚点</td></tr>
+        <tr><td>3</td><td>Teable 定位</td><td>业务事实源（skills 查询），不充当记忆存储</td></tr>
+        <tr><td>4</td><td>记忆载体</td><td>agent 自有空间 .md 账本，或外部插件（必须给出场景化对接对比）</td></tr>
+        <tr><td>5</td><td>短周期连续性</td><td>功能性连续；超窗滚动压缩，对话不中断</td></tr>
+        <tr><td>6</td><td>写入管道</td><td>3h 不活跃事件 → 轻量模型摘要 agent → 写入事项 .md</td></tr>
+        <tr><td>7</td><td>回顾触发</td><td>混合触发：激活注入 / 信号检索 / 任务预载</td></tr>
+        <tr><td>8</td><td>长期保留</td><td>分层沉降：活跃账本 → 摘要卡 → 冷存</td></tr>
+        <tr><td>9</td><td>账本可见性</td><td>普通用户黑盒；开发者服务器直查</td></tr>
+        <tr><td>10</td><td>群聊</td><td>本期不做，仅 DM</td></tr>
+        <tr><td>11</td><td>规模</td><td>几十人 / 几百事项</td></tr>
+        <tr><td>12</td><td>路线决策方式</td><td>吃透场景后输出方案对比（评分 + 推荐 + 对接设计）</td></tr>
+    </table>
+</div>
+
+<div class="section" id="research-options">
+    <h2><span class="no">07</span>候选方案调研</h2>
+    <p class="lede">详见 <code>docs/research/memory-options-research.md</code>。三候选的机制、代价与适用信号摘要：</p>
+    <div class="cards">
+        <div class="card"><h4>A 自研 .md 账本</h4><p>工作区文件 + frontmatter 元数据 + 分段规范；零基础设施、可 git 化、cat 即审计。代价：无语义检索与关系推理（规模内靠 INDEX + grep 够用）。</p></div>
+        <div class="card"><h4>B Graphiti <span class="tag">Zep 开源</span></h4><p>时序知识图谱：episode → 实体/关系抽取，语义+时间混合检索，擅长关系演变推理。代价：图库 + 嵌入模型运维，记忆黑盒化需另做导出，规模过剩。</p></div>
+        <div class="card"><h4>C mem0</h4><p>add/search 记忆 API，内置抽取/遗忘策略，接入快。代价：自托管仍需向量库；托管版数据出域不合规；向量库黑盒与「开发者直查」冲突；督办锚点结构需大量定制。</p></div>
+    </div>
+    <div class="callout"><b>洞察</b>：IM 场生命周期意味着「会话结束」由用户不活跃界定——归档触发器以不活跃事件为准（与写入管道一致）；账本可见性诉求天然排斥托管黑盒记忆服务，这是硬约束而非权衡项；督办场景存在 agent 主动发起的第三类上下文，回顾触发必须覆盖主动会话。</div>
+</div>
+
+<div class="section" id="research-correction">
+    <h2><span class="no">08</span>底座事实纠正</h2>
+    <p class="lede">详见 <code>docs/research/agent-framework-correction.md</code>。issue-17 调研文档（2026-08-24）记载底座为 OpenClaw；PM 于 2026-09-08 确认为 <b>AgentScope 自研 + PostgreSQL 会话持久化</b>。本工作包全部设计以 AgentScope + PG 为基线；issue-17 旧文档不回改。两层正交：话题管理管「对话在哪发生」，本方案管「对话沉淀到哪、如何被回忆」。</p>
+</div>
+
+<!-- ============ 产物 ============ -->
+<div class="section" id="artifacts">
+    <h2><span class="no">09</span>文档索引</h2>
+    <p class="lede">工作包：context-memory（分支 issue-17 · 工作流 interview-to-knowledge）</p>
+    <div class="artifact-list">
+        <a href="interviews/2026-09-08-context-memory/summary.md"><span>讨论纪要与 12 项决策</span><span class="path">interviews/2026-09-08-context-memory/summary.md</span></a>
+        <a href="interviews/2026-09-08-context-memory/raw-insights.md"><span>原始洞察（PM 原话）</span><span class="path">interviews/2026-09-08-context-memory/raw-insights.md</span></a>
+        <a href="requirements/2026-09-08-context-memory/requirements.md"><span>需求文档（8 条验收）</span><span class="path">requirements/2026-09-08-context-memory/requirements.md</span></a>
+        <a href="requirements/2026-09-08-context-memory/user-stories.md"><span>用户故事（6 则）</span><span class="path">requirements/2026-09-08-context-memory/user-stories.md</span></a>
+        <a href="requirements/2026-09-08-context-memory/prd.md"><span>PRD（F-CM01~10）</span><span class="path">requirements/2026-09-08-context-memory/prd.md</span></a>
+        <a href="designs/context-memory-v1/memory-options-comparison.md"><span>方案对比（评分表 + 推荐 + 演进条件）</span><span class="path">designs/context-memory-v1/memory-options-comparison.md</span></a>
+        <a href="designs/context-memory-v1/architecture.md"><span>四层架构设计</span><span class="path">designs/context-memory-v1/architecture.md</span></a>
+        <a href="designs/context-memory-v1/data-model.md"><span>数据模型（目录/frontmatter/分段规范）</span><span class="path">designs/context-memory-v1/data-model.md</span></a>
+        <a href="designs/context-memory-v1/flows.md"><span>流程设计（压缩/归档/回顾/沉降）</span><span class="path">designs/context-memory-v1/flows.md</span></a>
+        <a href="docs/research/memory-options-research.md"><span>候选方案调研笔记</span><span class="path">docs/research/memory-options-research.md</span></a>
+        <a href="docs/research/agent-framework-correction.md"><span>底座事实纠正决策记录</span><span class="path">docs/research/agent-framework-correction.md</span></a>
+        <a href="workflow-stage.yaml"><span>工作包状态（Lincoln）</span><span class="path">workflow-stage.yaml</span></a>
+    </div>
+</div>
+
+</main>
+</div>
+
+<script>
+(function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('.sidenav a.navlink'));
+    var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    function onScroll() {
+        var pos = window.scrollY + 80, current = 0;
+        sections.forEach(function (sec, i) { if (sec && sec.offsetTop <= pos) current = i; });
+        links.forEach(function (a, i) { a.classList.toggle('active', i === current); });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+})();
+</script>
+</body>
+</html>

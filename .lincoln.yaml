@@ -1,0 +1,3 @@
+enabled: true
+workflow_template: interview-to-knowledge
+min_lincoln_version: 1.8.4

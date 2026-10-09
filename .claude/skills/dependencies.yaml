@@ -1,0 +1,139 @@
+---
+schema_version: 1.0.0
+description: |
+  Declares external skills and CLIs required by the Lincoln workflow.
+  Run `scripts/check-skill-dependencies.sh` to verify the local environment.
+
+# Pin policy (#62): external skills/plugins are pinned to a known-good upstream
+# ref (full SHA), never a floating branch — an upstream commit must not silently
+# change every Lincoln user's session behavior. (#39 note: pins avoid the stale
+# fixed-version problem by making every upgrade explicit and reviewable.)
+# Upgrade flow: 1) pick the new upstream ref; 2) update `ref` (and `pinned_at`);
+# 3) run the benchmark to confirm no behavior regression; 4) merge.
+# Check upstream drift vs pins: `python3 scripts/check-dependency-drift.py`.
+
+skills:
+  superpowers:
+    source: https://github.com/obra/superpowers.git
+    ref: 6fd4507659784c351abbd2bc264c7162cfd386dc
+    pinned_from: main
+    pinned_at: 2026-07-15
+    type: skill
+    required: true
+    license: MIT
+    required_skills:
+      - superpowers:brainstorming
+      - superpowers:writing-plans
+      - superpowers:test-driven-development
+      - superpowers:subagent-driven-development
+      - superpowers:verification-before-completion
+      - superpowers:dispatching-parallel-agents
+      - superpowers:using-git-worktrees
+      - superpowers:systematic-debugging
+      - superpowers:finishing-a-development-branch
+      - superpowers:requesting-code-review
+      - superpowers:receiving-code-review
+      - superpowers:writing-skills
+
+  gsd:
+    source: https://github.com/gsd-build/get-shit-done.git
+    ref: bdcaab2c752d9a33a1a1ca9acf3a3c81fb991815
+    pinned_from: main
+    pinned_at: 2026-07-15
+    type: skill
+    required: true
+    license: MIT
+    required_skills:
+      - gsd-import
+      - gsd-docs-update
+      - gsd-forensics
+      - gsd-ns-review
+      - gsd-code-review
+      - gsd-debug
+      - gsd-eval-review
+      - gsd-ingest-docs
+
+  openspec:
+    source: https://github.com/Fission-AI/openspec.git
+    ref: v0.5.0
+    type: cli
+    binary: openspec
+    required: true
+    platforms:
+      macos: npm install -g @fission-ai/openspec
+      linux: npm install -g @fission-ai/openspec
+    install_note: Requires Node.js >= 20.
+
+  gh:
+    source: https://cli.github.com/
+    type: cli
+    binary: gh
+    required: true
+    platforms:
+      macos: brew install gh
+      linux: sudo apt-get install gh
+    install_note: After install, run 'gh auth login'.
+
+  ffmpeg:
+    source: https://ffmpeg.org/
+    type: cli
+    binary: ffmpeg
+    required: false
+    platforms:
+      macos: brew install ffmpeg
+      linux: sudo apt-get install ffmpeg
+    install_note: Optional. Only needed for audio/video processing during interview ingestion (recording transcription).
+
+  faster-whisper:
+    source: https://github.com/SYSTRAN/faster-whisper.git
+    type: cli
+    binary: faster-whisper
+    required: false
+    platforms:
+      macos: pip install faster-whisper
+      linux: pip install faster-whisper
+    install_note: |
+      Optional. Only needed for interview recording transcription.
+      Recommended local Whisper implementation.
+      Alternatives: openai-whisper (`pip install openai-whisper`) or OpenAI API.
+
+  lc-explore-opensource:
+    source: inline
+    type: skill
+    path: .claude/skills/lc-explore-opensource
+
+  lc-build-codebase-knowledge:
+    source: inline
+    type: skill
+    path: .claude/skills/lc-build-codebase-knowledge
+
+  lc-workflow-router:
+    source: inline
+    type: skill
+    path: .claude/skills/lc-workflow-router
+
+  # oh-my-claudecode — optional multi-agent orchestration layer, installed by default
+  oh-my-claudecode:
+    source: https://github.com/Yeachan-Heo/oh-my-claudecode.git
+    ref: 590fb988931d34a12604be0ca4215c818079018e
+    pinned_from: main
+    pinned_at: 2026-07-15
+    type: plugin
+    required: false
+    default_install: true
+    license: MIT
+    platforms:
+      macos: git clone https://github.com/Yeachan-Heo/oh-my-claudecode.git ~/.claude/skills/oh-my-claudecode && git -C ~/.claude/skills/oh-my-claudecode checkout 590fb988931d34a12604be0ca4215c818079018e
+      linux: git clone https://github.com/Yeachan-Heo/oh-my-claudecode.git ~/.claude/skills/oh-my-claudecode && git -C ~/.claude/skills/oh-my-claudecode checkout 590fb988931d34a12604be0ca4215c818079018e
+    install_note: Optional but recommended. Installed as a skill under ~/.claude/skills/.
+    recommended_skills:
+      - oh-my-claudecode:plan
+      - oh-my-claudecode:team
+      - oh-my-claudecode:verify
+      - oh-my-claudecode:autopilot
+      - oh-my-claudecode:ralph
+      - oh-my-claudecode:ultrawork
+      - oh-my-claudecode:deep-interview
+      - oh-my-claudecode:ai-slop-cleaner
+      - oh-my-claudecode:wiki
+      - oh-my-claudecode:writer-memory

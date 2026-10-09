@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>龙小督 × Mattermost 表单填报原型</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #1f1f24;
+      color: #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .mm-header {
+      background: #25252b;
+      padding: 14px 20px;
+      border-bottom: 1px solid #36363d;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mm-header-icon { font-size: 18px; }
+    .mm-header-title { font-weight: 600; font-size: 16px; }
+    .mm-header-sub { color: #999; font-size: 12px; margin-left: auto; }
+    .mm-chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 720px;
+    }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .avatar.bot { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .avatar.user { background: #2d8a4e; }
+    .message-body { display: flex; flex-direction: column; gap: 4px; }
+    .message-meta { display: flex; align-items: baseline; gap: 8px; }
+    .message-author { font-weight: 600; font-size: 14px; color: #fff; }
+    .message-time { font-size: 11px; color: #888; }
+    .message-bubble {
+      background: #2c2c33;
+      border: 1px solid #3a3a42;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e0e0e0;
+    }
+    .message-bubble p { margin: 0 0 10px; }
+    .message-bubble p:last-child { margin-bottom: 0; }
+    iframe.form-iframe {
+      width: 100%;
+      height: 420px;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+      margin-top: 8px;
+    }
+    .mm-input-bar {
+      background: #25252b;
+      border-top: 1px solid #36363d;
+      padding: 14px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .mm-input {
+      flex: 1;
+      background: #1f1f24;
+      border: 1px solid #3a3a42;
+      border-radius: 20px;
+      padding: 10px 16px;
+      color: #e0e0e0;
+      outline: none;
+    }
+    .mm-send-btn {
+      background: #1c58d9;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="mm-header">
+    <span class="mm-header-icon">#</span>
+    <span class="mm-header-title">督办填报</span>
+    <span class="mm-header-sub">龙小督 · Mattermost 表单填报原型</span>
+  </div>
+
+  <div class="mm-chat" id="chat">
+    <!-- 龙小督消息 -->
+    <div class="message">
+      <div class="avatar bot">龙</div>
+      <div class="message-body">
+        <div class="message-meta">
+          <span class="message-author">龙小督</span>
+          <span class="message-time">今天 10:30</span>
+        </div>
+        <div class="message-bubble">
+          <p>张三，你好！你当前有 <strong>3 条</strong> 待填报督办项，请直接在下方表单中完成填报。</p>
+          <p>提交时会使用你的身份令牌，确保操作痕迹归属正确。</p>
+          <iframe class="form-iframe" id="formIframe" srcdoc=""></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mm-input-bar">
+    <input class="mm-input" type="text" placeholder="给 龙小督 发送消息..." />
+    <button class="mm-send-btn">发送</button>
+  </div>
+
+  <script>
+    var iframeHtml = [
+      '<!DOCTYPE html>',
+      '<html lang="zh-CN">',
+      '<head>',
+      '  <meta charset="UTF-8">',
+      '  <style>',
+      '    * { box-sizing: border-box; }',
+      '    body {',
+      '      margin: 0;',
+      '      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;',
+      '      background: #f8f9fa;',
+      '      color: #1f1f24;',
+      '      padding: 16px;',
+      '    }',
+      '    .form-card {',
+      '      background: #fff;',
+      '      border: 1px solid #e0e0e0;',
+      '      border-radius: 8px;',
+      '      box-shadow: 0 1px 3px rgba(0,0,0,0.05);',
+      '      overflow: hidden;',
+      '    }',
+      '    .form-header {',
+      '      background: #f4f4f7;',
+      '      padding: 12px 16px;',
+      '      border-bottom: 1px solid #e0e0e0;',
+      '      display: flex;',
+      '      justify-content: space-between;',
+      '      align-items: center;',
+      '    }',
+      '    .form-title { font-weight: 600; font-size: 15px; }',
+      '    .form-progress { font-size: 13px; color: #666; }',
+      '    .form-body { padding: 16px; }',
+      '    .field { margin-bottom: 14px; }',
+      '    .field label {',
+      '      display: block;',
+      '      font-size: 13px;',
+      '      font-weight: 500;',
+      '      margin-bottom: 5px;',
+      '      color: #444;',
+      '    }',
+      '    .field input[type="text"],',
+      '    .field input[type="number"],',
+      '    .field input[type="date"],',
+      '    .field textarea,',
+      '    .field select {',
+      '      width: 100%;',
+      '      padding: 8px 10px;',
+      '      border: 1px solid #d0d0d5;',
+      '      border-radius: 5px;',
+      '      font-size: 14px;',
+      '      font-family: inherit;',
+      '    }',
+      '    .field input[readonly], .field textarea[readonly] {',
+      '      background: #f4f4f7;',
+      '      color: #666;',
+      '    }',
+      '    .field textarea { resize: vertical; min-height: 72px; }',
+      '    .field .error { color: #d32f2f; font-size: 12px; margin-top: 4px; display: none; }',
+      '    .field.invalid input, .field.invalid textarea { border-color: #d32f2f; }',
+      '    .field.invalid .error { display: block; }',
+      '    .token-box {',
+      '      background: #f4f4f7;',
+      '      border: 1px dashed #c0c0c5;',
+      '      border-radius: 5px;',
+      '      padding: 8px 10px;',
+      '      font-size: 12px;',
+      '      color: #555;',
+      '      word-break: break-all;',
+      '      margin-bottom: 14px;',
+      '    }',
+      '    .form-footer {',
+      '      display: flex;',
+      '      justify-content: space-between;',
+      '      align-items: center;',
+      '      gap: 10px;',
+      '      padding: 12px 16px;',
+      '      border-top: 1px solid #e0e0e0;',
+      '      background: #fafafa;',
+      '    }',
+      '    .nav-btns { display: flex; gap: 8px; }',
+      '    button {',
+      '      border: 1px solid #c0c0c5;',
+      '      background: #fff;',
+      '      padding: 7px 14px;',
+      '      border-radius: 5px;',
+      '      font-size: 13px;',
+      '      cursor: pointer;',
+      '      font-weight: 500;',
+      '    }',
+      '    button:disabled { opacity: 0.5; cursor: not-allowed; }',
+      '    .btn-primary { background: #1c58d9; color: #fff; border-color: #1c58d9; }',
+      '    .summary {',
+      '      padding: 24px 16px;',
+      '      text-align: center;',
+      '      display: none;',
+      '    }',
+      '    .summary h3 { margin: 0 0 10px; color: #2d8a4e; }',
+      '    .summary p { margin: 0; color: #555; font-size: 14px; }',
+      '    .api-log {',
+      '      background: #1e1e24;',
+      '      color: #c7c7d0;',
+      '      font-family: "Fira Mono", monospace;',
+      '      font-size: 12px;',
+      '      padding: 10px;',
+      '      border-radius: 5px;',
+      '      white-space: pre-wrap;',
+      '      word-break: break-all;',
+      '      margin-top: 12px;',
+      '      display: none;',
+      '    }',
+      '  </style>',
+      '</head>',
+      '<body>',
+      '  <div class="form-card" id="formCard">',
+      '    <div class="form-header">',
+      '      <span class="form-title">督办填报</span>',
+      '      <span class="form-progress" id="progressText">第 1/3 条</span>',
+      '    </div>',
+      '    <div class="form-body" id="formBody">',
+      '      <div class="token-box">',
+      '        <strong>用户身份令牌（模拟）：</strong><br>',
+      '        Authorization: Bearer teable_pat_user_xxx',
+      '      </div>',
+      '      <div class="field">',
+      '        <label>事项名称</label>',
+      '        <input type="text" id="title" readonly>',
+      '      </div>',
+      '      <div class="field">',
+      '        <label>截止日期</label>',
+      '        <input type="date" id="deadline" readonly>',
+      '      </div>',
+      '      <div class="field">',
+      '        <label>当前状态</label>',
+      '        <input type="text" id="status" readonly>',
+      '      </div>',
+      '      <div class="field" id="progressField">',
+      '        <label>进度百分比（%）</label>',
+      '        <input type="number" id="progress" min="0" max="100" placeholder="0-100">',
+      '        <span class="error">请填写 0-100 的整数</span>',
+      '      </div>',
+      '      <div class="field" id="contentField">',
+      '        <label>填报内容</label>',
+      '        <textarea id="content" placeholder="请填写本次进展..."></textarea>',
+      '        <span class="error">请填写至少 5 个字符</span>',
+      '      </div>',
+      '      <div class="api-log" id="apiLog"></div>',
+      '    </div>',
+      '    <div class="form-footer" id="formFooter">',
+      '      <div class="nav-btns">',
+      '        <button id="prevBtn" onclick="goPrev()">上一条</button>',
+      '        <button id="nextBtn" onclick="goNext()">下一条</button>',
+      '      </div>',
+      '      <button class="btn-primary" id="submitBtn" onclick="submitCurrent()">提交</button>',
+      '    </div>',
+      '  </div>',
+      '  <div class="summary" id="summary">',
+      '    <h3>✅ 全部填报完成</h3>',
+      '    <p>3 条督办项已成功提交，操作痕迹已归属到你的账户。</p>',
+      '  </div>',
+      '  <script>',
+      '    var items = [',
+      '      { recordId: "rec-2026-001", title: "完成 Q3 销售目标拆解", deadline: "2026-09-15", status: "进行中", progress: 30, content: "" },',
+      '      { recordId: "rec-2026-002", title: "提交上半年合规自查报告", deadline: "2026-09-10", status: "未开始", progress: 0, content: "" },',
+      '      { recordId: "rec-2026-003", title: "更新客户满意度调研问卷", deadline: "2026-09-20", status: "进行中", progress: 60, content: "" }',
+      '    ];',
+      '    var userToken = "teable_pat_user_xxx";',
+      '    var userId = "mm-user-10086";',
+      '    var currentIndex = 0;',
+      '    var submittedCount = 0;',
+      '    var submittedIds = {};',
+      '    function setText(id, value) { document.getElementById(id).value = value || ""; }',
+      '    function render() {',
+      '      var item = items[currentIndex];',
+      '      document.getElementById("progressText").textContent = "第 " + (currentIndex + 1) + "/" + items.length + " 条";',
+      '      setText("title", item.title);',
+      '      setText("deadline", item.deadline);',
+      '      setText("status", item.status);',
+      '      setText("progress", item.progress || "");',
+      '      setText("content", item.content || "");',
+      '      document.getElementById("prevBtn").disabled = currentIndex === 0;',
+      '      document.getElementById("nextBtn").disabled = currentIndex === items.length - 1;',
+      '      var isSubmitted = submittedIds[item.recordId];',
+      '      var btn = document.getElementById("submitBtn");',
+      '      btn.disabled = isSubmitted;',
+      '      btn.textContent = isSubmitted ? "已提交" : "提交";',
+      '      document.getElementById("progressField").classList.remove("invalid");',
+      '      document.getElementById("contentField").classList.remove("invalid");',
+      '      document.getElementById("apiLog").style.display = "none";',
+      '    }',
+      '    function saveDraft() {',
+      '      var item = items[currentIndex];',
+      '      item.progress = document.getElementById("progress").value;',
+      '      item.content = document.getElementById("content").value;',
+      '    }',
+      '    function goPrev() { if (currentIndex > 0) { saveDraft(); currentIndex--; render(); } }',
+      '    function goNext() { if (currentIndex < items.length - 1) { saveDraft(); currentIndex++; render(); } }',
+      '    function validate() {',
+      '      var valid = true;',
+      '      var progress = document.getElementById("progress").value;',
+      '      var content = document.getElementById("content").value;',
+      '      var pNum = parseInt(progress, 10);',
+      '      if (progress === "" || isNaN(pNum) || pNum < 0 || pNum > 100) {',
+      '        document.getElementById("progressField").classList.add("invalid");',
+      '        valid = false;',
+      '      } else {',
+      '        document.getElementById("progressField").classList.remove("invalid");',
+      '      }',
+      '      if (!content || content.trim().length < 5) {',
+      '        document.getElementById("contentField").classList.add("invalid");',
+      '        valid = false;',
+      '      } else {',
+      '        document.getElementById("contentField").classList.remove("invalid");',
+      '      }',
+      '      return valid;',
+      '    }',
+      '    function submitCurrent() {',
+      '      if (!validate()) return;',
+      '      saveDraft();',
+      '      var item = items[currentIndex];',
+      '      submittedIds[item.recordId] = true;',
+      '      submittedCount++;',
+      '      var payload = {',
+      '        recordId: item.recordId,',
+      '        userId: userId,',
+      '        token: "Bearer " + userToken,',
+      '        data: {',
+      '          progress: parseInt(item.progress, 10),',
+      '          content: item.content.trim(),',
+      '          status: item.status,',
+      '          filledAt: new Date().toISOString()',
+      '        }',
+      '      };',
+      '      var logEl = document.getElementById("apiLog");',
+      '      logEl.textContent = "[模拟请求] POST /api/table/{tableId}/record\\n" +',
+      '        "Authorization: " + payload.token + "\\n\\n" +',
+      '        JSON.stringify(payload, null, 2);',
+      '      logEl.style.display = "block";',
+      '      var btn = document.getElementById("submitBtn");',
+      '      btn.disabled = true;',
+      '      btn.textContent = "已提交";',
+      '      if (submittedCount === items.length) {',
+      '        setTimeout(function() {',
+      '          document.getElementById("formCard").style.display = "none";',
+      '          document.getElementById("summary").style.display = "block";',
+      '          if (window.parent && window.parent !== window) {',
+      '            window.parent.postMessage({ type: "SUPERVISION_FORM_COMPLETE", count: items.length }, "*");',
+      '          }',
+      '        }, 800);',
+      '      }',
+      '    }',
+      '    render();',
+      '  </script>',
+      '</body>',
+      '</html>'
+    ].join('\n');
+
+    document.getElementById("formIframe").srcdoc = iframeHtml;
+
+    window.addEventListener("message", function(event) {
+      if (event.data && event.data.type === "SUPERVISION_FORM_COMPLETE") {
+        var chat = document.getElementById("chat");
+        var confirmMsg = document.createElement("div");
+        confirmMsg.className = "message";
+        confirmMsg.innerHTML =
+          '<div class="avatar bot">龙</div>' +
+          '<div class="message-body">' +
+          '  <div class="message-meta">' +
+          '    <span class="message-author">龙小督</span>' +
+          '    <span class="message-time">刚刚</span>' +
+          '  </div>' +
+          '  <div class="message-bubble">' +
+          '    <p>✅ 已收到你的填报，共 <strong>' + event.data.count + ' 条</strong> 督办项。操作痕迹已归属到你的账户，感谢！</p>' +
+          '  </div>' +
+          '</div>';
+        chat.appendChild(confirmMsg);
+        chat.scrollTop = chat.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>

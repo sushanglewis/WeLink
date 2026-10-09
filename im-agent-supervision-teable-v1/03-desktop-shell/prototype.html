@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="桌面壳改造 · 四态布局原型">
+<meta name="nav-group" content="03-desktop-shell">
+<meta name="doc-version" content="v1.0-final">
+<title>桌面壳改造 · 四态布局原型</title>
+<link rel="stylesheet" href="../assets/eaic/tokens.css">
+<style>
+/* 四态线框：自包含内联样式；面板统一用品牌绿浅底突出 */
+*{box-sizing:border-box}
+body{margin:0;padding:28px 32px 40px;background:var(--bg,#F2F4F6);color:var(--text,#171918);
+    font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",ui-sans-serif,sans-serif;font-size:14px}
+.wf-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px}
+.wf-head h1{margin:0;font-size:20px;font-weight:700}
+.wf-head .wf-sub{font-size:12px;color:var(--text-3,#9CA3AF);text-align:right;line-height:1.6}
+.wf-grid{display:grid;grid-template-columns:repeat(2,minmax(480px,1fr));gap:24px}
+@media (max-width:1080px){.wf-grid{grid-template-columns:1fr}}
+.wf-card{background:var(--surface,#fff);border:1px solid var(--border,#E5E8EB);border-radius:12px;padding:18px 20px 16px}
+.wf-card h2{margin:0 0 4px;font-size:15px;font-weight:700}
+.wf-card .wf-trigger{margin:0 0 14px;font-size:12px;color:var(--text-2,#6B7280);line-height:1.6}
+/* 窗口线框：输入窗口仅横跨主区（聊天记录+插件面板），不覆盖功能菜单与对话列表 */
+.wf-win{display:flex;height:220px;border:1.5px solid #B9C4CE;border-radius:8px;overflow:hidden;background:#fff}
+.wf-side{display:flex;flex-shrink:0}
+.wf-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.wf-body{flex:1;display:flex;min-height:0}
+.wf-foot{flex-shrink:0}
+.wf-bar{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    font-size:11px;color:#5B6B7C;text-align:center;padding:8px 4px;line-height:1.5}
+.wf-ibar{width:56px;flex-shrink:0;background:#DDE5EC;border-right:1px solid #B9C4CE}
+.wf-ibar .wf-ico{width:22px;height:22px;border-radius:6px;background:#B9C4CE;flex-shrink:0}
+.wf-clist{width:240px;flex-shrink:0;background:#F0F3F6;border-right:1px solid #B9C4CE}
+.wf-chat{flex:1;background:#fff;min-width:0}
+.wf-panel{flex-shrink:0;background:var(--brand-light,#E8F7F0);border-left:1.5px solid var(--brand,#00AE68);color:var(--brand-dark,#008D55);font-weight:600}
+.wf-strip{width:26px;flex-shrink:0;background:var(--brand-light,#E8F7F0);border-left:1.5px solid var(--brand,#00AE68);
+    cursor:pointer;font-weight:600}
+.wf-strip .wf-strip-arrow{writing-mode:vertical-lr;font-size:12px;color:var(--brand-dark,#008D55);letter-spacing:2px}
+.wf-input{height:44px;display:flex;align-items:center;justify-content:center;background:#F7F9FA;border-top:1px solid #B9C4CE;
+    font-size:11px;color:#5B6B7C}
+.wf-input.green{background:#EDF9F3;border-top-color:var(--brand,#00AE68);color:var(--brand-dark,#008D55);font-weight:600}
+.wf-note{margin:12px 0 0;font-size:12px;color:var(--text-2,#6B7280);line-height:1.7;border-top:1px dashed var(--border,#E5E8EB);padding-top:10px}
+.wf-note b{color:var(--text,#171918)}
+.wf-legend{display:flex;gap:18px;margin-top:20px;font-size:12px;color:var(--text-2,#6B7280);flex-wrap:wrap}
+.wf-legend .lg{display:flex;align-items:center;gap:6px}
+.wf-legend .sw{width:14px;height:14px;border-radius:4px;border:1px solid #B9C4CE}
+.wf-legend .sw.green{background:var(--brand-light,#E8F7F0);border-color:var(--brand,#00AE68)}
+</style>
+</head>
+<body>
+<div class="wf-head">
+    <h1>桌面壳改造 · 四态布局原型</h1>
+    <div class="wf-sub">来源：对齐 2026-09 桌面壳示意 PDF<br>输入窗口仅横跨主区（聊天记录+插件面板）<br>不覆盖功能菜单与对话列表</div>
+</div>
+
+<div class="wf-grid">
+
+    <!-- ① 插件面板展开（默认） -->
+    <div class="wf-card">
+        <h2>① 插件面板展开（默认）</h2>
+        <p class="wf-trigger">触发：打开龙小督会话或点击聊天区内插件入口。插件面板默认展开，可拖拽左边缘调整宽度，最宽可覆盖整个聊天区。</p>
+        <div class="wf-win">
+            <div class="wf-side">
+                <div class="wf-bar wf-ibar"><div class="wf-ico"></div><div class="wf-ico"></div><div class="wf-ico"></div><div class="wf-ico"></div><span>功能菜单<br>56px</span></div>
+                <div class="wf-bar wf-clist"><span>对话列表<br>约240px</span></div>
+            </div>
+            <div class="wf-main">
+                <div class="wf-body">
+                <div class="wf-bar wf-chat"><span>聊天记录</span></div>
+                <div class="wf-bar wf-panel" style="flex:0 1 480px;min-width:200px"><span>插件面板<br>约480px<br>（可拖拽）</span></div>
+                </div>
+                <div class="wf-foot wf-input">输入窗口（仅横跨 聊天记录+插件面板）</div>
+            </div>
+        </div>
+        <p class="wf-note"><b>态①：</b>底部输入窗口仅横跨主区（聊天记录+插件面板），不覆盖左侧功能菜单与对话列表；发送内容对两侧上下文同时生效。</p>
+    </div>
+
+    <!-- ② 插件面板收起 -->
+    <div class="wf-card">
+        <h2>② 插件面板收起</h2>
+        <p class="wf-trigger">触发：点击插件面板右上角收起按钮，或拖拽面板右边缘至最窄。聊天记录自动占满主区。</p>
+        <div class="wf-win">
+            <div class="wf-side">
+                <div class="wf-bar wf-ibar"><div class="wf-ico"></div><div class="wf-ico"></div><div class="wf-ico"></div><div class="wf-ico"></div><span>功能菜单<br>56px</span></div>
+                <div class="wf-bar wf-clist"><span>对话列表<br>约240px</span></div>
+            </div>
+            <div class="wf-main">
+                <div class="wf-body">
+                <div class="wf-bar wf-chat"><span>聊天记录（占满主区）</span></div>
+                <div class="wf-bar wf-strip" title="点击展开插件面板"><span class="wf-strip-arrow">︿ 展开</span></div>
+                </div>
+                <div class="wf-foot wf-input">输入窗口（仅横跨主区，不含菜单与列表）</div>
+            </div>
+        </div>
+        <p class="wf-note"><b>态②：</b>插件面板收为 26px 分隔窄条，窄条即展开按钮，点击即可还原态①；输入窗口仍仅覆盖主区。</p>
+    </div>
+
+    <!-- ③ 插件面板全幅 -->
+    <div class="wf-card">
+        <h2>③ 插件面板全幅</h2>
+        <p class="wf-trigger">触发：在态①基础上继续拖拽面板左边缘至覆盖聊天区，或点击「全幅填报」。进入专注填报模式。</p>
+        <div class="wf-win">
+            <div class="wf-side">
+                <div class="wf-bar wf-ibar"><div class="wf-ico"></div><div class="wf-ico"></div><div class="wf-ico"></div><div class="wf-ico"></div><span>功能菜单<br>56px</span></div>
+                <div class="wf-bar wf-clist"><span>对话列表<br>约240px</span></div>
+            </div>
+            <div class="wf-main">
+                <div class="wf-body">
+                <div class="wf-bar wf-panel" style="flex:1"><span>插件面板（占满主区 · 全宽专注填报）</span></div>
+                </div>
+                <div class="wf-foot wf-input green">输入窗口（随插件面板全宽 · 仅主区）</div>
+            </div>
+        </div>
+        <p class="wf-note"><b>态③：</b>插件面板占满主区，适合表单字段较多的填报场景；输入窗口随之全宽但仍不覆盖左侧菜单与列表。</p>
+    </div>
+
+    <!-- ④ 无对话列表 -->
+    <div class="wf-card">
+        <h2>④ 无对话列表</h2>
+        <p class="wf-trigger">触发：从态①收起对话列表（或窄屏自适应），聊天记录与插件面板并排占满主区。</p>
+        <div class="wf-win">
+            <div class="wf-side">
+                <div class="wf-bar wf-ibar"><div class="wf-ico"></div><div class="wf-ico"></div><div class="wf-ico"></div><div class="wf-ico"></div><span>功能菜单<br>56px</span></div>
+            </div>
+            <div class="wf-main">
+                <div class="wf-body">
+                <div class="wf-bar wf-chat"><span>聊天记录</span></div>
+                <div class="wf-bar wf-panel" style="width:44%"><span>插件面板</span></div>
+                </div>
+                <div class="wf-foot wf-input">输入窗口（仅横跨 聊天+插件）</div>
+            </div>
+        </div>
+        <p class="wf-note"><b>态④：</b>聊天列表收起后不丢未读提醒，未读与待办徽标仍在龙小督会话行上保留；输入窗口仅横跨主区两栏。</p>
+    </div>
+
+</div>
+
+<div class="wf-legend">
+    <div class="lg"><span class="sw"></span>蓝灰中性区（菜单 / 列表 / 聊天）</div>
+    <div class="lg"><span class="sw green"></span>品牌绿浅底 = 插件面板区（#00AE68 体系）</div>
+</div>
+
+</body>
+</html>

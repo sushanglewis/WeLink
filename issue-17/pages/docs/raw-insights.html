@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="原始洞察">
+<meta name="nav-group" content="访谈记录">
+<meta name="doc-version" content="v1.0">
+<meta name="doc-uid" content="raw-insights">
+<title>原始洞察</title>
+<!-- Asset paths assume this page lives at pages/docs/*.html (depth 2). Adjust if placed elsewhere. -->
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="raw-insights">
+
+<header class="doc-header">
+    <h1 data-uid="raw-insights-h1">原始洞察</h1>
+    <div class="doc-meta">
+        <span class="doc-version">v1.0</span>
+        <span class="doc-stage">阶段: ingest</span>
+    </div>
+</header>
+
+<div class="doc-content" id="docContent">
+    <!-- Markdown will be rendered here from #docSource -->
+</div>
+
+<script type="text/markdown" id="docSource">
+<!-- version: v1.0 -->
+
+# 原始洞察: 2026-08-24-issue-17
+
+## 洞察一：话题机制是聊天上下文的显式化管理
+
+- 来源时间戳: 00:00:10 - 00:00:45
+- 内容: 当前 IM 对话窗口缺乏类似 AI 工作台的「多会话」管理能力。引入「话题」后，每个话题拥有独立窗口与历史，人/ agent 均可创建新话题或基于历史继续讨论。
+- 关联需求: FR-TOPIC-01 ~ FR-TOPIC-06
+
+## 洞察二：Clarify 与 Plan 模式是 Codex 式的人机协作协议
+
+- 来源时间戳: 00:00:55 - 00:02:00
+- 内容: Clarify 通过底部弹窗将模糊需求拆分为多选题（3 推荐 + 1 自定义），提交后转为 user message；Plan 模式用 Plan.md 描述任务前因后果与执行计划，支持审批、修改、再审批的迭代闭环。
+- 关联需求: FR-CLARIFY-01 ~ FR-CLARIFY-05, FR-PLAN-01 ~ FR-PLAN-05
+
+## 洞察三：Teable 集成需要「胶囊」作为消息原子与 agent 操作句柄
+
+- 来源时间戳: 00:02:05 - 00:02:40
+- 内容: 用户在输入框通过「+」菜单选择 teable 表格，消息中插入携带关键技术信息的胶囊；agent 可基于胶囊信息调用 teable skills 读写表格数据。
+- 关联需求: FR-TEABLE-01 ~ FR-TEABLE-04
+
+## 洞察四：表单视图 iframe 嵌入是聊天中轻量数据录入的关键交互
+
+- 来源时间戳: 00:02:45 - 00:03:00
+- 内容: 将 teable 单条数据的表单视图以 iframe 形式发送给用户，用户无需离开聊天窗口即可填报并提交，保持表单原样式。
+- 关联需求: FR-FORM-01 ~ FR-FORM-04
+
+## 洞察五：AI 日程需要同时满足「传统日历 UX」与「agent 可编程」
+
+- 来源时间戳: 00:03:05 - 00:03:45
+- 内容: 日程功能需提供个人看板、CLI/skills/token，支持 agent 从对话中提取待办并创建事件、邀请成员。开源协议限定 MIT/APL/AGPL。
+- 关联需求: FR-SCHEDULE-01 ~ FR-SCHEDULE-06
+
+## 洞察六：License 是日程选型的硬约束
+
+- 来源时间戳: 00:03:40
+- 内容: 明确要求 MIT / APL / AGPL，排除 GPL 家族（Radicale、Baikal、DAViCal、SOGo 等）。AGPL 方案（Nextcloud、Stalwart、Cal.com）需评估商业/私有部署合规成本。
+- 关联需求: NFR-LICENSE-01
+
+</script>
+
+<script src="../../assets/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var THEME_KEY = 'lincoln-theme';
+
+    function getQueryTheme() {
+        var m = window.location.search.match(/[?&]theme=(light|dark)(?:&|$)/);
+        return m ? m[1] : null;
+    }
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(THEME_KEY);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function setStoredTheme(theme) {
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') return;
+        document.documentElement.setAttribute('data-theme', theme);
+        setStoredTheme(theme);
+    }
+
+    function initTheme() {
+        var theme = getQueryTheme() || getStoredTheme() || 'light';
+        applyTheme(theme);
+
+        window.addEventListener('message', function (e) {
+            var data = e.data || {};
+            if (data.type === 'lincoln-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+                applyTheme(data.theme);
+            }
+        });
+
+        window.addEventListener('load', function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'lincoln-theme-ready' }, '*');
+            }
+        });
+    }
+
+    function renderMarkdown(src) {
+        var lines = src.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        var html = '';
+        var inCode = false;
+        var codeLang = '';
+        var codeBuffer = [];
+        var inTable = false;
+        var tableBuffer = [];
+
+        function flushCode() {
+            if (!inCode) return;
+            html += '<pre><code class="language-' + (codeLang || 'text') + '">' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>\n';
+            inCode = false;
+            codeLang = '';
+            codeBuffer = [];
+        }
+
+        function flushTable() {
+            if (!inTable || tableBuffer.length < 2) return;
+            html += '<table>\n<thead><tr>';
+            var headers = tableBuffer[0].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+            headers.forEach(function (h) { html += '<th>' + inlineRender(h) + '</th>'; });
+            html += '</tr></thead>\n<tbody>\n';
+            for (var i = 2; i < tableBuffer.length; i++) {
+                html += '<tr>';
+                var cells = tableBuffer[i].split('|').map(function (s) { return s.trim(); }).filter(Boolean);
+                cells.forEach(function (c) { html += '<td>' + inlineRender(c) + '</td>'; });
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n';
+            inTable = false;
+            tableBuffer = [];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function inlineRender(str) {
+            return escapeHtml(str)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function blockRender(line) {
+            if (/^#{1,6}\s+/.test(line)) {
+                var level = line.match(/^(#{1,6})\s+/)[1].length;
+                var text = line.replace(/^#{1,6}\s+/, '');
+                return '<h' + level + '>' + inlineRender(text) + '</h' + level + '>';
+            }
+            if (/^\s*>\s*(.*)/.test(line)) {
+                return '<blockquote><p>' + inlineRender(line.replace(/^\s*>\s*/, '')) + '</p></blockquote>';
+            }
+            if (/^\s*[-*+]\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*[-*+]\s+/, '')) + '</li>';
+            }
+            if (/^\s*\d+\.\s+/.test(line)) {
+                return '<li>' + inlineRender(line.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+            }
+            return '<p>' + inlineRender(line) + '</p>';
+        }
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushCode();
+                } else {
+                    flushTable();
+                    inCode = true;
+                    codeLang = line.replace(/^```\s*/, '').trim();
+                }
+                continue;
+            }
+
+            if (inCode) {
+                codeBuffer.push(line);
+                continue;
+            }
+
+            if (/^\|/.test(line)) {
+                inTable = true;
+                tableBuffer.push(line);
+                continue;
+            } else {
+                flushTable();
+            }
+
+            if (/^\s*$/.test(line)) {
+                continue;
+            }
+
+            html += blockRender(line) + '\n';
+        }
+        flushCode();
+        flushTable();
+
+        // Wrap consecutive list items
+        html = html.replace(/(<li>[^<]*<\/li>\n)+/g, function (match) {
+            return '<ul>\n' + match + '</ul>\n';
+        });
+
+        return html;
+    }
+
+    initTheme();
+
+    var sourceEl = document.getElementById('docSource');
+    var contentEl = document.getElementById('docContent');
+    if (sourceEl && contentEl) {
+        var src = sourceEl.textContent;
+        contentEl.innerHTML = renderMarkdown(src);
+    }
+})();
+</script>
+</body>
+</html>
