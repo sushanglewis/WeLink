@@ -13,6 +13,11 @@ def open_page(browser, query=""):
     return page
 
 
+def collaborator_status(page, role):
+    person = page.locator(f'.person[data-role="{role}"]')
+    return person.get_attribute("data-status")
+
+
 def test_supervisor_submit_changes_both_states():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
@@ -20,6 +25,8 @@ def test_supervisor_submit_changes_both_states():
         page.locator("#submitBtn").click()
         assert page.locator("#detailFollow").inner_text() == "已审核"
         assert "督办人已审核" in page.locator("#detailNode").inner_text()
+        assert collaborator_status(page, "supervisor") == "submitted"
+        assert all(collaborator_status(page, role) == "submitted" for role in ["handler", "transfer", "sub"])
         browser.close()
 
 
@@ -34,7 +41,29 @@ def test_return_requires_reason_and_moves_to_direct_downstream():
         page.locator("#modalConfirm").click()
         assert page.locator("#detailFollow").inner_text() == "跟进中"
         assert "待经办人处理" in page.locator("#detailNode").inner_text()
-        assert page.locator("#returnBanner").is_visible()
+        assert page.locator("#returnBanner").count() == 0
+        assert page.locator("details").get_attribute("open") is not None
+        assert "第 1 次打回" in page.locator("#flowList").inner_text()
+        assert "请补充责任单位与完成节点" in page.locator("#flowList").inner_text()
+        assert collaborator_status(page, "handler") == "pending"
+        assert collaborator_status(page, "transfer") == "submitted"
+        assert collaborator_status(page, "sub") == "submitted"
+        assert collaborator_status(page, "supervisor") == "inactive"
+        browser.close()
+
+
+def test_withdraw_preserves_collaborator_display_but_clears_pending_work():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser)
+        page.locator("#withdrawBtn").click()
+        page.locator("#modalReason").fill("事项下发有误")
+        page.locator("#modalConfirm").click()
+        assert page.locator("#detailFollow").inner_text() == "已撤回"
+        assert collaborator_status(page, "supervisor") == "pending"
+        assert collaborator_status(page, "handler") == "submitted"
+        assert page.locator("#submitBtn").is_hidden()
+        assert page.locator("#returnBtn").is_hidden()
         browser.close()
 
 
@@ -63,6 +92,12 @@ def test_export_archives_eligible_batch():
         assert page.locator('.batch-option-check[data-bid="b2"]').is_checked()
         assert page.locator('.batch-option-check[data-bid="b3"]').is_checked()
         assert "已选 2 个批次" in page.locator("#batchMultiSelect").inner_text()
+        page.locator('.batch-option-check[data-bid="b1"]').check()
+        page.locator("#batchMultiSelect").click()
+        page.locator('.card[data-rid="r1"]').evaluate("el => el.click()")
+        assert collaborator_status(page, "handler") == "submitted"
+        assert collaborator_status(page, "transfer") == "submitted"
+        assert collaborator_status(page, "sub") == "submitted"
         browser.close()
 
 
@@ -136,11 +171,19 @@ def test_handler_can_continue_return_to_transfer():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
         page = open_page(browser, "?scenario=handler-return")
+        assert collaborator_status(page, "handler") == "pending"
+        assert collaborator_status(page, "transfer") == "submitted"
+        assert collaborator_status(page, "sub") == "submitted"
+        assert page.locator("#transferBtn").is_hidden()
         assert page.locator("#returnBtn").is_visible()
         page.locator("#returnBtn").click()
         page.locator("#modalReason").fill("请转办人补充执行依据")
         page.locator("#modalConfirm").click()
         assert page.locator("#detailNode").inner_text() == "待转办人处理"
+        assert collaborator_status(page, "handler") == "inactive"
+        assert collaborator_status(page, "transfer") == "pending"
+        assert collaborator_status(page, "sub") == "submitted"
+        assert page.locator("#transferBtn").is_hidden()
         browser.close()
 
 
@@ -148,11 +191,86 @@ def test_transfer_can_continue_return_to_sub_transfer():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
         page = open_page(browser, "?scenario=transfer-return")
+        assert collaborator_status(page, "handler") == "inactive"
+        assert collaborator_status(page, "transfer") == "pending"
+        assert collaborator_status(page, "sub") == "submitted"
+        assert page.locator("#transferBtn").is_hidden()
         assert page.locator("#returnBtn").is_visible()
         page.locator("#returnBtn").click()
         page.locator("#modalReason").fill("请次转人补充实际进展")
         page.locator("#modalConfirm").click()
         assert page.locator("#detailNode").inner_text() == "待次转人处理"
+        assert collaborator_status(page, "handler") == "inactive"
+        assert collaborator_status(page, "transfer") == "inactive"
+        assert collaborator_status(page, "sub") == "pending"
+        assert page.locator("#transferBtn").is_hidden()
+        flow = page.locator("#flowList").inner_text()
+        assert "第 1 次打回" in flow
+        assert "第 2 次打回" in flow
+        assert "第 3 次打回" in flow
+        assert "苏尚打回" in flow
+        assert "张明明继续打回" in flow
+        assert "李良龙继续打回" in flow
+        browser.close()
+
+
+def test_withdrawn_card_uses_supervisor_withdrawn_node_label():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser)
+        node = page.locator('.card[data-rid="r4"] .node')
+        assert node.inner_text() == "督办人已撤回"
+        browser.close()
+
+
+def test_handler_and_transfer_entry_pages_open_return_to_downstream_dialogs():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        cases = [
+            (ROOT / "pages" / "prototype" / "02-handler-return.html", "转办人"),
+            (ROOT / "pages" / "prototype" / "03-transfer-return.html", "次转人"),
+        ]
+        for entry, target in cases:
+            page = browser.new_page(viewport={"width": 1600, "height": 1000})
+            page.goto(entry.as_uri(), wait_until="load")
+            page.wait_for_url("**/01-supervisor.html?scenario=*-return&action=return")
+            assert page.locator("#modal").is_visible()
+            assert page.locator("#modalTitle").inner_text() == "打回事项"
+            assert target in page.locator("#modalSummary").inner_text()
+            assert page.locator("#modalReason").is_visible()
+            assert page.locator("#modalConfirm").is_disabled()
+            page.close()
+        browser.close()
+
+
+def test_sub_handler_can_only_resubmit_to_transfer():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser, "?scenario=sub-return")
+        assert collaborator_status(page, "handler") == "inactive"
+        assert collaborator_status(page, "transfer") == "inactive"
+        assert collaborator_status(page, "sub") == "pending"
+        assert page.locator("#transferBtn").is_hidden()
+        assert page.locator("#returnBtn").is_hidden()
+        page.locator("#submitBtn").click()
+        assert page.locator("#detailNode").inner_text() == "待转办人提交"
+        assert collaborator_status(page, "transfer") == "pending"
+        assert collaborator_status(page, "sub") == "submitted"
+        browser.close()
+
+
+def test_missing_collaborators_show_dash_without_status_marker():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser, "?scenario=missing-collaborators")
+        transfer = page.locator('.person[data-role="transfer"]')
+        sub = page.locator('.person[data-role="sub"]')
+        assert transfer.locator("b").inner_text() == "—"
+        assert sub.locator("b").inner_text() == "—"
+        assert transfer.get_attribute("data-status") == "missing"
+        assert sub.get_attribute("data-status") == "missing"
+        assert transfer.locator(".collaborator-status").count() == 0
+        assert sub.locator(".collaborator-status").count() == 0
         browser.close()
 
 
@@ -171,4 +289,79 @@ def test_portal_left_navigation_switches_role_views():
         page.locator("#navDrawerBtn").click()
         page.locator('.pnav-link[data-path="pages/prototype/03-transfer-return.html"]').click()
         assert "03-transfer-return.html" in page.locator("#frame").get_attribute("src")
+        page.locator("#navDrawerBtn").click()
+        page.locator('.pnav-link[data-path="pages/prototype/04-sub-handler-return.html"]').click()
+        assert "04-sub-handler-return.html" in page.locator("#frame").get_attribute("src")
+        browser.close()
+
+
+def test_supervisor_cannot_withdraw_reviewed_item():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser)
+        page.locator('.card[data-rid="r2"]').click()
+        assert page.locator("#detailFollow").inner_text() == "已审核"
+        assert page.locator("#detailNode").inner_text() == "督办人已审核"
+        assert page.locator("#withdrawBtn").is_hidden()
+        browser.close()
+
+
+def test_supervisor_can_withdraw_filled_but_unreviewed_item():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser)
+        page.locator('.card[data-rid="r1"]').click()
+        assert page.locator("#detailFollow").inner_text() == "已填报"
+        assert page.locator("#withdrawBtn").is_visible()
+        browser.close()
+
+
+def test_card_click_switches_selected_item_record():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser)
+        assert page.locator(".card.on").get_attribute("data-rid") == "r1"
+        page.locator('.card[data-rid="r3"]').click()
+        assert page.locator(".card.on").get_attribute("data-rid") == "r3"
+        assert "数据资源目录" in page.locator("#detailTitle").inner_text()
+        assert page.locator("#detailNode").inner_text() == "待督办人提交"
+        browser.close()
+
+
+def test_bottom_left_avatar_uses_simulated_role_person_surname():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        cases = [
+            ("?scenario=supervisor", "苏"),
+            ("?scenario=handler-return", "张"),
+            ("?scenario=transfer-return", "李"),
+            ("?scenario=sub-return", "王"),
+        ]
+        for query, surname in cases:
+            page = browser.new_page(viewport={"width": 1600, "height": 1000})
+            page.goto(PROTOTYPE.as_uri() + query, wait_until="load")
+            assert page.locator("#userAvatar").inner_text() == surname
+            page.close()
+        browser.close()
+
+
+def test_left_rail_uses_icons_instead_of_text_labels():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser)
+        buttons = page.locator(".app-rail .rail-icon")
+        assert buttons.count() == 5
+        for idx in range(buttons.count()):
+            button = buttons.nth(idx)
+            assert button.locator("svg").count() >= 1
+            assert button.inner_text().strip() == ""
+        browser.close()
+
+
+def test_no_legacy_supervisor_name_references():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, executable_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        page = open_page(browser)
+        assert "詹少鹏" not in page.content()
+        assert "苏尚" in page.content()
         browser.close()

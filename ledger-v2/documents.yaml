@@ -1,7 +1,7 @@
 process_slug: ledger-v2
 issue_number: ''
 current_stage: product-prototype
-last_updated: '2026-10-15T02:47:28Z'
+last_updated: '2026-10-15T06:27:32Z'
 documents:
 - path: designs/ledger-v2/data-model.md
   stage: product-design-docs

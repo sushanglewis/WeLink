@@ -2,8 +2,8 @@ window.LINC_PACKAGE = {
   "process_slug": "ledger-v2",
   "issue_number": "",
   "current_stage": "product-prototype",
-  "status": "validation_failed",
-  "generated_at": "2026-10-15T02:47:40Z",
+  "status": "in_progress",
+  "generated_at": "2026-10-15T03:09:26Z",
   "nav": [
     {
       "group": "01 · 产品需求",
@@ -81,6 +81,19 @@ window.LINC_PACKAGE = {
           "gate_passed": false,
           "human_confirmed": false,
           "uid": "ledger-v2-transfer-return",
+          "markdown": ""
+        },
+        {
+          "path": "pages/prototype/04-sub-handler-return.html",
+          "label": "次级转办人视角",
+          "title": "龙小督台账 V2 · 次级转办人视角",
+          "archived": false,
+          "version": null,
+          "status": "",
+          "stage": "",
+          "gate_passed": false,
+          "human_confirmed": false,
+          "uid": "ledger-v2-sub-handler-return",
           "markdown": ""
         }
       ]
