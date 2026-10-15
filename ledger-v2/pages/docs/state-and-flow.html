@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="doc-title" content="龙小督台账 V2 · 状态机与业务流转">
+<meta name="nav-label" content="状态机与业务流转">
+<meta name="nav-group" content="02 · 业务规则">
+<meta name="doc-version" content="v2.0-review">
+<meta name="doc-uid" content="ledger-v2-state-flow">
+<title>龙小督台账 V2 · 状态机与业务流转</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body class="doc-page" data-page-uid="ledger-v2-state-flow">
+<header class="doc-header"><h1 data-uid="ledger-v2-state-flow-h1">状态机与业务流转</h1><div class="doc-meta"><span class="doc-version">v2.0-review</span><span class="doc-stage">阶段: product-design-docs</span></div></header>
+<div class="doc-content" id="docContent"></div>
+<script type="text/markdown" id="docSource">
+<!-- version: v2.0 -->
+<!-- status: approved -->
+
+## 提交与打回
+
+`下游填报并提交 → 上游收到待办 → 上游提交或打回`
+
+- 提交表示认可当前内容并继续向上流转。
+- 打回表示不认可，原因必填，退回实际直接下游。
+- 收到打回的角色若仍有下游，可继续向下打回。
+- 每一次提交和打回都独立留痕，原内容不被覆盖。
+
+## 完整责任链
+
+`督办人 → 经办人 → 转办人 → 次转人`
+
+- 次转人提交 → 待转办人提交。
+- 转办人提交 → 待经办人提交；转办人也可打回次转人。
+- 经办人提交 → 待督办人提交；经办人也可打回转办人。
+- 督办人提交 → 督办人已审核；督办人也可打回经办人。
+- 督办人导出批次 → 所有有效记录归档。
+
+## 事项跟进状态
+
+| 状态 | 业务含义 |
+|---|---|
+| 跟进中 | 正在填报或被打回修改 |
+| 已填报 | 已有下游提交内容 |
+| 已审核 | 督办人已逐项提交 |
+| 已归档 | 所属批次已导出关闭 |
+| 逾期未填报 | 超过批次截止时间仍需填报或修改 |
+
+## 事项节点状态
+
+| 状态 | 当前动作承担人 |
+|---|---|
+| 待经办人处理 | 经办人 |
+| 待转办人处理 | 转办人 |
+| 待次转人处理 | 次转人 |
+| 待转办人提交 | 转办人审核下游内容 |
+| 待经办人提交 | 经办人审核下游内容 |
+| 待督办人提交 | 督办人审核下游内容 |
+| 督办人已审核 | 督办人已逐项认可 |
+| 归档 | 本轮已关闭 |
+
+## 批次多选与事项排序
+
+`逾期未填报 > 跟进中 > 已填报 > 已审核 > 已归档 > 已撤回`
+
+进入台账默认全选全部未归档批次；已归档批次可手动选择回看。所选批次的事项形成单行卡片合集，同一状态按填报截止时间、批次序号和事项编号排序。
+
+当前批次选择同时决定导出范围。任一选中批次不满足条件或已经归档时整体禁止导出；已撤回事项计入总事项数但不参与导出。导出成功后，已归档批次取消选择，并重新全选剩余未归档批次。
+</script>
+<script src="../../assets/marked.min.js"></script>
+<script>
+(function () {
+    'use strict';
+    var source = document.getElementById('docSource');
+    var content = document.getElementById('docContent');
+    if (!source || !content) return;
+    if (window.marked) {
+        window.marked.setOptions({ gfm: true, breaks: false });
+        content.innerHTML = window.marked.parse(source.textContent);
+    } else {
+        content.textContent = source.textContent;
+    }
+})();
+</script>
+</body>
+</html>
