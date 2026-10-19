@@ -12,7 +12,7 @@ current_run:
   last_updated_at: '2026-10-19T01:31:16Z'
   issue_number: ''
   variables:
-    process_slug: ledger-v2
+    process_slug: longxiaodu-ledger-v2
     session_id: 2026-10-14-ledger-v2
     design_id: ledger-v2
     issue_number: ''
@@ -43,7 +43,7 @@ nodes:
   gate_passed: true
   approved_by: zhanshaopeng
   artifacts:
-  - ledger-v2/workflow-stage.yaml
+  - knowledge/longxiaodu-ledger-v2/workflow-stage.yaml
   handoff_file: null
 - stage_id: ingest
   node_id: ingest-start
@@ -53,10 +53,10 @@ nodes:
   gate_passed: false
   approved_by: null
   artifacts:
-  - ledger-v2/interviews/2026-10-14-ledger-v2/metadata.json
-  - ledger-v2/interviews/2026-10-14-ledger-v2/raw-insights.md
-  - ledger-v2/interviews/2026-10-14-ledger-v2/summary.md
-  - ledger-v2/interviews/2026-10-14-ledger-v2/transcript.md
+  - knowledge/longxiaodu-ledger-v2/interviews/2026-10-14-ledger-v2/metadata.json
+  - knowledge/longxiaodu-ledger-v2/interviews/2026-10-14-ledger-v2/raw-insights.md
+  - knowledge/longxiaodu-ledger-v2/interviews/2026-10-14-ledger-v2/summary.md
+  - knowledge/longxiaodu-ledger-v2/interviews/2026-10-14-ledger-v2/transcript.md
   handoff_file: null
 - stage_id: ingest
   node_id: ingest-completed
@@ -66,10 +66,10 @@ nodes:
   gate_passed: true
   approved_by: system
   artifacts:
-  - ledger-v2/interviews/2026-10-14-ledger-v2/metadata.json
-  - ledger-v2/interviews/2026-10-14-ledger-v2/transcript.md
-  - ledger-v2/interviews/2026-10-14-ledger-v2/summary.md
-  - ledger-v2/interviews/2026-10-14-ledger-v2/raw-insights.md
+  - knowledge/longxiaodu-ledger-v2/interviews/2026-10-14-ledger-v2/metadata.json
+  - knowledge/longxiaodu-ledger-v2/interviews/2026-10-14-ledger-v2/transcript.md
+  - knowledge/longxiaodu-ledger-v2/interviews/2026-10-14-ledger-v2/summary.md
+  - knowledge/longxiaodu-ledger-v2/interviews/2026-10-14-ledger-v2/raw-insights.md
   handoff_file: null
 - stage_id: clarify
   node_id: clarify-2026-10-14T03:58:55Z
@@ -79,9 +79,9 @@ nodes:
   gate_passed: true
   approved_by: zhanshaopeng
   artifacts:
-  - ledger-v2/requirements/2026-10-14-ledger-v2/prd.md
-  - ledger-v2/requirements/2026-10-14-ledger-v2/requirements.md
-  - ledger-v2/requirements/2026-10-14-ledger-v2/user-stories.md
+  - knowledge/longxiaodu-ledger-v2/requirements/2026-10-14-ledger-v2/prd.md
+  - knowledge/longxiaodu-ledger-v2/requirements/2026-10-14-ledger-v2/requirements.md
+  - knowledge/longxiaodu-ledger-v2/requirements/2026-10-14-ledger-v2/user-stories.md
   handoff_file: null
 - stage_id: clarify
   node_id: clarify-completed
@@ -91,9 +91,9 @@ nodes:
   gate_passed: true
   approved_by: system
   artifacts:
-  - ledger-v2/requirements/2026-10-14-ledger-v2/requirements.md
-  - ledger-v2/requirements/2026-10-14-ledger-v2/user-stories.md
-  - ledger-v2/requirements/2026-10-14-ledger-v2/prd.md
+  - knowledge/longxiaodu-ledger-v2/requirements/2026-10-14-ledger-v2/requirements.md
+  - knowledge/longxiaodu-ledger-v2/requirements/2026-10-14-ledger-v2/user-stories.md
+  - knowledge/longxiaodu-ledger-v2/requirements/2026-10-14-ledger-v2/prd.md
   handoff_file: null
 - stage_id: product-design-docs
   node_id: product-design-docs-2026-10-14T04:00:17Z
@@ -103,12 +103,12 @@ nodes:
   gate_passed: true
   approved_by: zhanshaopeng
   artifacts:
-  - ledger-v2/designs/ledger-v2/data-model.md
-  - ledger-v2/designs/ledger-v2/design-review.md
-  - ledger-v2/designs/ledger-v2/feasibility.md
-  - ledger-v2/designs/ledger-v2/feature-catalog.md
-  - ledger-v2/designs/ledger-v2/flows.md
-  - ledger-v2/designs/ledger-v2/scenarios.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/data-model.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/design-review.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/feasibility.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/feature-catalog.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/flows.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/scenarios.md
   handoff_file: null
 - stage_id: product-design-docs
   node_id: product-design-docs-completed
@@ -118,12 +118,12 @@ nodes:
   gate_passed: true
   approved_by: system
   artifacts:
-  - ledger-v2/designs/ledger-v2/design-review.md
-  - ledger-v2/designs/ledger-v2/scenarios.md
-  - ledger-v2/designs/ledger-v2/feature-catalog.md
-  - ledger-v2/designs/ledger-v2/data-model.md
-  - ledger-v2/designs/ledger-v2/flows.md
-  - ledger-v2/designs/ledger-v2/feasibility.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/design-review.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/scenarios.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/feature-catalog.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/data-model.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/flows.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/feasibility.md
   handoff_file: null
 - stage_id: product-prototype
   node_id: product-prototype-2026-10-14T08:05:59Z
@@ -133,9 +133,9 @@ nodes:
   gate_passed: false
   approved_by: null
   artifacts:
-  - ledger-v2/designs/ledger-v2/fields.md
-  - ledger-v2/designs/ledger-v2/ui-spec.md
-  - ledger-v2/index.html
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/fields.md
+  - knowledge/longxiaodu-ledger-v2/designs/ledger-v2/ui-spec.md
+  - knowledge/longxiaodu-ledger-v2/index.html
   handoff_file: null
 recovery:
   last_validated_checkpoint: ''

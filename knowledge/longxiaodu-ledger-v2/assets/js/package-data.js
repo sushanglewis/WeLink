@@ -1,5 +1,5 @@
 window.LINC_PACKAGE = {
-  "process_slug": "ledger-v2",
+  "process_slug": "longxiaodu-ledger-v2",
   "issue_number": "",
   "current_stage": "product-prototype",
   "status": "in_progress",

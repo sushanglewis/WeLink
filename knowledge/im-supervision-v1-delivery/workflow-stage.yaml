@@ -12,7 +12,7 @@ current_run:
   last_updated_at: '2026-10-08T09:35:14Z'
   issue_number: ''
   variables:
-    process_slug: im-agent-supervision-teable-v1
+    process_slug: im-supervision-v1-delivery
     session_id: 2026-09-07-supervision-gui-form
     design_id: im-agent-supervision-teable
     issue_number: ''
@@ -40,9 +40,9 @@ nodes:
   gate_passed: true
   approved_by: PM（2026-09-15 定版打包指令）
   artifacts:
-  - im-agent-supervision-teable-v1/01-prd/overview.md
-  - im-agent-supervision-teable-v1/01-prd/sections.md
-  - im-agent-supervision-teable-v1/01-prd/requirements.md
+  - knowledge/im-supervision-v1-delivery/01-prd/overview.md
+  - knowledge/im-supervision-v1-delivery/01-prd/sections.md
+  - knowledge/im-supervision-v1-delivery/01-prd/requirements.md
   handoff_file: null
 - stage_id: product-design-docs
   node_id: pdd-v1-final-package
@@ -52,16 +52,16 @@ nodes:
   gate_passed: false
   approved_by: null
   artifacts:
-  - im-agent-supervision-teable-v1/02-ledger/notification-messages.md
-  - im-agent-supervision-teable-v1/02-ledger/role-scenarios.md
-  - im-agent-supervision-teable-v1/02-ledger/state-machine.md
-  - im-agent-supervision-teable-v1/04-gui-dashboard/metrics-dictionary.md
-  - im-agent-supervision-teable-v1/designs/im-agent-supervision-teable/data-model.md
-  - im-agent-supervision-teable-v1/designs/im-agent-supervision-teable/design-review.md
-  - im-agent-supervision-teable-v1/designs/im-agent-supervision-teable/feasibility.md
-  - im-agent-supervision-teable-v1/designs/im-agent-supervision-teable/feature-catalog.md
-  - im-agent-supervision-teable-v1/designs/im-agent-supervision-teable/flows.md
-  - im-agent-supervision-teable-v1/designs/im-agent-supervision-teable/scenarios.md
+  - knowledge/im-supervision-v1-delivery/02-ledger/notification-messages.md
+  - knowledge/im-supervision-v1-delivery/02-ledger/role-scenarios.md
+  - knowledge/im-supervision-v1-delivery/02-ledger/state-machine.md
+  - knowledge/im-supervision-v1-delivery/04-gui-dashboard/metrics-dictionary.md
+  - knowledge/im-supervision-v1-delivery/designs/im-agent-supervision-teable/data-model.md
+  - knowledge/im-supervision-v1-delivery/designs/im-agent-supervision-teable/design-review.md
+  - knowledge/im-supervision-v1-delivery/designs/im-agent-supervision-teable/feasibility.md
+  - knowledge/im-supervision-v1-delivery/designs/im-agent-supervision-teable/feature-catalog.md
+  - knowledge/im-supervision-v1-delivery/designs/im-agent-supervision-teable/flows.md
+  - knowledge/im-supervision-v1-delivery/designs/im-agent-supervision-teable/scenarios.md
   handoff_file: null
 - stage_id: product-design-docs
   node_id: pdd-issue-dashboard-v12

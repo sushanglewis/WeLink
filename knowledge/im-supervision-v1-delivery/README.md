@@ -1,11 +1,11 @@
-# im-agent-supervision-teable-v1 · 定版交付包
+# im-supervision-v1-delivery · 定版交付包
 
 IM 督办（龙小督台账 + GUI 看板 + 桌面壳改造）最终定版方案与原型，供研发直接开工。
 由 `im-agent-supervision-teable-next`（草稿工作包，原样保留）抽取定稿产物重组而成。
 
 ## 打开方式
 
-直接双击 `index.html`（门户，file:// 可用），或 `python3 -m http.server` 后访问 `/im-agent-supervision-teable-v1/`。
+直接双击 `index.html`（门户，file:// 可用），或 `python3 -m http.server` 后访问 `/knowledge/im-supervision-v1-delivery/`。
 
 ## 阅读顺序（研发导读）
 

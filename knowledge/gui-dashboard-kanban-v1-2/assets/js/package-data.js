@@ -2,7 +2,7 @@
  * 信息架构：产品需求（PRD，含指标口径）→ 交互原型 → 版本记录。
  * 每条注解 ≤3 句；PRD 与版本记录以 .md 为源文件，html 页由 tools/build_doc_pages.py 生成。 */
 window.LINC_PACKAGE = {
-  "process_slug": "issue-dashboard",
+  "process_slug": "gui-dashboard-kanban-v1-2",
   "issue_number": "",
   "current_stage": "product-design-docs",
   "status": "in_progress",

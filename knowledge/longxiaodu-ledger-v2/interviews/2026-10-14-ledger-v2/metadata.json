@@ -1,0 +1,35 @@
+{
+  "session_id": "2026-10-14-ledger-v2",
+  "issue_number": null,
+  "source_type": "requirements_package_and_live_observation",
+  "recording_file": null,
+  "duration_seconds": null,
+  "language": "zh-CN",
+  "participants": [
+    "人类产品经理",
+    "Lincoln PM Agent"
+  ],
+  "topics": [
+    "交办内容展示",
+    "事项撤回",
+    "批次命名",
+    "多批次合并导出",
+    "平铺模式",
+    "逐级打回"
+  ],
+  "source_files": [
+    ".context/attachments/kojFvT/README.md",
+    ".context/attachments/kPg2zC/REQ-01-交办内容字段.md",
+    ".context/attachments/p5Olkb/REQ-02-督办人撤回事项.md",
+    ".context/attachments/iYvmla/REQ-03-批次命名规范.md",
+    ".context/attachments/Dhdhlq/REQ-04-多批次合并导出.md",
+    ".context/attachments/axZZQd/REQ-05-平铺模式.md",
+    ".context/attachments/6ocSf1/REQ-06-打回功能.md"
+  ],
+  "live_evidence": {
+    "system_url": "http://172.16.198.84:8065/lgdg/messages/@sherry",
+    "captured_at": "2026-10-14T11:00:00+08:00",
+    "screenshot": ".context/current-system-panel.png",
+    "mode": "read-only"
+  }
+}

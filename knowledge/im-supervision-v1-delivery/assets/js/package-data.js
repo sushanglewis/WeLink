@@ -2,7 +2,7 @@
  * 信息架构：01 PRD → 02 龙小督台账（设计说明 + 17 屏角色原型）→ 03 桌面壳 → 04 GUI 看板。
  * 每条注解 ≤3 句；中间稿见旧包 im-agent-supervision-teable-next。 */
 window.LINC_PACKAGE = {
-  "process_slug": "im-agent-supervision-teable-v1",
+  "process_slug": "im-supervision-v1-delivery",
   "issue_number": "",
   "current_stage": "product-design-docs",
   "status": "in_progress",
@@ -21,7 +21,7 @@ window.LINC_PACKAGE = {
           "version": "v1.0-final",
           "status": "final",
           "purpose": "需求基线：两大目标（GUI 看板 + 龙小督台账）、版本规划（1.3.1）与 10 条核心口径（双字段状态机、批次 DDL 默认 36h、提交即审核、导出即归档、无催办按钮等）。研发从这里开始读。",
-          "refs": ["01-prd/sections.html", "01-prd/requirements.html", "../im-agent-supervision-teable-next/requirements/2026-09-07-supervision-gui-form/prd.md"]
+          "refs": ["01-prd/sections.html", "01-prd/requirements.html", "../../im-agent-supervision-teable-next/requirements/2026-09-07-supervision-gui-form/prd.md"]
         },
         {
           "path": "01-prd/sections.html",
@@ -59,7 +59,7 @@ window.LINC_PACKAGE = {
           "version": "v1.0-final",
           "status": "final",
           "purpose": "唯一生命周期口径：三字段独立互不迁移（D-37）——事项状态=主表字段（风险/逾期仅通知督办人）× 事项跟进状态=跟进记录表字段（1-1 跟进记录明细）× 节点状态=跟进记录表独立字段（7 值含归档，提交即审核、逐级通知、越级代提，D-38）；逾期未填报记录不回推进中、下轮新建（D-41）。",
-          "refs": ["02-ledger/role-scenarios.html", "../im-agent-supervision-teable-next/designs/im-agent-supervision-teable/state-machine.md"]
+          "refs": ["02-ledger/role-scenarios.html", "../../im-agent-supervision-teable-next/designs/im-agent-supervision-teable/state-machine.md"]
         },
         {
           "path": "02-ledger/role-scenarios.html",
@@ -70,7 +70,7 @@ window.LINC_PACKAGE = {
           "version": "v1.0-final",
           "status": "final",
           "purpose": "4 角色 × 7 事项状态操作映射矩阵（附件《事项状态-不同角色操作映射表》定稿）+ 场景闭环与 17 屏原型逐步对照。",
-          "refs": ["02-ledger/state-machine.html", "../im-agent-supervision-teable-next/designs/im-agent-supervision-teable/role-scenarios.md"]
+          "refs": ["02-ledger/state-machine.html", "../../im-agent-supervision-teable-next/designs/im-agent-supervision-teable/role-scenarios.md"]
         },
         {
           "path": "02-ledger/submission-sequences.html",
@@ -224,7 +224,7 @@ window.LINC_PACKAGE = {
           "version": "v1.0-final",
           "status": "final",
           "purpose": "领导/督办人只读看板：5 指标卡（主表口径 D-43：总数/正常/风险/逾期/完结）+ 组合筛选/表头排序 + 行点击下钻跟进时间线 + 分页；零写操作入口。?role= 切换视角。",
-          "refs": ["04-gui-dashboard/metrics-dictionary.html", "../im-agent-supervision-teable-next/designs/im-agent-supervision-teable/gui-dashboard-spec.md"],
+          "refs": ["04-gui-dashboard/metrics-dictionary.html", "../../im-agent-supervision-teable-next/designs/im-agent-supervision-teable/gui-dashboard-spec.md"],
           "cases": [
             {"label": "领导 / 督办人 · 全量", "query": "?role=leader", "desc": "5 指标卡（主表口径）按全量统计；筛选/排序/分页演示；点击行下钻跟进记录时间线（每次填报五要素）。"},
             {"label": "经办人 · 仅本人", "query": "?role=jb", "desc": "指标按身份过滤后实时重算；事项状态列着色，逾期红边条/风险橙边条。"},
@@ -241,7 +241,7 @@ window.LINC_PACKAGE = {
           "version": "v1.0-final",
           "status": "final",
           "purpose": "5 指标卡（主表口径 D-43）+ 主表明细列清单的业务/技术双口径；mock 数据对照演算；待复核项（明细列与 D-26 对账、空截止时间）。",
-          "refs": ["04-gui-dashboard/prototype/index.html", "../im-agent-supervision-teable-next/designs/im-agent-supervision-teable/metrics-dictionary.md"]
+          "refs": ["04-gui-dashboard/prototype/index.html", "../../im-agent-supervision-teable-next/designs/im-agent-supervision-teable/metrics-dictionary.md"]
         }
       ]
     }

@@ -1,6 +1,6 @@
-# issue-dashboard · 事项看板设计 v1.2
+# gui-dashboard-kanban-v1-2 · 事项看板设计 v1.2
 
-AI+重点工作推进系统的 GUI Dashboard「事项看板」独立设计包（从 im-agent-supervision-teable-v1 复制分化，原包保持定版不动）。
+AI+重点工作推进系统的 GUI Dashboard「事项看板」独立设计包（从 im-supervision-v1-delivery 复制分化，原包保持定版不动）。
 
 ## 打开方式
 - 入口：`index.html` — Lincoln 门户（左侧导航 + 文档/原型画布 + 右侧注解面板），默认落地「事项看板」原型
@@ -12,4 +12,4 @@ AI+重点工作推进系统的 GUI Dashboard「事项看板」独立设计包（
 - `documents.yaml` — 文档索引（各产物 stage / 确认状态）
 - `requirements/<session-id>/` — 需求文档目录（.md 为源，.html 为生成页）
 - `assets/` — 门户运行时（style.css / app.js / js/package-data.js / js/doc-render.js，与 teable-v1 同一套）
-- 阶段状态（human_gate 待批）记录在 `../im-agent-supervision-teable-v1/workflow-stage.yaml`（node: pdd-issue-dashboard-v12）
+- 阶段状态（human_gate 待批）记录在 `../im-supervision-v1-delivery/workflow-stage.yaml`（node: pdd-issue-dashboard-v12）
